@@ -10,22 +10,6 @@ const TemplateLibrary = lazy(() => import("./templates/TemplateLibrary"));
 
 export default function EditorLayout() {
   const { activeOverlay, setActiveOverlay } = useCanvasStore();
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
-    return (
-      <div className="h-screen w-full bg-white flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-neutral-500 font-medium">Initializing Workspace...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="h-screen w-full overflow-hidden bg-white flex flex-col">

@@ -1,8 +1,16 @@
-import { createFileRoute } from "@tanstack/react-router";
-import EditorLayout from "@/components/editor/EditorLayout";
+import { ClientOnly, createFileRoute } from "@tanstack/react-router";
+import React, { lazy, Suspense } from "react";
+
+const EditorLayout = lazy(() => import("@/components/editor/EditorLayout"));
 
 export const Route = createFileRoute("/")({
-  component: EditorLayout,
+  component: () => (
+    <ClientOnly>
+      <Suspense fallback={<div className="h-screen w-full bg-white flex items-center justify-center">Loading Editor...</div>}>
+        <EditorLayout />
+      </Suspense>
+    </ClientOnly>
+  ),
   head: () => ({
     title: "Editor | ZoomCanvas AI",
     meta: [
