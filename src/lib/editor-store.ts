@@ -457,7 +457,7 @@ export const useEditor = create<EditorState>((set, get) => ({
     const s = get();
     if (!s.editor) return "";
     const id = createShapeId();
-    const center = s.editor.getViewportPageCenter();
+    const center = s.editor.screenToPage(s.editor.getViewportScreenCenter());
     const pos = at || { x: center.x, y: center.y };
 
     s.editor.createShapes([

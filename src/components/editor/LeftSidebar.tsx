@@ -147,7 +147,7 @@ export function LeftSidebar() {
                   key={t.id}
                   onClick={() => {
                     if (!editor) return;
-                    const center = editor.getViewportPageCenter();
+                    const center = editor.screenToPage(editor.getViewportScreenCenter());
                     editor.createShapes([
                       {
                         id: createShapeId(),
@@ -186,7 +186,7 @@ export function LeftSidebar() {
                   if (!file) return;
                   const url = URL.createObjectURL(file);
                   if (editor) {
-                    const center = editor.getViewportPageCenter();
+                    const center = editor.screenToPage(editor.getViewportScreenCenter());
                     editor.createShapes([{
                       id: createShapeId(),
                       type: 'note',
@@ -220,7 +220,7 @@ export function LeftSidebar() {
                   title={name}
                   onClick={() => {
                     if (editor) {
-                      const center = editor.getViewportPageCenter();
+                      const center = editor.screenToPage(editor.getViewportScreenCenter());
                       editor.createShapes([{
                         id: createShapeId(),
                         type: 'text',
