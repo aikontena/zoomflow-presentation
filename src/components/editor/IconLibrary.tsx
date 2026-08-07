@@ -42,23 +42,32 @@ export const IconLibrary: React.FC = () => {
   };
 
   const handleAddIcon = (name: string) => {
-    addObject({
-      type: 'icon',
-      iconName: name,
-      x: 100,
-      y: 100,
-      width: 48,
-      height: 48,
-      rotation: 0,
-      fill: '#3b82f6',
-      opacity: 1
-    });
+    // Check if we should replace selected icon
+    const selectedIconId = selection.length === 1 ? selection[0] : null;
+    const selectedObj = selectedIconId ? objects.find(o => o.id === selectedIconId) : null;
+
+    if (selectedObj && selectedObj.type === 'icon') {
+      updateObject(selectedObj.id, { iconName: name });
+      toast.success('Icon replaced');
+    } else {
+      addObject({
+        type: 'icon',
+        iconName: name,
+        x: 100,
+        y: 100,
+        width: 48,
+        height: 48,
+        rotation: 0,
+        fill: '#3b82f6',
+        opacity: 1
+      });
+      toast.success('Icon added to canvas');
+    }
 
     // Update recent
     const newRecent = [name, ...recent.filter(r => r !== name)].slice(0, 20);
     setRecent(newRecent);
     localStorage.setItem('zoomcanvas-recent-icons', JSON.stringify(newRecent));
-    toast.success('Icon added to canvas');
   };
 
   const filteredIcons = useMemo(() => {
