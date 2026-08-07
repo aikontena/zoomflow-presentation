@@ -164,10 +164,29 @@ export default function RightSidebar() {
           </Section>
         )}
 
-        <Section title="Animation">
-          <div className="p-3 bg-neutral-50 rounded-lg border border-neutral-100 text-center">
-            <Wind size={20} className="mx-auto text-neutral-300 mb-1" />
-            <p className="text-[10px] text-neutral-400">No animations applied</p>
+        <Section title="Animation & Transition">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-medium text-neutral-500 uppercase">Entrance Animation</label>
+              <select className="w-full p-2 bg-neutral-50 border border-neutral-200 rounded text-xs outline-none focus:border-primary">
+                <option>None</option>
+                <option>Fade In</option>
+                <option>Scale Up</option>
+                <option>Slide Left</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-medium text-neutral-500 uppercase">Transition Duration</label>
+              <div className="flex items-center gap-2">
+                <input type="range" className="flex-1 accent-primary" min="0" max="2" step="0.1" />
+                <span className="text-[10px] w-8">0.3s</span>
+              </div>
+            </div>
+            <div className="p-3 bg-blue-50/50 rounded-lg border border-blue-100">
+              <p className="text-[10px] text-blue-600 leading-relaxed font-medium">
+                Focus Mode: When this object is focused, the camera will zoom to its position with the selected transition.
+              </p>
+            </div>
           </div>
         </Section>
       </div>
