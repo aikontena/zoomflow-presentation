@@ -5,6 +5,7 @@ import {
   createTLStore, 
   defaultShapeUtils,
   createShapeId,
+  GeoShapeGeoStyle,
   getSnapshot,
   loadSnapshot,
 } from "tldraw";
@@ -202,9 +203,7 @@ export const useEditor = create<EditorState>((set, get) => ({
       if (toolState) {
         let currentTool = toolState.activeToolId || 'select';
         if (currentTool === 'geo') {
-          const props = toolState.propsForNextShape;
-          if (props?.geo === 'rectangle') currentTool = 'geo-rect';
-          else if (props?.geo === 'ellipse') currentTool = 'geo-circle';
+          currentTool = get().tool === 'geo-circle' ? 'geo-circle' : 'geo-rect';
         }
         if (get().tool !== currentTool) {
           set({ tool: currentTool });
@@ -245,10 +244,10 @@ export const useEditor = create<EditorState>((set, get) => ({
     if (tool === 'select') {
       editor.setCurrentTool('select');
     } else if (tool === 'geo-rect') {
-      editor.updateInstanceState({ propsForNextShape: { geo: 'rectangle' } } as any);
+      editor.setStyleForNextShapes(GeoShapeGeoStyle, 'rectangle');
       editor.setCurrentTool('geo');
     } else if (tool === 'geo-circle') {
-      editor.updateInstanceState({ propsForNextShape: { geo: 'ellipse' } } as any);
+      editor.setStyleForNextShapes(GeoShapeGeoStyle, 'ellipse');
       editor.setCurrentTool('geo');
     } else if (['text', 'arrow', 'note', 'draw'].includes(tool)) {
       editor.setCurrentTool(tool);
