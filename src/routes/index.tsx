@@ -1,4 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { ClientOnly, createFileRoute } from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
+
+const Canvas = lazy(() => import("@/components/editor/Canvas"));
 
 export const Route = createFileRoute("/")({
   component: EditorPage,
@@ -6,11 +9,16 @@ export const Route = createFileRoute("/")({
 
 function EditorPage() {
   return (
-    <div className="h-screen w-full overflow-hidden bg-white flex items-center justify-center">
-      <h1 className="text-4xl font-bold">Safe Mode Active</h1>
+    <div className="h-screen w-full overflow-hidden bg-white">
+      <ClientOnly>
+        <Suspense fallback={<div>Loading Canvas...</div>}>
+          <Canvas />
+        </Suspense>
+      </ClientOnly>
     </div>
   );
 }
+
 
 
 
