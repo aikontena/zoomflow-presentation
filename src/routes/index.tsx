@@ -28,21 +28,21 @@ function EditorPage() {
   return (
     <div className="h-screen w-full overflow-hidden bg-white flex flex-col">
       <div className="flex-1 flex overflow-hidden">
-        <ClientOnly>
-          <Suspense fallback={<div className="w-16 h-full bg-neutral-50 border-r border-neutral-200" />}>
-            <LeftSidebar />
-          </Suspense>
-          <div className="flex-1 relative flex overflow-hidden">
-            <div className="flex-1 relative overflow-hidden">
-              <Suspense fallback={<div className="h-full w-full flex items-center justify-center text-neutral-400">Loading Canvas...</div>}>
-                <Canvas />
-              </Suspense>
-            </div>
-            <Suspense fallback={<div className="w-64 h-full bg-white border-l border-neutral-200" />}>
-              <RightSidebar />
+        {/* <ClientOnly> */}
+        <Suspense fallback={<div className="w-16 h-full bg-neutral-50 border-r border-neutral-200" />}>
+          <LeftSidebar />
+        </Suspense>
+        <div className="flex-1 relative flex overflow-hidden">
+          <div className="flex-1 relative overflow-hidden">
+            <Suspense fallback={<div className="h-full w-full flex items-center justify-center text-neutral-400">Loading Canvas...</div>}>
+              <Canvas />
             </Suspense>
           </div>
-        </ClientOnly>
+          <Suspense fallback={<div className="w-64 h-full bg-white border-l border-neutral-200" />}>
+            <RightSidebar />
+          </Suspense>
+        </div>
+        {/* </ClientOnly> */}
       </div>
 
       {activeOverlay === 'templates' && (
