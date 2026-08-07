@@ -7,7 +7,7 @@ import { useServerFn } from "@tanstack/react-start";
 
 export function AIPanel() {
   const { setGenerating, isGenerating, aiProgress, applyGeneration } = useEditor();
-  const [prompt, setPrompt] = useState("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                            \n                                            still have to reload when using it... please fixed the aplication . maybe by the 1st prompt but try other way");
+  const [prompt, setPrompt] = useState("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                            \n                                            editor setting also still not active. please active it. canvas sill cannot be use.");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [metadata, setMetadata] = useState({
     title: "",
