@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
-import { useCanvasStore, type CanvasObject } from '@/lib/canvas-store';
+import React, { useRef, useEffect, useState } from 'react';
+import { useCanvasStore } from '@/lib/canvas-store';
 
 export default function Canvas() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -10,7 +10,6 @@ export default function Canvas() {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [activeTool, setActiveTool] = useState<'select' | 'rect' | 'circle' | 'text'>('select');
 
-  // Handle zooming with scroll
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -22,7 +21,6 @@ export default function Canvas() {
         const factor = Math.pow(1.1, delta / 100);
         const newZoom = Math.min(Math.max(viewport.zoom * factor, 0.05), 20);
         
-        // Zoom relative to mouse position
         const rect = container.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
@@ -36,7 +34,6 @@ export default function Canvas() {
           y: mouseY - worldY * newZoom
         });
       } else {
-        // Panning
         setViewport({
           ...viewport,
           x: viewport.x - e.deltaX,
@@ -56,7 +53,7 @@ export default function Canvas() {
     const x = (e.clientX - rect.left - viewport.x) / viewport.zoom;
     const y = (e.clientY - rect.top - viewport.y) / viewport.zoom;
 
-    if (e.button === 1) { // Middle click for pan
+    if (e.button === 1) {
       setIsPanning(true);
       setDragStart({ x: e.clientX, y: e.clientY });
       return;
@@ -77,7 +74,6 @@ export default function Canvas() {
       return;
     }
 
-    // Find clicked object (z-order top first)
     const clickedObj = [...objects].reverse().find(obj => 
       x >= obj.x && x <= obj.x + obj.width &&
       y >= obj.y && y <= obj.y + obj.height
@@ -113,12 +109,11 @@ export default function Canvas() {
       
       const target = objects.find(o => o.id === selection[0]);
       if (target) {
-        updateObject(selection[0] as string, {
+        updateObject(selection[0], {
           x: target.x + dx,
           y: target.y + dy
         });
       }
-
       setDragStart({ x, y });
     }
   };
@@ -138,10 +133,9 @@ export default function Canvas() {
   };
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-neutral-100 outline-none" 
+    <div className="relative h-full w-full overflow-hidden bg-white outline-none" 
          tabIndex={0}
          onKeyDown={handleKeyDown}>
-      {/* Tool Overlay */}
       <div className="absolute left-1/2 top-4 z-10 flex -translate-x-1/2 gap-2 rounded-xl bg-white p-1 shadow-xl border border-neutral-200">
         {(['select', 'rect', 'circle', 'text'] as const).map(t => (
           <button 
@@ -156,7 +150,6 @@ export default function Canvas() {
         <button onClick={redo} className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs">Redo</button>
       </div>
 
-      {/* Main Canvas Area */}
       <div 
         ref={containerRef}
         className="h-full w-full touch-none"
