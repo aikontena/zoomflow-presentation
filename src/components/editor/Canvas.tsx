@@ -7,6 +7,7 @@ import { PathEditor } from "./PathEditor";
 export function Canvas() {
   const { 
     editor,
+    store,
     setEditor, 
     showGrid, 
     activePageId, 
@@ -51,6 +52,7 @@ export function Canvas() {
   return (
     <div className={`relative h-full w-full overflow-hidden ${backgroundClass}`} style={bgStyle}>
       <Tldraw 
+        store={store}
         onMount={handleMount}
         autoFocus
       />
