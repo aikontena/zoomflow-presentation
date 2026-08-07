@@ -2,6 +2,10 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useCanvasStore, CanvasObject } from '@/lib/canvas-store';
 import { IconRenderer } from './IconRenderer';
 import { toast } from 'sonner';
+import ZoomControls from './ZoomControls';
+import MiniMap from './MiniMap';
+import StatusBar from './StatusBar';
+import { useViewportController } from './ViewportController';
 
 export default function Canvas() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -10,6 +14,8 @@ export default function Canvas() {
     updateObject, deleteObjects, addObject, undo, redo,
     duplicateObjects
   } = useCanvasStore();
+  
+  const { zoomTo, resetZoom } = useViewportController();
   
   const [isPanning, setIsPanning] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -35,7 +41,7 @@ export default function Canvas() {
         e.preventDefault();
         const delta = -e.deltaY;
         const factor = Math.pow(1.1, delta / 100);
-        const newZoom = Math.min(Math.max(viewport.zoom * factor, 0.05), 20);
+        const newZoom = Math.min(Math.max(viewport.zoom * factor, 0.05), 10);
         
         const rect = container.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
@@ -57,10 +63,6 @@ export default function Canvas() {
         });
       }
     };
-
-    container.addEventListener('wheel', handleWheel, { passive: false });
-    return () => container.removeEventListener('wheel', handleWheel);
-  }, [viewport, setViewport]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     const pos = getPointerPos(e);
@@ -151,6 +153,15 @@ export default function Canvas() {
 
     if (e.key === 'Backspace' || e.key === 'Delete') {
       deleteObjects(selection);
+    } else if (e.key === '=' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      zoomTo(viewport.zoom * 1.2);
+    } else if (e.key === '-' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      zoomTo(viewport.zoom / 1.2);
+    } else if (e.key === '0' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      resetZoom();
     } else if (e.key === 'z' && (e.metaKey || e.ctrlKey)) {
       if (e.shiftKey) redo();
       else undo();
@@ -204,7 +215,21 @@ export default function Canvas() {
          onDragOver={(e) => e.preventDefault()}
          onDrop={handleDrop}>
       
-      {/* Toolbars & Overlays */}
+      {/* Floating Controls */}
+      <div className="absolute bottom-4 left-4 z-20 flex flex-col gap-3 items-start pointer-events-none">
+        <div className="pointer-events-auto">
+          <StatusBar />
+        </div>
+        <div className="pointer-events-auto">
+          <ZoomControls />
+        </div>
+      </div>
+
+      <div className="absolute bottom-4 right-4 z-20 pointer-events-auto">
+        <MiniMap />
+      </div>
+
+      {/* Main Toolbar */}
       <div className="absolute left-1/2 top-4 z-10 flex -translate-x-1/2 gap-2 rounded-xl bg-white p-1 shadow-lg border border-neutral-200">
         {(['select', 'rect', 'circle', 'text', 'frame'] as const).map(t => (
           <button 
@@ -217,13 +242,6 @@ export default function Canvas() {
         <div className="w-px h-4 bg-neutral-200 self-center mx-1" />
         <button onClick={undo} className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs" title="Undo (Ctrl+Z)">Undo</button>
         <button onClick={redo} className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs" title="Redo (Ctrl+Shift+Z)">Redo</button>
-        <div className="w-px h-4 bg-neutral-200 self-center mx-1" />
-        <button 
-          onClick={() => setViewport({ x: 0, y: 0, zoom: 1 })}
-          className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs text-primary font-medium"
-        >
-          Reset View
-        </button>
       </div>
 
       <div 
@@ -307,17 +325,6 @@ export default function Canvas() {
         </div>
       </div>
 
-      {/* Info Bar */}
-      <div className="absolute bottom-4 left-4 flex gap-2">
-        <div className="bg-white shadow-sm rounded-lg px-2 py-1 text-[10px] text-neutral-500 border border-neutral-200">
-          Zoom: {Math.round(viewport.zoom * 100)}% · X: {Math.round(viewport.x)} Y: {Math.round(viewport.y)}
-        </div>
-        {selection.length > 0 && (
-          <div className="bg-blue-50 text-blue-600 shadow-sm rounded-lg px-2 py-1 text-[10px] font-medium border border-blue-100">
-            {selection.length} selected
-          </div>
-        )}
-      </div>
     </div>
   );
 }
