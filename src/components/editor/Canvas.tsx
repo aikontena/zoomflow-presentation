@@ -51,7 +51,6 @@ export function Canvas() {
   return (
     <div className={`relative h-full w-full overflow-hidden ${backgroundClass}`} style={bgStyle}>
       <Tldraw 
-        persistenceKey="zoomcanvas-editor-v2"
         onMount={handleMount}
         autoFocus
       />
