@@ -6,7 +6,7 @@ import {
   Timer as TimerIcon, 
   ChevronRight, 
   ChevronLeft,
-  RotateCcw
+  FileText
 } from 'lucide-react';
 
 interface PresenterViewProps {
@@ -19,8 +19,8 @@ export default function PresenterView({ onClose, dark }: PresenterViewProps) {
     currentFrameIndex, 
     presentationPath, 
     objects,
-    nextFrame,
-    prevFrame
+    nextFrame: goToNextFrame,
+    prevFrame: goToPrevFrame
   } = useCanvasStore();
 
   const [startTime] = useState(Date.now());
@@ -45,8 +45,8 @@ export default function PresenterView({ onClose, dark }: PresenterViewProps) {
   const currentFrameId = presentationPath[currentFrameIndex];
   const nextFrameId = presentationPath[currentFrameIndex + 1];
 
-  const currentFrame = objects.find(o => o.id === currentFrameId);
-  const nextFrame = objects.find(o => o.id === nextFrameId);
+  const currentFrameObj = objects.find(o => o.id === currentFrameId);
+  const nextFrameObj = objects.find(o => o.id === nextFrameId);
 
   const bgClass = dark ? 'bg-neutral-900 text-white' : 'bg-white text-neutral-900';
   const subBgClass = dark ? 'bg-white/5' : 'bg-black/5';
@@ -85,7 +85,7 @@ export default function PresenterView({ onClose, dark }: PresenterViewProps) {
             <h3 className="text-xs font-bold uppercase tracking-wider text-primary mb-2">Current Frame</h3>
             <div className={`flex-1 rounded-2xl border border-current opacity-10 overflow-hidden flex items-center justify-center relative ${subBgClass}`}>
               <div className="text-center p-4">
-                <p className="text-lg font-medium">{currentFrame?.text || `Frame ${currentFrameIndex + 1}`}</p>
+                <p className="text-lg font-medium">{currentFrameObj?.text || `Frame ${currentFrameIndex + 1}`}</p>
                 <p className="text-xs opacity-50 mt-1">{currentFrameId}</p>
               </div>
               <div className="absolute bottom-4 right-4 text-[10px] font-bold opacity-30">
@@ -97,9 +97,9 @@ export default function PresenterView({ onClose, dark }: PresenterViewProps) {
           <div className="h-1/3 flex flex-col">
             <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">Next Up</h3>
             <div className={`flex-1 rounded-2xl border border-current opacity-10 overflow-hidden flex items-center justify-center relative ${subBgClass}`}>
-              {nextFrame ? (
+              {nextFrameObj ? (
                 <div className="text-center p-4">
-                  <p className="text-sm font-medium">{nextFrame.text || `Frame ${currentFrameIndex + 2}`}</p>
+                  <p className="text-sm font-medium">{nextFrameObj.text || `Frame ${currentFrameIndex + 2}`}</p>
                 </div>
               ) : (
                 <span className="text-xs opacity-30">End of Presentation</span>
@@ -112,9 +112,9 @@ export default function PresenterView({ onClose, dark }: PresenterViewProps) {
         <div className="w-1/3 flex flex-col">
           <h3 className="text-xs font-bold uppercase tracking-wider text-primary mb-2">Speaker Notes</h3>
           <div className={`flex-1 rounded-2xl p-6 border border-current opacity-10 overflow-y-auto ${subBgClass}`}>
-            {currentFrame?.speakerNotes ? (
+            {currentFrameObj?.speakerNotes ? (
               <div className="prose prose-sm dark:prose-invert max-w-none">
-                <p className="whitespace-pre-wrap text-sm leading-relaxed">{currentFrame.speakerNotes}</p>
+                <p className="whitespace-pre-wrap text-sm leading-relaxed">{currentFrameObj.speakerNotes}</p>
               </div>
             ) : (
               <div className="h-full flex flex-col items-center justify-center opacity-30 text-center p-4">
@@ -130,7 +130,7 @@ export default function PresenterView({ onClose, dark }: PresenterViewProps) {
       {/* Footer Navigation */}
       <div className="px-8 py-6 border-t border-current opacity-10 flex items-center justify-between shrink-0">
         <button 
-          onClick={prevFrame} 
+          onClick={goToPrevFrame} 
           disabled={currentFrameIndex === 0}
           className="flex items-center gap-2 px-6 py-3 rounded-xl bg-current opacity-10 hover:opacity-20 transition-all disabled:opacity-5 text-sm font-bold"
         >
@@ -150,7 +150,7 @@ export default function PresenterView({ onClose, dark }: PresenterViewProps) {
         </div>
 
         <button 
-          onClick={nextFrame} 
+          onClick={goToNextFrame} 
           disabled={currentFrameIndex === presentationPath.length - 1}
           className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white hover:bg-primary/80 transition-all disabled:opacity-50 text-sm font-bold"
         >
@@ -161,3 +161,4 @@ export default function PresenterView({ onClose, dark }: PresenterViewProps) {
     </div>
   );
 }
+
