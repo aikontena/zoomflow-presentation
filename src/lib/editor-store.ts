@@ -546,9 +546,10 @@ export const useEditor = create<EditorState>((set, get) => ({
     return {
       pages: [...s.pages, ...newPages],
       doc: { ...s.doc, pages: [...s.pages, ...newPages] },
+      activePageId: newPages[0]?.id || s.activePageId,
       dirty: true,
     };
-  })
+  }),
 }));
 
 
