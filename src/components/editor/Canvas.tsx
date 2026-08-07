@@ -2,6 +2,10 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useCanvasStore, CanvasObject } from '@/lib/canvas-store';
 import { IconRenderer } from './IconRenderer';
 import { toast } from 'sonner';
+import ZoomControls from './ZoomControls';
+import MiniMap from './MiniMap';
+import StatusBar from './StatusBar';
+import { useViewportController } from './ViewportController';
 
 export default function Canvas() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -10,6 +14,8 @@ export default function Canvas() {
     updateObject, deleteObjects, addObject, undo, redo,
     duplicateObjects
   } = useCanvasStore();
+  
+  const { zoomTo, resetZoom } = useViewportController();
   
   const [isPanning, setIsPanning] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -20,9 +26,10 @@ export default function Canvas() {
   const getPointerPos = (e: React.MouseEvent | MouseEvent | Touch) => {
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return { x: 0, y: 0 };
+    const zoom = viewport.zoom || 1;
     return {
-      x: (e.clientX - rect.left - viewport.x) / viewport.zoom,
-      y: (e.clientY - rect.top - viewport.y) / viewport.zoom
+      x: (e.clientX - rect.left - viewport.x) / zoom,
+      y: (e.clientY - rect.top - viewport.y) / zoom
     };
   };
 
@@ -35,14 +42,15 @@ export default function Canvas() {
         e.preventDefault();
         const delta = -e.deltaY;
         const factor = Math.pow(1.1, delta / 100);
-        const newZoom = Math.min(Math.max(viewport.zoom * factor, 0.05), 20);
+        const currentZoom = viewport.zoom || 1;
+        const newZoom = Math.min(Math.max(currentZoom * factor, 0.05), 10);
         
         const rect = container.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
         
-        const worldX = (mouseX - viewport.x) / viewport.zoom;
-        const worldY = (mouseY - viewport.y) / viewport.zoom;
+        const worldX = (mouseX - viewport.x) / currentZoom;
+        const worldY = (mouseY - viewport.y) / currentZoom;
         
         setViewport({
           zoom: newZoom,
@@ -88,8 +96,8 @@ export default function Canvas() {
     }
 
     const clickedObj = [...objects].reverse().find(obj => 
-      pos.x >= obj.x && pos.x <= obj.x + obj.width &&
-      pos.y >= obj.y && pos.y <= obj.y + obj.height
+      pos.x >= obj.x && pos.x <= obj.x + (obj.width || 0) &&
+      pos.y >= obj.y && pos.y <= obj.y + (obj.height || 0)
     );
 
     if (clickedObj) {
@@ -121,9 +129,6 @@ export default function Canvas() {
       let dx = pos.x - dragStart.x;
       let dy = pos.y - dragStart.y;
       
-      // Alt+Drag: Duplicate on move (simplified logic: just move originals, 
-      // but if we wanted to true alt-drag duplicate we'd spawn new ones on mousedown)
-      
       selection.forEach(id => {
         const target = objects.find(o => o.id === id);
         if (target) {
@@ -143,7 +148,6 @@ export default function Canvas() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Space for Panning
     if (e.code === 'Space' && !isPanning) {
       setIsPanning(true);
       return;
@@ -151,6 +155,15 @@ export default function Canvas() {
 
     if (e.key === 'Backspace' || e.key === 'Delete') {
       deleteObjects(selection);
+    } else if (e.key === '=' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      zoomTo((viewport.zoom || 1) * 1.2);
+    } else if (e.key === '-' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      zoomTo((viewport.zoom || 1) / 1.2);
+    } else if (e.key === '0' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      resetZoom();
     } else if (e.key === 'z' && (e.metaKey || e.ctrlKey)) {
       if (e.shiftKey) redo();
       else undo();
@@ -204,7 +217,21 @@ export default function Canvas() {
          onDragOver={(e) => e.preventDefault()}
          onDrop={handleDrop}>
       
-      {/* Toolbars & Overlays */}
+      {/* Floating UI Elements */}
+      <div className="absolute bottom-4 left-4 z-50 flex flex-col gap-3 items-start pointer-events-none">
+        <div className="pointer-events-auto">
+          <StatusBar />
+        </div>
+        <div className="pointer-events-auto">
+          <ZoomControls />
+        </div>
+      </div>
+
+      <div className="absolute bottom-4 right-4 z-50 pointer-events-auto">
+        <MiniMap />
+      </div>
+
+      {/* Main Toolbar */}
       <div className="absolute left-1/2 top-4 z-10 flex -translate-x-1/2 gap-2 rounded-xl bg-white p-1 shadow-lg border border-neutral-200">
         {(['select', 'rect', 'circle', 'text', 'frame'] as const).map(t => (
           <button 
@@ -217,18 +244,11 @@ export default function Canvas() {
         <div className="w-px h-4 bg-neutral-200 self-center mx-1" />
         <button onClick={undo} className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs" title="Undo (Ctrl+Z)">Undo</button>
         <button onClick={redo} className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs" title="Redo (Ctrl+Shift+Z)">Redo</button>
-        <div className="w-px h-4 bg-neutral-200 self-center mx-1" />
-        <button 
-          onClick={() => setViewport({ x: 0, y: 0, zoom: 1 })}
-          className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs text-primary font-medium"
-        >
-          Reset View
-        </button>
       </div>
 
       <div 
         ref={containerRef}
-        className="h-full w-full touch-none cursor-crosshair"
+        className="h-full w-full touch-none"
         style={{ cursor: isPanning ? 'grabbing' : activeTool === 'select' ? 'default' : 'crosshair' }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -236,7 +256,7 @@ export default function Canvas() {
         onMouseLeave={handleMouseUp}
       >
         <div style={{
-          transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+          transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom || 1})`,
           transformOrigin: '0 0'
         }}>
           {/* Grid Background */}
@@ -289,7 +309,6 @@ export default function Canvas() {
                   />
                 )}
                 
-                {/* Selection Handles (Visual only for now) */}
                 {isSelected && (
                   <>
                     <div className="absolute -top-1 -left-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
@@ -305,18 +324,6 @@ export default function Canvas() {
             );
           })}
         </div>
-      </div>
-
-      {/* Info Bar */}
-      <div className="absolute bottom-4 left-4 flex gap-2">
-        <div className="bg-white shadow-sm rounded-lg px-2 py-1 text-[10px] text-neutral-500 border border-neutral-200">
-          Zoom: {Math.round(viewport.zoom * 100)}% · X: {Math.round(viewport.x)} Y: {Math.round(viewport.y)}
-        </div>
-        {selection.length > 0 && (
-          <div className="bg-blue-50 text-blue-600 shadow-sm rounded-lg px-2 py-1 text-[10px] font-medium border border-blue-100">
-            {selection.length} selected
-          </div>
-        )}
       </div>
     </div>
   );
