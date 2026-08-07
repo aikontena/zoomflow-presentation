@@ -7,9 +7,6 @@ export default function MiniMap() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    console.log('MiniMap Mounted and Rendered', { objectsCount: objects?.length });
-  }, [objects]);
 
   const MAP_SIZE = 160;
   const PADDING = 20;
