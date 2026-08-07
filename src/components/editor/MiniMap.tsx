@@ -1,14 +1,15 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { useCanvasStore } from '@/lib/canvas-store';
 import { ChevronUp, ChevronDown, Map as MapIcon } from 'lucide-react';
 
 export default function MiniMap() {
   const { objects, viewport, setViewport } = useCanvasStore();
-  console.log('MiniMap Render', { objectsCount: objects?.length });
-
-
   const [isCollapsed, setIsCollapsed] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    console.log('MiniMap Mounted and Rendered', { objectsCount: objects?.length });
+  }, [objects]);
 
   const MAP_SIZE = 160;
   const PADDING = 20;
@@ -52,21 +53,23 @@ export default function MiniMap() {
     const winWidth = typeof window !== 'undefined' ? window.innerWidth : 1000;
     const winHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
 
+    const currentZoom = viewport.zoom || 1;
     setViewport({
       ...viewport,
-      x: winWidth / 2 - worldX * (viewport.zoom || 1),
-      y: winHeight / 2 - worldY * (viewport.zoom || 1)
+      x: winWidth / 2 - worldX * currentZoom,
+      y: winHeight / 2 - worldY * currentZoom
     });
   };
 
   const winWidth = typeof window !== 'undefined' ? window.innerWidth : 1000;
   const winHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
 
+  const currentZoom = viewport.zoom || 1;
   const viewportRect = {
-    x: -viewport.x / (viewport.zoom || 1),
-    y: -viewport.y / (viewport.zoom || 1),
-    width: winWidth / (viewport.zoom || 1),
-    height: winHeight / (viewport.zoom || 1)
+    x: -viewport.x / currentZoom,
+    y: -viewport.y / currentZoom,
+    width: winWidth / currentZoom,
+    height: winHeight / currentZoom
   };
 
   const vMap = toMapCoord(viewportRect.x, viewportRect.y);
