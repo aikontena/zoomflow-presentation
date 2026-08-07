@@ -59,6 +59,7 @@ export function TopToolbar({ onPresent }: { onPresent: () => void }) {
     setViewport,
     viewport,
     addObject,
+    setActivePath,
   } = useEditor();
   const [savedLabel, setSavedLabel] = useState("Not saved yet");
 
