@@ -17,6 +17,7 @@ import {
   LayoutGrid
 } from 'lucide-react';
 import { IconLibrary } from './IconLibrary';
+import { useCanvasStore } from '@/lib/canvas-store';
 
 const TABS = [
   { id: 'pages', label: 'Pages', icon: FileText },
@@ -29,7 +30,6 @@ const TABS = [
   { id: 'history', label: 'History', icon: History },
 ];
 
-import { useCanvasStore } from '@/lib/canvas-store';
 
 export default function LeftSidebar() {
   const { undo, redo, history, lastSaved, save, setActiveOverlay } = useCanvasStore();
