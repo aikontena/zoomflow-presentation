@@ -44,6 +44,32 @@ export const TEMPLATES: Template[] = Array.from({ length: 40 }).map((_, i) => {
     popularity: Math.floor(Math.random() * 1000),
     tags: ['modern', 'presentation', CATEGORIES[i % CATEGORIES.length]!.toLowerCase()],
     thumbnail: `https://picsum.photos/seed/${i + 100}/800/450`,
-    objects: []
+    objects: [
+      {
+        id: Math.random().toString(36).substring(7),
+        type: 'text',
+        x: 400,
+        y: 250,
+        width: 400,
+        height: 60,
+        rotation: 0,
+        fill: '#1E293B',
+        text: i === 0 ? "BUSINESS PROPOSAL" : "TEMPLATE TITLE",
+        fontSize: 48,
+        parentId: 'f1'
+      },
+      {
+        id: Math.random().toString(36).substring(7),
+        type: 'rectangle',
+        x: 100,
+        y: 100,
+        width: 600,
+        height: 400,
+        rotation: 0,
+        fill: '#3B82F6',
+        opacity: 0.1,
+        parentId: 'f1'
+      }
+    ]
   };
 });
