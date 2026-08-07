@@ -27,8 +27,8 @@ export default function Canvas() {
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return { x: 0, y: 0 };
     return {
-      x: (e.clientX - rect.left - viewport.x) / viewport.zoom,
-      y: (e.clientY - rect.top - viewport.y) / viewport.zoom
+      x: (e.clientX - rect.left - viewport.x) / (viewport.zoom || 1),
+      y: (e.clientY - rect.top - viewport.y) / (viewport.zoom || 1)
     };
   };
 
@@ -63,6 +63,7 @@ export default function Canvas() {
         });
       }
     };
+
     container.addEventListener('wheel', handleWheel, { passive: false });
     return () => container.removeEventListener('wheel', handleWheel);
   }, [viewport, setViewport]);
@@ -126,9 +127,6 @@ export default function Canvas() {
       let dx = pos.x - dragStart.x;
       let dy = pos.y - dragStart.y;
       
-      // Alt+Drag: Duplicate on move (simplified logic: just move originals, 
-      // but if we wanted to true alt-drag duplicate we'd spawn new ones on mousedown)
-      
       selection.forEach(id => {
         const target = objects.find(o => o.id === id);
         if (target) {
@@ -148,7 +146,6 @@ export default function Canvas() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Space for Panning
     if (e.code === 'Space' && !isPanning) {
       setIsPanning(true);
       return;
@@ -218,8 +215,8 @@ export default function Canvas() {
          onDragOver={(e) => e.preventDefault()}
          onDrop={handleDrop}>
       
-      {/* Floating Controls */}
-      <div className="absolute bottom-4 left-4 z-20 flex flex-col gap-3 items-start pointer-events-none">
+      {/* Floating UI Elements */}
+      <div className="absolute bottom-4 left-4 z-50 flex flex-col gap-3 items-start pointer-events-none">
         <div className="pointer-events-auto">
           <StatusBar />
         </div>
@@ -228,11 +225,7 @@ export default function Canvas() {
         </div>
       </div>
 
-      <div className="absolute bottom-4 right-4 z-20 pointer-events-auto">
-        <MiniMap />
-      </div>
-
-      <div className="absolute bottom-4 right-4 z-20 pointer-events-auto">
+      <div className="absolute bottom-4 right-4 z-50 pointer-events-auto">
         <MiniMap />
       </div>
 
@@ -253,7 +246,7 @@ export default function Canvas() {
 
       <div 
         ref={containerRef}
-        className="h-full w-full touch-none cursor-crosshair"
+        className="h-full w-full touch-none"
         style={{ cursor: isPanning ? 'grabbing' : activeTool === 'select' ? 'default' : 'crosshair' }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -314,7 +307,6 @@ export default function Canvas() {
                   />
                 )}
                 
-                {/* Selection Handles (Visual only for now) */}
                 {isSelected && (
                   <>
                     <div className="absolute -top-1 -left-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
@@ -331,7 +323,6 @@ export default function Canvas() {
           })}
         </div>
       </div>
-
     </div>
   );
 }
