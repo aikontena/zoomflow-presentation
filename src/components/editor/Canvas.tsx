@@ -113,7 +113,7 @@ export default function Canvas() {
       
       const target = objects.find(o => o.id === selection[0]);
       if (target) {
-        updateObject(selection[0], {
+        updateObject(selection[0] as string, {
           x: target.x + dx,
           y: target.y + dy
         });
