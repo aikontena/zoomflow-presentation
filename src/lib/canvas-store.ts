@@ -226,8 +226,10 @@ export const useCanvasStore = create<CanvasStore>()(
           },
           objects: state.objects.filter((o) => !ids.includes(o.id)),
           selection: state.selection.filter((id) => !ids.includes(id)),
+          presentationPath: state.presentationPath.filter((id) => !ids.includes(id))
         }));
       },
+
 
       setSelection: (selection) => {
         const current = get().selection;
