@@ -210,45 +210,17 @@ export default function Canvas() {
   };
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-[#f8f9fa] outline-none" 
+    <div className="relative h-full w-full overflow-hidden bg-[#f8f9fa] outline-none flex flex-col" 
          tabIndex={0}
          onKeyDown={handleKeyDown}
          onKeyUp={handleKeyUp}
          onDragOver={(e) => e.preventDefault()}
          onDrop={handleDrop}>
       
-      {/* Floating UI Elements */}
-      <div className="absolute bottom-4 left-4 z-50 flex flex-col gap-3 items-start pointer-events-none">
-        <div className="pointer-events-auto">
-          <StatusBar />
-        </div>
-        <div className="pointer-events-auto">
-          <ZoomControls />
-        </div>
-      </div>
-
-      <div className="absolute bottom-4 right-4 z-50 pointer-events-auto">
-        <MiniMap />
-      </div>
-
-      {/* Main Toolbar */}
-      <div className="absolute left-1/2 top-4 z-10 flex -translate-x-1/2 gap-2 rounded-xl bg-white p-1 shadow-lg border border-neutral-200">
-        {(['select', 'rect', 'circle', 'text', 'frame'] as const).map(t => (
-          <button 
-            key={t}
-            onClick={() => setActiveTool(t)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${activeTool === t ? 'bg-primary text-white' : 'hover:bg-neutral-100 text-neutral-600'}`}>
-            {t.charAt(0).toUpperCase() + t.slice(1)}
-          </button>
-        ))}
-        <div className="w-px h-4 bg-neutral-200 self-center mx-1" />
-        <button onClick={undo} className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs" title="Undo (Ctrl+Z)">Undo</button>
-        <button onClick={redo} className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs" title="Redo (Ctrl+Shift+Z)">Redo</button>
-      </div>
-
+      {/* Canvas Area */}
       <div 
         ref={containerRef}
-        className="h-full w-full touch-none"
+        className="relative flex-1 touch-none overflow-hidden"
         style={{ cursor: isPanning ? 'grabbing' : activeTool === 'select' ? 'default' : 'crosshair' }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -324,7 +296,34 @@ export default function Canvas() {
             );
           })}
         </div>
+
+        {/* Floating Overlays inside Canvas Area */}
+        <div className="absolute bottom-4 right-4 z-50 pointer-events-auto">
+          <MiniMap />
+        </div>
+
+        <div className="absolute bottom-4 left-4 z-50 pointer-events-auto">
+          <StatusBar />
+        </div>
+
+        {/* Main Tool Selector */}
+        <div className="absolute left-1/2 top-4 z-10 flex -translate-x-1/2 gap-2 rounded-xl bg-white p-1 shadow-lg border border-neutral-200">
+          {(['select', 'rect', 'circle', 'text', 'frame'] as const).map(t => (
+            <button 
+              key={t}
+              onClick={() => setActiveTool(t)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${activeTool === t ? 'bg-primary text-white' : 'hover:bg-neutral-100 text-neutral-600'}`}>
+              {t.charAt(0).toUpperCase() + t.slice(1)}
+            </button>
+          ))}
+          <div className="w-px h-4 bg-neutral-200 self-center mx-1" />
+          <button onClick={undo} className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs" title="Undo (Ctrl+Z)">Undo</button>
+          <button onClick={redo} className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs" title="Redo (Ctrl+Shift+Z)">Redo</button>
+        </div>
       </div>
+
+      {/* Footer Bar */}
+      <ZoomControls />
     </div>
   );
 }
