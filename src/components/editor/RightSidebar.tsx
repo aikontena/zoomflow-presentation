@@ -12,27 +12,21 @@ import {
   Layers,
   ChevronDown,
   RefreshCw,
-  Box
+  Box,
+  FileText
 } from 'lucide-react';
 import { IconRenderer } from './IconRenderer';
 import { ICONS } from '@/lib/icons';
 import { toast } from 'sonner';
 
 export default function RightSidebar() {
-  const { objects, selection, updateObject } = useCanvasStore();
+  const { objects, selection, updateObject, presentationSettings, updatePresentationSettings } = useCanvasStore();
   const selectedObject = objects.find(o => selection.includes(o.id));
 
-  if (!selectedObject) {
-    return (
-      <div className="w-64 h-full bg-white border-l border-neutral-200 p-4 flex flex-col items-center justify-center text-neutral-400 gap-2">
-        <Layers size={32} strokeWidth={1.5} />
-        <p className="text-sm">Select an object to edit</p>
-      </div>
-    );
-  }
-
   const handleChange = (key: string, value: any) => {
-    updateObject(selectedObject.id, { [key]: value });
+    if (selectedObject) {
+      updateObject(selectedObject.id, { [key]: value });
+    }
   };
 
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -56,10 +50,74 @@ export default function RightSidebar() {
     </div>
   );
 
+  if (!selectedObject) {
+    return (
+      <div className="w-64 h-full bg-white border-l border-neutral-200 flex flex-col overflow-y-auto">
+        <div className="p-4 border-b border-neutral-100">
+          <h2 className="font-semibold text-neutral-900">Project Settings</h2>
+        </div>
+        <div className="p-4 flex-1">
+          <Section title="Presentation Mode">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-medium text-neutral-500 uppercase">Transition Speed (ms)</label>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="range" 
+                    min="100" max="2000" step="100"
+                    value={presentationSettings.transitionDuration}
+                    onChange={(e) => updatePresentationSettings({ transitionDuration: parseInt(e.target.value) })}
+                    className="flex-1 accent-primary" 
+                  />
+                  <span className="text-[10px] w-12">{presentationSettings.transitionDuration}ms</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-neutral-500">Auto-play</label>
+                <input 
+                  type="checkbox"
+                  checked={presentationSettings.autoPlay}
+                  onChange={(e) => updatePresentationSettings({ autoPlay: e.target.checked })}
+                  className="rounded border-neutral-300 text-primary"
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-neutral-500">Loop</label>
+                <input 
+                  type="checkbox"
+                  checked={presentationSettings.loop}
+                  onChange={(e) => updatePresentationSettings({ loop: e.target.checked })}
+                  className="rounded border-neutral-300 text-primary"
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-neutral-500">Dark Background</label>
+                <input 
+                  type="checkbox"
+                  checked={presentationSettings.darkBackground}
+                  onChange={(e) => updatePresentationSettings({ darkBackground: e.target.checked })}
+                  className="rounded border-neutral-300 text-primary"
+                />
+              </div>
+            </div>
+          </Section>
+
+          <div className="mt-8 flex flex-col items-center justify-center text-neutral-400 gap-2 opacity-50">
+            <Layers size={32} strokeWidth={1.5} />
+            <p className="text-sm">Select an object for properties</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-64 h-full bg-white border-l border-neutral-200 flex flex-col overflow-y-auto">
       <div className="p-4 border-b border-neutral-100">
-        <h2 className="font-semibold text-neutral-900">Properties</h2>
+        <h2 className="font-semibold text-neutral-900 capitalize">{selectedObject.type} Properties</h2>
       </div>
 
       <div className="p-4 flex-1">
@@ -124,18 +182,6 @@ export default function RightSidebar() {
               />
             </div>
           </InputRow>
-          <InputRow label="Stroke">
-             <div className="flex items-center gap-2">
-                <div className="w-6 h-6 border border-neutral-200 rounded bg-transparent" />
-             </div>
-          </InputRow>
-          <InputRow label="Corner Radius">
-             <input 
-                type="number" 
-                defaultValue={0}
-                className="w-12 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary text-right"
-              />
-          </InputRow>
           <InputRow label="Opacity">
             <input 
               type="range" 
@@ -145,93 +191,56 @@ export default function RightSidebar() {
               className="w-24 accent-primary"
             />
           </InputRow>
-          <InputRow label="Shadow">
-             <div className="w-4 h-4 rounded border border-neutral-200" />
-          </InputRow>
         </Section>
 
-        {(selectedObject.type === 'text' || selectedObject.type === 'icon') && (
-          <Section title={selectedObject.type === 'text' ? "Typography" : "Icon Settings"}>
-            {selectedObject.type === 'text' ? (
-              <>
-                <InputRow label="Font Size">
-                  <input 
-                    type="number" 
-                    value={selectedObject.fontSize || 16}
-                    onChange={(e) => handleChange('fontSize', parseInt(e.target.value))}
-                    className="w-12 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary text-right"
-                  />
-                </InputRow>
-                <div className="grid grid-cols-2 gap-1 mt-2">
-                  <button className="p-1.5 bg-neutral-50 border border-neutral-200 rounded hover:bg-neutral-100 transition-colors">
-                    <Type size={14} className="mx-auto" />
-                  </button>
-                  <button className="p-1.5 bg-neutral-50 border border-neutral-200 rounded hover:bg-neutral-100 transition-colors font-bold">B</button>
-                </div>
-              </>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-neutral-500">Current Icon</span>
-                  <div className="flex items-center gap-2 bg-neutral-50 border border-neutral-100 rounded-lg p-2">
-                    <IconRenderer name={selectedObject.iconName || 'help-circle'} size={20} color={selectedObject.fill} />
-                    <span className="text-[10px] font-medium text-neutral-700 truncate w-24 capitalize">
-                      {(selectedObject.iconName || '').replace(/-/g, ' ')}
-                    </span>
-                  </div>
-                </div>
-                
-                <InputRow label="Stroke Width">
-                  <input 
-                    type="number" 
-                    min="0.5"
-                    max="4"
-                    step="0.5"
-                    value={selectedObject.strokeWidth || 2}
-                    onChange={(e) => handleChange('strokeWidth', parseFloat(e.target.value))}
-                    className="w-12 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary text-right"
-                  />
-                </InputRow>
-
-                <div className="pt-2">
-                  <button 
-                    onClick={() => toast.info("Use the Left Sidebar to search and click an icon to replace.")}
-                    className="w-full flex items-center justify-center gap-2 py-2 border border-neutral-200 rounded-lg text-xs font-medium text-neutral-600 hover:bg-neutral-50 transition-colors"
-                  >
-                    <RefreshCw size={14} />
-                    Replace Icon
-                  </button>
-                </div>
-              </div>
-            )}
+        {selectedObject.type === 'frame' && (
+          <Section title="Speaker Notes">
+            <textarea 
+              value={selectedObject.speakerNotes || ''}
+              onChange={(e) => handleChange('speakerNotes', e.target.value)}
+              placeholder="Add notes for this frame..."
+              className="w-full h-32 bg-neutral-50 border border-neutral-200 rounded px-2 py-2 text-xs outline-none focus:border-primary resize-none font-medium leading-relaxed"
+            />
+            <p className="text-[10px] text-neutral-400">
+              These notes are only visible in Presenter View.
+            </p>
           </Section>
         )}
 
-        <Section title="Animation & Transition">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-medium text-neutral-500 uppercase">Entrance Animation</label>
-              <select className="w-full p-2 bg-neutral-50 border border-neutral-200 rounded text-xs outline-none focus:border-primary">
-                <option>None</option>
-                <option>Fade In</option>
-                <option>Scale Up</option>
-                <option>Slide Left</option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-medium text-neutral-500 uppercase">Transition Duration</label>
-              <div className="flex items-center gap-2">
-                <input type="range" className="flex-1 accent-primary" min="0" max="2" step="0.1" />
-                <span className="text-[10px] w-8">0.3s</span>
+        {selectedObject.type === 'text' && (
+          <Section title="Typography">
+            <InputRow label="Font Size">
+              <input 
+                type="number" 
+                value={selectedObject.fontSize || 16}
+                onChange={(e) => handleChange('fontSize', parseInt(e.target.value))}
+                className="w-12 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary text-right"
+              />
+            </InputRow>
+          </Section>
+        )}
+
+        {selectedObject.type === 'icon' && (
+          <Section title="Icon Settings">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-neutral-500">Current Icon</span>
+                <div className="flex items-center gap-2 bg-neutral-50 border border-neutral-100 rounded-lg p-2">
+                  <IconRenderer name={selectedObject.iconName || 'help-circle'} size={20} color={selectedObject.fill} />
+                </div>
               </div>
+              <InputRow label="Stroke Width">
+                <input 
+                  type="number" 
+                  min="0.5" max="4" step="0.5"
+                  value={selectedObject.strokeWidth || 2}
+                  onChange={(e) => handleChange('strokeWidth', parseFloat(e.target.value))}
+                  className="w-12 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary text-right"
+                />
+              </InputRow>
             </div>
-            <div className="p-3 bg-blue-50/50 rounded-lg border border-blue-100">
-              <p className="text-[10px] text-blue-600 leading-relaxed font-medium">
-                Focus Mode: When this object is focused, the camera will zoom to its position with the selected transition.
-              </p>
-            </div>
-          </div>
-        </Section>
+          </Section>
+        )}
       </div>
     </div>
   );

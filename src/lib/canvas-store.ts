@@ -18,16 +18,42 @@ export interface CanvasObject {
   iconName?: string;
   opacity?: number;
   parentId?: string;
+  speakerNotes?: string;
 }
+
+export interface PresentationSettings {
+  transitionDuration: number;
+  autoPlay: boolean;
+  autoPlayInterval: number;
+  loop: boolean;
+  showProgressBar: boolean;
+  showFrameTitles: boolean;
+  darkBackground: boolean;
+}
+
 
 interface CanvasStore {
   objects: CanvasObject[];
-  frames: { id: string; name: string; order: number }[];
+  frames: { id: string; name: string; order: number }[]; // Keeping legacy frames for now if needed
   selection: string[];
   viewport: { x: number; y: number; zoom: number };
-  activeOverlay: 'templates' | 'export' | 'settings' | null;
+  activeOverlay: 'templates' | 'export' | 'settings' | 'presentation' | null;
   snapEnabled: boolean;
   setSnapEnabled: (enabled: boolean) => void;
+  
+  // Presentation State
+  isPresenting: boolean;
+  currentFrameIndex: number;
+  presentationPath: string[]; // List of object IDs that are frames, in order
+  presentationSettings: PresentationSettings;
+  startPresentation: (startFromFrameId?: string) => void;
+  stopPresentation: () => void;
+  nextFrame: () => void;
+  prevFrame: () => void;
+  goToFrame: (index: number) => void;
+  setPresentationPath: (path: string[]) => void;
+  updatePresentationSettings: (settings: Partial<PresentationSettings>) => void;
+
   
   // Basic Actions
   addObject: (obj: Omit<CanvasObject, "id">) => string;
@@ -75,23 +101,103 @@ export const useCanvasStore = create<CanvasStore>()(
       viewport: { x: 0, y: 0, zoom: 1 },
       activeOverlay: null,
       snapEnabled: true,
+      isPresenting: false,
+      currentFrameIndex: 0,
+      presentationPath: [],
+      presentationSettings: {
+        transitionDuration: 800,
+        autoPlay: false,
+        autoPlayInterval: 5000,
+        loop: false,
+        showProgressBar: true,
+        showFrameTitles: true,
+        darkBackground: false,
+      },
       setSnapEnabled: (snapEnabled) => set({ snapEnabled }),
       history: { past: [], future: [] },
       lastSaved: Date.now(),
 
+      startPresentation: (startFromFrameId) => {
+        const { objects, presentationPath } = get();
+        let path = presentationPath;
+        
+        // If path is empty, auto-generate from frames sorted by x/y
+        if (path.length === 0) {
+          path = objects
+            .filter(o => o.type === 'frame')
+            .sort((a, b) => (a.y - b.y) || (a.x - b.x))
+            .map(o => o.id);
+        }
+
+        if (path.length === 0) {
+          return;
+        }
+
+        const startIndex = startFromFrameId 
+          ? path.indexOf(startFromFrameId) 
+          : 0;
+
+        set({ 
+          isPresenting: true, 
+          currentFrameIndex: startIndex === -1 ? 0 : startIndex,
+          presentationPath: path,
+          activeOverlay: 'presentation'
+        });
+      },
+
+      stopPresentation: () => set({ isPresenting: false, activeOverlay: null }),
+
+      nextFrame: () => {
+        const { currentFrameIndex, presentationPath, presentationSettings } = get();
+        if (currentFrameIndex < presentationPath.length - 1) {
+          set({ currentFrameIndex: currentFrameIndex + 1 });
+        } else if (presentationSettings.loop) {
+          set({ currentFrameIndex: 0 });
+        }
+      },
+
+      prevFrame: () => {
+        const { currentFrameIndex } = get();
+        if (currentFrameIndex > 0) {
+          set({ currentFrameIndex: currentFrameIndex - 1 });
+        }
+      },
+
+      goToFrame: (index) => {
+        const { presentationPath } = get();
+        if (index >= 0 && index < presentationPath.length) {
+          set({ currentFrameIndex: index });
+        }
+      },
+
+      setPresentationPath: (presentationPath) => set({ presentationPath }),
+      
+      updatePresentationSettings: (settings) => set((state) => ({
+        presentationSettings: { ...state.presentationSettings, ...settings }
+      })),
+
+
       addObject: (obj) => {
         const id = Math.random().toString(36).substring(7);
         const newObj = { ...obj, id };
-        set((state) => ({
-          lastSaved: Date.now(),
-          history: {
-            past: [...state.history.past, state.objects].slice(-50),
-            future: [],
-          },
-          objects: [...state.objects, newObj],
-        }));
+        set((state) => {
+          const nextPath = obj.type === 'frame' 
+            ? [...state.presentationPath, id] 
+            : state.presentationPath;
+            
+          return {
+            lastSaved: Date.now(),
+            history: {
+              past: [...state.history.past, state.objects].slice(-50),
+              future: [],
+            },
+            objects: [...state.objects, newObj],
+            presentationPath: nextPath
+          };
+        });
         return id;
       },
+
 
       updateObject: (id, patch) => {
         const currentObjects = get().objects;
@@ -120,8 +226,10 @@ export const useCanvasStore = create<CanvasStore>()(
           },
           objects: state.objects.filter((o) => !ids.includes(o.id)),
           selection: state.selection.filter((id) => !ids.includes(id)),
+          presentationPath: state.presentationPath.filter((id) => !ids.includes(id))
         }));
       },
+
 
       setSelection: (selection) => {
         const current = get().selection;
@@ -205,7 +313,13 @@ export const useCanvasStore = create<CanvasStore>()(
     }),
     {
       name: "zoomcanvas-v4-storage",
-      partialize: (state) => ({ objects: state.objects, viewport: state.viewport }),
+      partialize: (state) => ({ 
+        objects: state.objects, 
+        viewport: state.viewport,
+        presentationPath: state.presentationPath,
+        presentationSettings: state.presentationSettings
+      }),
+
     }
   )
 );

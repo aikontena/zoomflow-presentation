@@ -1,0 +1,114 @@
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useCanvasStore } from '@/lib/canvas-store';
+import { useViewportController } from './ViewportController';
+import PresentationControls from './PresentationControls';
+import LaserPointer from './LaserPointer';
+import ProgressBar from './ProgressBar';
+import PresenterView from './PresenterView';
+import { X } from 'lucide-react';
+
+export default function PresentationMode() {
+  const { 
+    isPresenting, 
+    stopPresentation, 
+    currentFrameIndex, 
+    presentationPath, 
+    objects,
+    nextFrame,
+    prevFrame,
+    goToFrame,
+    presentationSettings
+  } = useCanvasStore();
+  
+  const { zoomToFrame } = useViewportController();
+  const [showControls, setShowControls] = useState(true);
+  const [showPresenterNotes, setShowPresenterNotes] = useState(false);
+  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseMove = useCallback(() => {
+    setShowControls(true);
+    if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+    controlsTimeoutRef.current = setTimeout(() => {
+      setShowControls(false);
+    }, 3000);
+  }, []);
+
+  useEffect(() => {
+    if (!isPresenting) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextFrame();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevFrame();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        stopPresentation();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPresenting, nextFrame, prevFrame, stopPresentation]);
+
+  useEffect(() => {
+    if (isPresenting && presentationPath[currentFrameIndex]) {
+      zoomToFrame(presentationPath[currentFrameIndex], presentationSettings.transitionDuration);
+    }
+  }, [currentFrameIndex, isPresenting, presentationPath, zoomToFrame, presentationSettings.transitionDuration]);
+
+  if (!isPresenting) {
+    return null;
+  }
+
+  const currentFrameId = presentationPath[currentFrameIndex];
+  const currentFrame = objects.find(o => o.id === currentFrameId);
+
+  return (
+    <div 
+      className={`fixed inset-0 z-[100] flex flex-col overflow-hidden select-none transition-colors duration-500 ${presentationSettings.darkBackground ? 'bg-neutral-950' : 'bg-white'}`}
+      onMouseMove={handleMouseMove}
+    >
+      <div className="flex-1 relative overflow-hidden">
+        <LaserPointer />
+        
+        {presentationSettings.showFrameTitles && currentFrame && (
+          <div className={`absolute top-8 left-1/2 -translate-x-1/2 px-6 py-2 rounded-full backdrop-blur-md border animate-in fade-in slide-in-from-top-4 duration-500 ${presentationSettings.darkBackground ? 'bg-white/10 border-white/20 text-white' : 'bg-black/5 border-black/10 text-black'}`}>
+            <h2 className="text-lg font-medium">{currentFrame.text || `Frame ${currentFrameIndex + 1}`}</h2>
+          </div>
+        )}
+      </div>
+
+      {presentationSettings.showProgressBar && (
+        <ProgressBar 
+          current={currentFrameIndex + 1} 
+          total={presentationPath.length} 
+          dark={presentationSettings.darkBackground}
+        />
+      )}
+
+      <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 transition-all duration-300 transform ${showControls ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+        <PresentationControls 
+          onToggleNotes={() => setShowPresenterNotes(!showPresenterNotes)}
+          dark={presentationSettings.darkBackground}
+        />
+      </div>
+
+      {showPresenterNotes && (
+        <PresenterView 
+          onClose={() => setShowPresenterNotes(false)}
+          dark={presentationSettings.darkBackground}
+        />
+      )}
+
+      <button 
+        onClick={stopPresentation}
+        className={`fixed top-4 right-4 p-2 rounded-full transition-all duration-300 transform ${showControls ? 'opacity-100 scale-100' : 'opacity-0 scale-75'} hover:bg-black/10 ${presentationSettings.darkBackground ? 'text-white hover:bg-white/10' : 'text-black'}`}
+      >
+        <X size={24} />
+      </button>
+    </div>
+  );
+}

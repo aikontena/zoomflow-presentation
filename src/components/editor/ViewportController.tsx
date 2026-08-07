@@ -128,9 +128,34 @@ export function useViewportController() {
     animateViewport(target);
   }, [objects, selection, animateViewport]);
 
+  const zoomToFrame = useCallback((frameId: string, duration: number = 800) => {
+    const frame = objects.find(o => o.id === frameId);
+    if (!frame) return;
+
+    const padding = 0; // Presentation mode fits frame exactly
+    const availableWidth = window.innerWidth;
+    const availableHeight = window.innerHeight;
+
+    const zoomX = availableWidth / (frame.width + padding);
+    const zoomY = availableHeight / (frame.height + padding);
+    const zoom = Math.min(zoomX, zoomY);
+
+    const centerX = frame.x + frame.width / 2;
+    const centerY = frame.y + frame.height / 2;
+
+    const target = {
+      zoom,
+      x: window.innerWidth / 2 - centerX * zoom,
+      y: window.innerHeight / 2 - centerY * zoom,
+    };
+
+    animateViewport(target, duration);
+  }, [objects, animateViewport]);
+
   const resetZoom = useCallback(() => {
     animateViewport({ x: 0, y: 0, zoom: 1 });
   }, [animateViewport]);
 
-  return { zoomTo, fitToScreen, zoomToSelection, resetZoom };
+  return { zoomTo, fitToScreen, zoomToSelection, resetZoom, zoomToFrame };
 }
+
