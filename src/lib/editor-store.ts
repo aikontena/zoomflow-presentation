@@ -78,6 +78,13 @@ interface EditorState {
   lastSavedAt: number | null;
   dirty: boolean;
   
+  paths: CameraPath[];
+  bookmarks: CameraBookmark[];
+  activePathId: string | null;
+  currentKeyframeIndex: number;
+  focusMode: boolean;
+  spotlightId: string | null;
+
   doc: EditorDoc;
   viewport: { x: number, y: number, zoom: number };
   tool: string;
@@ -102,6 +109,21 @@ interface EditorState {
   setPageNotes: (id: string, notes: string) => void;
   setActivePage: (id: string) => void;
   capturePageFrame: (id: string, frame: Page["frame"]) => void;
+
+  addPath: (name: string) => void;
+  removePath: (id: string) => void;
+  addKeyframe: (pathId: string, frameId: string) => void;
+  removeKeyframe: (pathId: string, keyframeId: string) => void;
+  reorderKeyframe: (pathId: string, fromIndex: number, toIndex: number) => void;
+  setActivePath: (id: string | null) => void;
+  
+  addBookmark: (name: string) => void;
+  removeBookmark: (id: string) => void;
+  applyBookmark: (id: string) => void;
+  
+  setFocusMode: (enabled: boolean) => void;
+  setSpotlight: (id: string | null) => void;
+  goToFrame: (frameId: string, options?: { duration?: number, preset?: AnimationPreset, instant?: boolean }) => void;
 
   undo: () => void;
   redo: () => void;
