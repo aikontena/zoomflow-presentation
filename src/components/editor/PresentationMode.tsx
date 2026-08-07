@@ -107,6 +107,7 @@ export default function PresentationMode() {
 
   if (!isPresenting) return null;
 
+
   const currentFrameId = presentationPath[currentFrameIndex];
   const currentFrame = objects.find(o => o.id === currentFrameId);
 
