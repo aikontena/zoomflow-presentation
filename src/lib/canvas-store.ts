@@ -180,16 +180,24 @@ export const useCanvasStore = create<CanvasStore>()(
       addObject: (obj) => {
         const id = Math.random().toString(36).substring(7);
         const newObj = { ...obj, id };
-        set((state) => ({
-          lastSaved: Date.now(),
-          history: {
-            past: [...state.history.past, state.objects].slice(-50),
-            future: [],
-          },
-          objects: [...state.objects, newObj],
-        }));
+        set((state) => {
+          const nextPath = obj.type === 'frame' 
+            ? [...state.presentationPath, id] 
+            : state.presentationPath;
+            
+          return {
+            lastSaved: Date.now(),
+            history: {
+              past: [...state.history.past, state.objects].slice(-50),
+              future: [],
+            },
+            objects: [...state.objects, newObj],
+            presentationPath: nextPath
+          };
+        });
         return id;
       },
+
 
       updateObject: (id, patch) => {
         const currentObjects = get().objects;
