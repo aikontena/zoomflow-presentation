@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useCanvasStore } from '@/lib/canvas-store';
-import { ChevronUp, ChevronDown, Map as MapIcon } from 'lucide-react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 
 export default function MiniMap() {
   const { objects, viewport, setViewport } = useCanvasStore();
@@ -79,7 +79,7 @@ export default function MiniMap() {
     <div className="bg-white/90 backdrop-blur-sm border-2 border-red-500 rounded-lg shadow-lg overflow-hidden transition-all duration-300 pointer-events-auto z-[9999]">
       <div className="flex items-center justify-between px-2 py-1.5 border-b border-neutral-100 bg-neutral-50/50">
         <div className="flex items-center gap-1.5 text-[10px] font-bold text-neutral-500 uppercase tracking-wider">
-          <MapIcon size={12} />
+          MAP
           Navigator
         </div>
         <button 
