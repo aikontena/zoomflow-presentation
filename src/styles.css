@@ -1,6 +1,17 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "tldraw/tldraw.css";
+
+/* Reset tldraw defaults to match cinematic theme */
+.tl-container {
+  --tl-background: transparent !important;
+}
+
+.tl-canvas {
+  background-color: transparent !important;
+}
+
 
 @custom-variant dark (&:is(.dark *));
 

@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { Tldraw, Editor } from "tldraw";
-import "tldraw/tldraw.css";
 import { useEditor } from "@/lib/editor-store";
 
 export function Canvas() {
