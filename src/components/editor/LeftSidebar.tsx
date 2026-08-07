@@ -33,7 +33,7 @@ const TABS = [
 
 export default function LeftSidebar() {
   const { undo, redo, history, lastSaved, save, setActiveOverlay } = useCanvasStore();
-  const [activeTab, setActiveTab] = useState<string | null>('icons');
+  const [activeTab, setActiveTab] = useState<string | null>(null);
   
   const [isCollapsed, setIsCollapsed] = useState(false);
 
