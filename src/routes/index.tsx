@@ -1,6 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Canvas } from "@/components/editor/Canvas";
+import { ClientOnly, createFileRoute } from "@tanstack/react-router";
+import { lazy, Suspense, useState } from "react";
 import { LeftSidebar } from "@/components/editor/LeftSidebar";
 import { RightSidebar } from "@/components/editor/RightSidebar";
 import { TopToolbar } from "@/components/editor/TopToolbar";
@@ -8,6 +7,17 @@ import { MiniMap } from "@/components/editor/MiniMap";
 import { PresentMode } from "@/components/editor/PresentMode";
 import { Timeline } from "@/components/editor/Timeline";
 
+const Canvas = lazy(() =>
+  import("@/components/editor/Canvas").then((module) => ({ default: module.Canvas })),
+);
+
+function CanvasFallback() {
+  return (
+    <div className="flex h-full w-full items-center justify-center bg-canvas text-sm text-muted-foreground">
+      Loading canvas…
+    </div>
+  );
+}
 
 const title = "ZoomCanvas AI — Infinite canvas presentation editor";
 const description =
@@ -41,7 +51,11 @@ function EditorPage() {
         </div>
 
           <main className="relative min-w-0 flex-1">
-            <Canvas />
+            <ClientOnly fallback={<CanvasFallback />}>
+              <Suspense fallback={<CanvasFallback />}>
+                <Canvas />
+              </Suspense>
+            </ClientOnly>
             <div className="pointer-events-none absolute bottom-4 right-4 hidden sm:block">
               <div className="pointer-events-auto">
                 <MiniMap />
