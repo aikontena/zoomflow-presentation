@@ -26,6 +26,8 @@ interface CanvasStore {
   selection: string[];
   viewport: { x: number; y: number; zoom: number };
   activeOverlay: 'templates' | 'export' | 'settings' | null;
+  snapEnabled: boolean;
+  setSnapEnabled: (enabled: boolean) => void;
   
   // Basic Actions
   addObject: (obj: Omit<CanvasObject, "id">) => string;
@@ -72,6 +74,8 @@ export const useCanvasStore = create<CanvasStore>()(
       selection: [],
       viewport: { x: 0, y: 0, zoom: 1 },
       activeOverlay: null,
+      snapEnabled: true,
+      setSnapEnabled: (snapEnabled) => set({ snapEnabled }),
       history: { past: [], future: [] },
       lastSaved: Date.now(),
 
