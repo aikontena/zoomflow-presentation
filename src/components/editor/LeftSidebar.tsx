@@ -14,6 +14,7 @@ import {
 import { useEditor, type ObjectType } from "@/lib/editor-store";
 import { templates } from "@/lib/templates";
 import { AIPanel } from "./AIPanel";
+import { createShapeId } from "tldraw";
 
 const TABS = [
   { id: "pages", label: "Pages", icon: Layers },
@@ -146,14 +147,18 @@ export function LeftSidebar() {
                   key={t.id}
                   onClick={() => {
                     if (!editor) return;
-                    const center = editor.getViewportScreenCenter();
+                    const center = editor.getViewportPageCenter();
                     editor.createShapes([
                       {
-                        id: (editor as any).createShapeId(),
-                        type: t.type,
+                        id: createShapeId(),
+                        type: t.type === "asset" ? "note" : t.type,
                         x: center.x,
                         y: center.y,
-                        props: t.geo ? { geo: t.geo } : {},
+                        props: t.geo
+                          ? { geo: t.geo }
+                          : t.type === "asset"
+                            ? { text: `${t.label} — upload or drop a file here` }
+                            : {},
                       } as any
                     ]);
                   }}
@@ -181,13 +186,13 @@ export function LeftSidebar() {
                   if (!file) return;
                   const url = URL.createObjectURL(file);
                   if (editor) {
-                    const center = editor.getViewportScreenCenter();
+                    const center = editor.getViewportPageCenter();
                     editor.createShapes([{
-                      id: (editor as any).createShapeId(),
-                      type: 'image',
+                      id: createShapeId(),
+                      type: 'note',
                       x: center.x,
                       y: center.y,
-                      props: { w: 400, h: 300, src: url, name: file.name }
+                      props: { text: `Uploaded image: ${file.name}\n${url}` }
                     } as any]);
                   }
                 }}
@@ -215,9 +220,9 @@ export function LeftSidebar() {
                   title={name}
                   onClick={() => {
                     if (editor) {
-                      const center = editor.getViewportScreenCenter();
+                      const center = editor.getViewportPageCenter();
                       editor.createShapes([{
-                        id: (editor as any).createShapeId(),
+                        id: createShapeId(),
                         type: 'text',
                         x: center.x,
                         y: center.y,
