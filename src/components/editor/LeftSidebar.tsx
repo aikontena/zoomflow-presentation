@@ -30,7 +30,7 @@ const TABS = [
 import { useCanvasStore } from '@/lib/canvas-store';
 
 export default function LeftSidebar() {
-  const { undo, redo, history } = useCanvasStore();
+  const { undo, redo, history, lastSaved, save } = useCanvasStore();
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -145,26 +145,51 @@ export default function LeftSidebar() {
             {activeTab === 'icons' && <p>Search thousands of icons.</p>}
             {activeTab === 'history' && (
               <div className="space-y-4">
-                <div className="flex items-center gap-2 text-neutral-900 font-medium mb-2">
-                  <Clock size={16} />
-                  <span>Time Travel</span>
+                <div className="flex items-center justify-between text-neutral-900 font-medium mb-2">
+                  <div className="flex items-center gap-2">
+                    <Clock size={16} />
+                    <span>Time Travel</span>
+                  </div>
+                  {lastSaved && (
+                    <span className="text-[10px] text-green-500 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                      Auto Saved
+                    </span>
+                  )}
                 </div>
+
+                <div className="bg-neutral-50 rounded-lg p-3 border border-neutral-100 space-y-2">
+                  <div className="flex items-center justify-between text-[11px] text-neutral-500">
+                    <span className="uppercase tracking-widest font-bold">Project Version</span>
+                    <span>v1.0.4</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px] text-neutral-500">
+                    <span className="uppercase tracking-widest font-bold">Recovery Status</span>
+                    <span className="text-green-600">Active</span>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <p className="text-xs uppercase tracking-wider text-neutral-400 font-bold">History Stack</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs uppercase tracking-wider text-neutral-400 font-bold">History Stack</p>
+                    <button 
+                      onClick={() => save()}
+                      className="text-[10px] text-primary hover:underline"
+                    >
+                      Restore Points
+                    </button>
+                  </div>
                   <div className="space-y-1">
                     {history.past.map((_, i) => (
-                      <div key={`past-${i}`} className="p-2 text-xs rounded border border-transparent hover:border-neutral-200 hover:bg-neutral-50 cursor-pointer">
-                        Version {i + 1}
+                      <div key={`past-${i}`} className="p-2 text-xs rounded border border-transparent hover:border-neutral-200 hover:bg-neutral-50 cursor-pointer flex justify-between items-center group">
+                        <span>Version {i + 1}</span>
+                        <span className="text-[9px] text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity">Restore</span>
                       </div>
                     )).reverse()}
-                    <div className="p-2 text-xs rounded bg-primary/5 text-primary border border-primary/20 font-medium">
-                      Current State
+                    <div className="p-2 text-xs rounded bg-primary/5 text-primary border border-primary/20 font-medium flex justify-between items-center">
+                      <span>Current State</span>
+                      <span className="text-[9px]">Active</span>
                     </div>
-                    {history.future.map((_, i) => (
-                      <div key={`future-${i}`} className="p-2 text-xs rounded border border-transparent hover:border-neutral-200 hover:bg-neutral-50 cursor-pointer text-neutral-300">
-                        Redo Version {i + 1}
-                      </div>
-                    ))}
                   </div>
                 </div>
               </div>

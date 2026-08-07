@@ -48,7 +48,9 @@ interface CanvasStore {
   ungroupObjects: (ids: string[]) => void;
 
   // System
+  lastSaved: number | null;
   clear: () => void;
+  save: () => void;
 }
 
 export const useCanvasStore = create<CanvasStore>()(
@@ -64,11 +66,13 @@ export const useCanvasStore = create<CanvasStore>()(
       selection: [],
       viewport: { x: 0, y: 0, zoom: 1 },
       history: { past: [], future: [] },
+      lastSaved: Date.now(),
 
       addObject: (obj) => {
         const id = Math.random().toString(36).substring(7);
         const newObj = { ...obj, id };
         set((state) => ({
+          lastSaved: Date.now(),
           history: {
             past: [...state.history.past, state.objects],
             future: [],
@@ -162,7 +166,8 @@ export const useCanvasStore = create<CanvasStore>()(
         console.log("Ungrouping", ids);
       },
 
-      clear: () => set({ objects: [], selection: [], history: { past: [], future: [] } }),
+      clear: () => set({ objects: [], selection: [], history: { past: [], future: [] }, lastSaved: null }),
+      save: () => set({ lastSaved: Date.now() }),
     }),
     {
       name: "zoomcanvas-v4-storage",
