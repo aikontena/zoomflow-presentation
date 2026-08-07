@@ -1,5 +1,4 @@
 import type { EditorDoc } from "./editor-store";
-import { makeObject } from "./editor-store";
 
 export interface TemplateDef {
   id: string;
@@ -9,20 +8,14 @@ export interface TemplateDef {
   build: () => EditorDoc;
 }
 
-function doc(title: string, objects: ReturnType<typeof makeObject>[], pages: EditorDoc["pages"]): EditorDoc {
+function doc(title: string, objects: any[], pages: EditorDoc["pages"]): EditorDoc {
   return { title, objects, pages };
 }
 
 const frame = (x: number, y: number) => ({ x, y, width: 960, height: 540 });
 
 function simple(title: string, headline: string, sub: string, accent: "rect" | "circle"): EditorDoc {
-  const h = { ...makeObject("heading", 120, 140), text: headline };
-  const s = { ...makeObject("text", 122, 250), text: sub, width: 480 };
-  const a = { ...makeObject(accent, 760, 160), width: 240, height: 240 };
-  const n1 = { ...makeObject("sticky", 180, 520), text: "Key point one" };
-  const n2 = { ...makeObject("sticky", 420, 520), text: "Key point two" };
-  const c = { ...makeObject("chart", 700, 520) };
-  return doc(title, [h, s, a, n1, n2, c], [
+  return doc(title, [], [
     { id: "t1", name: "Cover", frame: frame(60, 60), notes: "Open strong." },
     { id: "t2", name: "Points", frame: frame(120, 440), notes: "Walk the key points." },
     { id: "t3", name: "Data", frame: frame(620, 460), notes: "Land the evidence." },
