@@ -226,7 +226,9 @@ export default function Canvas() {
       </div>
 
       <div className="absolute bottom-4 right-4 z-50 pointer-events-auto">
+        <div className="bg-red-500 text-white p-2">MiniMap Placeholder</div>
         <MiniMap />
+
       </div>
 
       {/* Main Toolbar */}
