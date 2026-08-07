@@ -7,7 +7,7 @@ import { useServerFn } from "@tanstack/react-start";
 
 export function AIPanel() {
   const { setGenerating, isGenerating, aiProgress, applyGeneration } = useEditor();
-  const [prompt, setPrompt] = useState("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                            \n                                            masih tak boleh guna aplikasi ini. tolong fix sampai dapat guna.");
+  const [prompt, setPrompt] = useState("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                            \n                                            still not solve");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [metadata, setMetadata] = useState({
     title: "",
