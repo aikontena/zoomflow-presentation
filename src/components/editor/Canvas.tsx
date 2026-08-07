@@ -71,6 +71,8 @@ export function Canvas() {
       <Tldraw 
         onMount={handleMount}
         autoFocus
+        inferDarkMode
+        persistenceKey="zoomcanvas-persistence-v3"
       />
       
       <PathEditor />

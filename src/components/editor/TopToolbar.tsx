@@ -155,7 +155,7 @@ export function TopToolbar({ onPresent }: { onPresent: () => void }) {
         <button className={iconBtn} title="Version history" onClick={() => toast("Version history lands with the backend phase.")}>
           <History size={16} />
         </button>
-        <button className={iconBtn} title="Settings" onClick={() => toast("Editor settings coming soon.")}>
+        <button className={iconBtn} title="Settings" onClick={() => toast.info("Settings modal coming soon. Use the left sidebar 'Pages' and 'Templates' for now.")}>
           <Settings size={16} />
         </button>
         <button
