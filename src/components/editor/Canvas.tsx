@@ -35,9 +35,7 @@ export function Canvas() {
   return (
     <div className="relative h-full w-full overflow-hidden" style={bgStyle}>
       <Tldraw 
-        autoFocus
         onMount={handleMount}
-        inferDarkMode
       />
       
       {/* Overlay frames for pages/sections */}
