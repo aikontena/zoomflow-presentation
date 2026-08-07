@@ -28,7 +28,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 
+import { useCanvasStore } from '@/lib/canvas-store';
+import { toast } from 'sonner';
+
 export default function TemplateLibrary() {
+  const { setActiveOverlay, loadTemplate } = useCanvasStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
