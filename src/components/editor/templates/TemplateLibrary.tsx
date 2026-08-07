@@ -12,7 +12,8 @@ import {
   Layers,
   ArrowRight,
   TrendingUp,
-  Layout
+  Layout,
+  Sparkles
 } from 'lucide-react';
 import { TEMPLATES, Template } from '@/lib/templates';
 import { Button } from '@/components/ui/button';
