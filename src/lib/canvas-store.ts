@@ -8,6 +8,7 @@ export interface CanvasObject {
   y: number;
   width: number;
   height: number;
+  rotation: number;
   fill: string;
   text?: string;
   fontSize?: number;
@@ -39,6 +40,11 @@ interface CanvasStore {
   undo: () => void;
   redo: () => void;
   
+  // Advanced Actions
+  duplicateObjects: (ids: string[]) => void;
+  groupObjects: (ids: string[]) => void;
+  ungroupObjects: (ids: string[]) => void;
+
   // System
   clear: () => void;
 }
@@ -119,6 +125,33 @@ export const useCanvasStore = create<CanvasStore>()(
             future: newFuture,
           },
         }));
+      },
+
+      duplicateObjects: (ids) => {
+        const { objects } = get();
+        const toDuplicate = objects.filter(o => ids.includes(o.id));
+        const newObjects = toDuplicate.map(o => ({
+          ...o,
+          id: Math.random().toString(36).substring(7),
+          x: o.x + 20,
+          y: o.y + 20
+        }));
+        
+        set((state) => ({
+          history: { past: [...state.history.past, state.objects], future: [] },
+          objects: [...state.objects, ...newObjects],
+          selection: newObjects.map(o => o.id)
+        }));
+      },
+
+      groupObjects: (ids) => {
+        // Implementation for grouping would require a new 'group' object type
+        // For now, we'll toast or placeholder
+        console.log("Grouping", ids);
+      },
+
+      ungroupObjects: (ids) => {
+        console.log("Ungrouping", ids);
       },
 
       clear: () => set({ objects: [], selection: [], history: { past: [], future: [] } }),
