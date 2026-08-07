@@ -3,16 +3,19 @@ import { persist } from "zustand/middleware";
 
 export interface CanvasObject {
   id: string;
-  type: "rectangle" | "circle" | "text" | "image" | "frame";
+  type: "rectangle" | "circle" | "text" | "image" | "frame" | "icon";
   x: number;
   y: number;
   width: number;
   height: number;
   rotation: number;
   fill: string;
+  stroke?: string;
+  strokeWidth?: number;
   text?: string;
   fontSize?: number;
   src?: string;
+  iconName?: string;
   opacity?: number;
   parentId?: string;
 }
