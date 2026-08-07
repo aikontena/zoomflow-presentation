@@ -93,6 +93,9 @@ interface EditorState {
   past: any[];
   future: any[];
   selectedIds: string[];
+  isGenerating: boolean;
+  aiProgress: number;
+
 
   setEditor: (editor: Editor) => void;
   setTitle: (title: string) => void;
@@ -141,7 +144,10 @@ interface EditorState {
   
   exportToJson: () => string;
   importFromJson: (json: string) => void;
+  setGenerating: (isGenerating: boolean, progress?: number) => void;
+  applyGeneration: (data: any) => void;
 }
+
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
@@ -176,6 +182,9 @@ export const useEditor = create<EditorState>((set, get) => ({
   past: [],
   future: [],
   selectedIds: [],
+  isGenerating: false,
+  aiProgress: 0,
+
 
   setEditor: (editor) => set({ editor }),
   setTitle: (title) => set((s) => ({ title, doc: { ...s.doc, title }, dirty: true })),
@@ -431,7 +440,69 @@ export const useEditor = create<EditorState>((set, get) => ({
     } catch (e) {
       console.error("Failed to import canvas data", e);
     }
-  }
+  },
+
+  setGenerating: (isGenerating, aiProgress = 0) => set({ isGenerating, aiProgress }),
+
+  applyGeneration: (data) => set((s) => {
+    if (!s.editor) return s;
+    
+    const margin = 200;
+    const frameWidth = 960;
+    const frameHeight = 540;
+    const gap = 400;
+    
+    let currentX = 0;
+    let currentY = 0;
+    
+    const newPages: Page[] = [];
+    
+    // Simple layout engine: horizontal row for now
+    data.frames.forEach((f: any, i: number) => {
+      const pageId = uid();
+      const page: Page = {
+        id: pageId,
+        name: f.title,
+        subtitle: f.subtitle,
+        description: f.description,
+        frame: { 
+          x: currentX, 
+          y: currentY, 
+          width: frameWidth, 
+          height: frameHeight 
+        },
+        notes: f.speakerNotes || "",
+      };
+      newPages.push(page);
+      
+      // Add text content to the canvas
+      s.editor?.createShapes([
+        {
+          id: `shape:${uid()}` as any,
+          type: 'text',
+          x: currentX + 50,
+          y: currentY + 50,
+          props: { text: f.title, font: 'draw', size: 'l' }
+        },
+        {
+          id: `shape:${uid()}` as any,
+          type: 'text',
+          x: currentX + 50,
+          y: currentY + 120,
+          props: { text: f.description, font: 'sans', size: 'm' }
+        }
+      ]);
+      
+      currentX += frameWidth + gap;
+    });
+
+    return {
+      pages: [...s.pages, ...newPages],
+      doc: { ...s.doc, pages: [...s.pages, ...newPages] },
+      dirty: true,
+    };
+  })
 }));
+
 
 export const makeObject = (type: any, x: number, y: number) => ({});
