@@ -9,12 +9,48 @@ import {
 } from "tldraw";
 
 export type CanvasBackground = "white" | "light-grid" | "dot-grid" | "dark-grid" | "plain" | "custom";
+export type AnimationPreset = 'smooth' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'bounce' | 'elastic' | 'fast' | 'slow' | 'cinematic';
+export type TransitionEffect = 'zoom' | 'fade' | 'cross-fade' | 'slide' | 'rotate' | 'scale' | 'morph';
 
 export interface Page {
   id: string;
   name: string;
   frame: { x: number; y: number; width: number; height: number };
   notes: string;
+  transition?: TransitionEffect;
+  duration?: number;
+  preset?: AnimationPreset;
+}
+
+export interface CameraPath {
+  id: string;
+  name: string;
+  description?: string;
+  keyframes: CameraKeyframe[];
+  isLooping: boolean;
+  isReverse: boolean;
+}
+
+export interface CameraKeyframe {
+  id: string;
+  frameId: string;
+  orderIndex: number;
+  transitionDuration: number;
+  transitionType: TransitionEffect;
+  animationPreset: AnimationPreset;
+  stayDuration: number;
+  isSkipped: boolean;
+  notes?: string;
+}
+
+export interface CameraBookmark {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  zoom: number;
+  rotation: number;
+  targetFrameId?: string;
 }
 
 export type ObjectType = any;
@@ -24,6 +60,8 @@ export interface EditorDoc {
   title: string;
   pages: Page[];
   objects: any[];
+  paths: CameraPath[];
+  bookmarks: CameraBookmark[];
 }
 
 interface EditorState {
