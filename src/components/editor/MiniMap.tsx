@@ -3,8 +3,9 @@ import { useCanvasStore } from '@/lib/canvas-store';
 import { ChevronUp, ChevronDown, Map as MapIcon } from 'lucide-react';
 
 export default function MiniMap() {
-  console.log('MiniMap Render', { objectsCount: objects?.length });
   const { objects, viewport, setViewport } = useCanvasStore();
+  console.log('MiniMap Render', { objectsCount: objects?.length });
+
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
