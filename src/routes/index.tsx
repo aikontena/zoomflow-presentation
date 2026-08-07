@@ -7,14 +7,21 @@ import { MiniMap } from "@/components/editor/MiniMap";
 import { PresentMode } from "@/components/editor/PresentMode";
 import { Timeline } from "@/components/editor/Timeline";
 
-const Canvas = lazy(() =>
-  import("@/components/editor/Canvas").then((module) => ({ default: module.Canvas })),
-);
-
 function CanvasFallback() {
   return (
-    <div className="flex h-full w-full items-center justify-center bg-canvas text-sm text-muted-foreground">
-      Loading canvas…
+    <div className="flex h-full w-full flex-col items-center justify-center bg-canvas p-10 text-center">
+      <div className="max-w-md space-y-4">
+        <h2 className="text-2xl font-bold tracking-tight text-foreground">Canvas Resetting</h2>
+        <p className="text-sm text-muted-foreground">
+          The canvas module is being completely rebuilt to address stability and performance issues. 
+          Please wait for the next update to begin editing.
+        </p>
+        <div className="mt-8 flex justify-center">
+          <div className="h-1.5 w-full max-w-[200px] overflow-hidden rounded-full bg-secondary">
+            <div className="h-full w-1/3 animate-pulse bg-primary" />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -51,11 +58,7 @@ function EditorPage() {
         </div>
 
           <main className="relative min-w-0 flex-1">
-            <ClientOnly fallback={<CanvasFallback />}>
-              <Suspense fallback={<CanvasFallback />}>
-                <Canvas />
-              </Suspense>
-            </ClientOnly>
+            <CanvasFallback />
             <div className="pointer-events-none absolute bottom-4 right-4 hidden sm:block">
               <div className="pointer-events-auto">
                 <MiniMap />
