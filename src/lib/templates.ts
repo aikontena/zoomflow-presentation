@@ -9,7 +9,7 @@ export interface TemplateDef {
 }
 
 function doc(title: string, objects: any[], pages: EditorDoc["pages"]): EditorDoc {
-  return { title, objects, pages };
+  return { title, objects, pages, paths: [], bookmarks: [] };
 }
 
 const frame = (x: number, y: number) => ({ x, y, width: 960, height: 540 });

@@ -9,12 +9,50 @@ import {
 } from "tldraw";
 
 export type CanvasBackground = "white" | "light-grid" | "dot-grid" | "dark-grid" | "plain" | "custom";
+export type AnimationPreset = 'smooth' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'bounce' | 'elastic' | 'fast' | 'slow' | 'cinematic';
+export type TransitionEffect = 'zoom' | 'fade' | 'cross-fade' | 'slide' | 'rotate' | 'scale' | 'morph';
 
 export interface Page {
   id: string;
   name: string;
+  subtitle?: string;
+  description?: string;
   frame: { x: number; y: number; width: number; height: number };
   notes: string;
+  transition?: TransitionEffect;
+  duration?: number;
+  preset?: AnimationPreset;
+}
+
+export interface CameraPath {
+  id: string;
+  name: string;
+  description?: string;
+  keyframes: CameraKeyframe[];
+  isLooping: boolean;
+  isReverse: boolean;
+}
+
+export interface CameraKeyframe {
+  id: string;
+  frameId: string;
+  orderIndex: number;
+  transitionDuration: number;
+  transitionType: TransitionEffect;
+  animationPreset: AnimationPreset;
+  stayDuration: number;
+  isSkipped: boolean;
+  notes?: string;
+}
+
+export interface CameraBookmark {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  zoom: number;
+  rotation: number;
+  targetFrameId?: string;
 }
 
 export type ObjectType = any;
@@ -24,6 +62,8 @@ export interface EditorDoc {
   title: string;
   pages: Page[];
   objects: any[];
+  paths: CameraPath[];
+  bookmarks: CameraBookmark[];
 }
 
 interface EditorState {
@@ -40,6 +80,13 @@ interface EditorState {
   lastSavedAt: number | null;
   dirty: boolean;
   
+  paths: CameraPath[];
+  bookmarks: CameraBookmark[];
+  activePathId: string | null;
+  currentKeyframeIndex: number;
+  focusMode: boolean;
+  spotlightId: string | null;
+
   doc: EditorDoc;
   viewport: { x: number, y: number, zoom: number };
   tool: string;
@@ -64,6 +111,21 @@ interface EditorState {
   setPageNotes: (id: string, notes: string) => void;
   setActivePage: (id: string) => void;
   capturePageFrame: (id: string, frame: Page["frame"]) => void;
+
+  addPath: (name: string) => void;
+  removePath: (id: string) => void;
+  addKeyframe: (pathId: string, frameId: string) => void;
+  removeKeyframe: (pathId: string, keyframeId: string) => void;
+  reorderKeyframe: (pathId: string, fromIndex: number, toIndex: number) => void;
+  setActivePath: (id: string | null) => void;
+  
+  addBookmark: (name: string) => void;
+  removeBookmark: (id: string) => void;
+  applyBookmark: (id: string) => void;
+  
+  setFocusMode: (enabled: boolean) => void;
+  setSpotlight: (id: string | null) => void;
+  goToFrame: (frameId: string, options?: { duration?: number, preset?: AnimationPreset, instant?: boolean }) => void;
 
   undo: () => void;
   redo: () => void;
@@ -90,7 +152,7 @@ export const useEditor = create<EditorState>((set, get) => ({
   store: createTLStore({ shapeUtils: [...defaultShapeUtils] as any }),
   activePageId: "p1",
   pages: [
-    { id: "p1", name: "Opening", frame: { x: 0, y: 0, width: 960, height: 540 }, notes: "Welcome the room." },
+    { id: "p1", name: "Opening", frame: { x: 0, y: 0, width: 960, height: 540 }, notes: "Welcome the room.", preset: 'cinematic', transition: 'zoom', duration: 1000 },
   ],
   title: "Untitled presentation",
   background: "dark-grid",
@@ -100,8 +162,15 @@ export const useEditor = create<EditorState>((set, get) => ({
   snapToGrid: true,
   lastSavedAt: null,
   dirty: false,
+  
+  paths: [],
+  bookmarks: [],
+  activePathId: null,
+  currentKeyframeIndex: 0,
+  focusMode: false,
+  spotlightId: null,
 
-  doc: { title: "Untitled presentation", pages: [], objects: [] },
+  doc: { title: "Untitled presentation", pages: [], objects: [], paths: [], bookmarks: [] },
   viewport: { x: 0, y: 0, zoom: 1 },
   tool: "select",
   past: [],
@@ -189,6 +258,111 @@ export const useEditor = create<EditorState>((set, get) => ({
       dirty: true,
     };
   }),
+
+  addPath: (name) => set((s) => ({
+    paths: [...s.paths, { id: uid(), name, keyframes: [], isLooping: false, isReverse: false }],
+    dirty: true
+  })),
+
+  removePath: (id) => set((s) => ({
+    paths: s.paths.filter(p => p.id !== id),
+    activePathId: s.activePathId === id ? null : s.activePathId,
+    dirty: true
+  })),
+
+  addKeyframe: (pathId, frameId) => set((s) => {
+    const paths = s.paths.map(p => {
+      if (p.id !== pathId) return p;
+      const kf: CameraKeyframe = {
+        id: uid(),
+        frameId,
+        orderIndex: p.keyframes.length,
+        transitionDuration: 1000,
+        transitionType: 'zoom',
+        animationPreset: 'cinematic',
+        stayDuration: 0,
+        isSkipped: false
+      };
+      return { ...p, keyframes: [...p.keyframes, kf] };
+    });
+    return { paths, dirty: true };
+  }),
+
+  removeKeyframe: (pathId, keyframeId) => set((s) => {
+    const paths = s.paths.map(p => {
+      if (p.id !== pathId) return p;
+      return { ...p, keyframes: p.keyframes.filter(k => k.id !== keyframeId) };
+    });
+    return { paths, dirty: true };
+  }),
+
+  reorderKeyframe: (pathId, fromIndex, toIndex) => set((s) => {
+    const paths = s.paths.map(p => {
+      if (p.id !== pathId) return p;
+      const keyframes = [...p.keyframes];
+      const [moved] = keyframes.splice(fromIndex, 1);
+      if (moved) keyframes.splice(toIndex, 0, moved);
+      return { ...p, keyframes: keyframes.map((k, i) => ({ ...k, orderIndex: i })) };
+    });
+    return { paths, dirty: true };
+  }),
+
+  setActivePath: (activePathId) => set({ activePathId, currentKeyframeIndex: 0 }),
+
+  addBookmark: (name) => set((s) => {
+    if (!s.editor) return s;
+    const camera = s.editor.getCamera();
+    const bookmark: CameraBookmark = {
+      id: uid(),
+      name,
+      x: camera.x,
+      y: camera.y,
+      zoom: camera.z,
+      rotation: 0,
+    };
+    return { bookmarks: [...s.bookmarks, bookmark], dirty: true };
+  }),
+
+  removeBookmark: (id) => set((s) => ({
+    bookmarks: s.bookmarks.filter(b => b.id !== id),
+    dirty: true
+  })),
+
+  applyBookmark: (id) => {
+    const s = get();
+    const b = s.bookmarks.find(x => x.id === id);
+    if (b && s.editor) {
+      s.editor.setCamera({ x: b.x, y: b.y, z: b.zoom });
+    }
+  },
+
+  setFocusMode: (focusMode) => set({ focusMode }),
+  setSpotlight: (spotlightId) => set({ spotlightId }),
+
+  goToFrame: (frameId, options) => {
+    const s = get();
+    const page = s.pages.find(p => p.id === frameId);
+    if (page && s.editor) {
+      const { x, y, width, height } = page.frame;
+      const margin = 100;
+      
+      if (options?.instant) {
+        s.editor.setCamera({ x: -x + margin, y: -y + margin, z: 1 });
+      } else {
+        const zoom = Math.min(
+          (s.editor.getContainer().clientWidth - margin) / width,
+          (s.editor.getContainer().clientHeight - margin) / height
+        );
+        s.editor.setCamera({
+          x: -x + (s.editor.getContainer().clientWidth / zoom - width) / 2,
+          y: -y + (s.editor.getContainer().clientHeight / zoom - height) / 2,
+          z: zoom
+        }, {
+          animation: { duration: options?.duration || 1000 }
+        });
+      }
+    }
+  },
 
   undo: () => {
     const s = get();
