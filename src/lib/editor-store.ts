@@ -345,20 +345,18 @@ export const useEditor = create<EditorState>((set, get) => ({
       const margin = 100;
       
       if (options?.instant) {
-        s.editor.zoomToFit(); // Fallback for simple zoom to fit if needed
-        // Or manual:
         s.editor.setCamera({ x: -x + margin, y: -y + margin, z: 1 });
       } else {
-        // Use tldraw's built in camera easing if possible, or manual easing
-        s.editor.animateCamera({
-          x: -x + (s.editor.getContainer().clientWidth - width) / 2,
-          y: -y + (s.editor.getContainer().clientHeight - height) / 2,
-          z: Math.min(
-            (s.editor.getContainer().clientWidth - margin) / width,
-            (s.editor.getContainer().clientHeight - margin) / height
-          )
+        const zoom = Math.min(
+          (s.editor.getContainer().clientWidth - margin) / width,
+          (s.editor.getContainer().clientHeight - margin) / height
+        );
+        s.editor.setCamera({
+          x: -x + (s.editor.getContainer().clientWidth / zoom - width) / 2,
+          y: -y + (s.editor.getContainer().clientHeight / zoom - height) / 2,
+          z: zoom
         }, {
-          duration: options?.duration || 1000,
+          animation: { duration: options?.duration || 1000 }
         });
       }
     }
