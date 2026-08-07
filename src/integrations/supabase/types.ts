@@ -14,7 +14,166 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      camera_bookmarks: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          rotation: number | null
+          target_frame_id: string | null
+          x: number
+          y: number
+          zoom: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          rotation?: number | null
+          target_frame_id?: string | null
+          x: number
+          y: number
+          zoom: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          rotation?: number | null
+          target_frame_id?: string | null
+          x?: number
+          y?: number
+          zoom?: number
+        }
+        Relationships: []
+      }
+      camera_keyframes: {
+        Row: {
+          animation_preset:
+            | Database["public"]["Enums"]["animation_preset"]
+            | null
+          created_at: string | null
+          frame_id: string
+          id: string
+          is_skipped: boolean | null
+          notes: string | null
+          order_index: number
+          path_id: string
+          stay_duration: number | null
+          transition_duration: number | null
+          transition_type:
+            | Database["public"]["Enums"]["transition_effect"]
+            | null
+        }
+        Insert: {
+          animation_preset?:
+            | Database["public"]["Enums"]["animation_preset"]
+            | null
+          created_at?: string | null
+          frame_id: string
+          id?: string
+          is_skipped?: boolean | null
+          notes?: string | null
+          order_index: number
+          path_id: string
+          stay_duration?: number | null
+          transition_duration?: number | null
+          transition_type?:
+            | Database["public"]["Enums"]["transition_effect"]
+            | null
+        }
+        Update: {
+          animation_preset?:
+            | Database["public"]["Enums"]["animation_preset"]
+            | null
+          created_at?: string | null
+          frame_id?: string
+          id?: string
+          is_skipped?: boolean | null
+          notes?: string | null
+          order_index?: number
+          path_id?: string
+          stay_duration?: number | null
+          transition_duration?: number | null
+          transition_type?:
+            | Database["public"]["Enums"]["transition_effect"]
+            | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "camera_keyframes_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "camera_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      camera_paths: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_looping: boolean | null
+          is_reverse: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_looping?: boolean | null
+          is_reverse?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_looping?: boolean | null
+          is_reverse?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      presentation_sessions: {
+        Row: {
+          completed_frames: number | null
+          ended_at: string | null
+          id: string
+          path_id: string | null
+          started_at: string | null
+          total_frames: number | null
+        }
+        Insert: {
+          completed_frames?: number | null
+          ended_at?: string | null
+          id?: string
+          path_id?: string | null
+          started_at?: string | null
+          total_frames?: number | null
+        }
+        Update: {
+          completed_frames?: number | null
+          ended_at?: string | null
+          id?: string
+          path_id?: string | null
+          started_at?: string | null
+          total_frames?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presentation_sessions_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "camera_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +182,24 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      animation_preset:
+        | "smooth"
+        | "ease-in"
+        | "ease-out"
+        | "ease-in-out"
+        | "bounce"
+        | "elastic"
+        | "fast"
+        | "slow"
+        | "cinematic"
+      transition_effect:
+        | "zoom"
+        | "fade"
+        | "cross-fade"
+        | "slide"
+        | "rotate"
+        | "scale"
+        | "morph"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +326,27 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      animation_preset: [
+        "smooth",
+        "ease-in",
+        "ease-out",
+        "ease-in-out",
+        "bounce",
+        "elastic",
+        "fast",
+        "slow",
+        "cinematic",
+      ],
+      transition_effect: [
+        "zoom",
+        "fade",
+        "cross-fade",
+        "slide",
+        "rotate",
+        "scale",
+        "morph",
+      ],
+    },
   },
 } as const
