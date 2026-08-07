@@ -190,7 +190,7 @@ export const useEditor = create<EditorState>((set, get) => ({
     set({ editor });
     
     // Sync store tool with editor tool
-    editor.store.listen(() => {
+    const syncFromEditor = () => {
       const toolState = editor.getInstanceState() as any;
       if (toolState) {
         let currentTool = toolState.activeToolId || 'select';
@@ -203,7 +203,15 @@ export const useEditor = create<EditorState>((set, get) => ({
           set({ tool: currentTool });
         }
       }
-    }, { source: 'user', scope: 'presence' });
+
+      const camera = editor.getCamera();
+      if (get().viewport.zoom !== camera.z || get().viewport.x !== camera.x || get().viewport.y !== camera.y) {
+        set({ viewport: { x: camera.x, y: camera.y, zoom: camera.z } });
+      }
+    };
+
+    editor.store.listen(syncFromEditor, { source: 'user', scope: 'presence' });
+    editor.store.listen(syncFromEditor, { source: 'remote', scope: 'presence' }); // Catch programmatic changes too
   },
   setTitle: (title) => set((s) => ({ title, doc: { ...s.doc, title }, dirty: true })),
   setBackground: (background) => set({ background, dirty: true }),
