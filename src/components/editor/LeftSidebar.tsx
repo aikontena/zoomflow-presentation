@@ -92,13 +92,18 @@ export default function LeftSidebar() {
                   {[1, 2, 3, 4].map(i => (
                     <React.Fragment key={i}>
                       <div className="group relative flex flex-col gap-2">
-                        <div className="p-3 bg-white rounded-lg border border-neutral-200 text-neutral-900 font-medium shadow-sm flex items-center justify-between hover:border-primary transition-colors cursor-pointer">
-                          <span>Frame {i}</span>
-                          <span className="text-[10px] text-neutral-400">1920x1080</span>
+                        <div className="aspect-video bg-neutral-100 rounded-lg border border-neutral-200 overflow-hidden relative group-hover:border-primary transition-colors cursor-pointer shadow-sm">
+                          <div className="absolute inset-0 flex items-center justify-center text-neutral-300">
+                            <span className="text-2xl font-thin">□</span>
+                          </div>
+                          <div className="absolute bottom-0 inset-x-0 bg-white/90 backdrop-blur-sm p-2 text-[10px] font-medium border-t border-neutral-100 flex justify-between items-center">
+                            <span>Frame {i}</span>
+                            <span className="opacity-0 group-hover:opacity-100 transition-opacity">Edit</span>
+                          </div>
                         </div>
                         {i < 4 && (
-                          <div className="flex justify-center text-neutral-300">
-                            <ChevronRight className="rotate-90" size={16} />
+                          <div className="flex justify-center text-neutral-200">
+                            <div className="w-px h-4 bg-neutral-200" />
                           </div>
                         )}
                       </div>
