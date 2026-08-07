@@ -122,7 +122,9 @@ export function RightSidebar() {
                       step="0.1"
                       value={(firstSelected?.props as any)?.opacity ?? 1}
                       onChange={(e) => {
-                        editor?.updateShapes([{ id: firstSelected.id, props: { opacity: parseFloat(e.target.value) } }]);
+                        if (firstSelected) {
+                          editor?.updateShapes([{ id: firstSelected.id, props: { opacity: parseFloat(e.target.value) } } as any]);
+                        }
                       }}
                     />
                  </div>
