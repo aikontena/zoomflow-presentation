@@ -56,7 +56,7 @@ export default function Canvas() {
     const x = (e.clientX - rect.left - viewport.x) / viewport.zoom;
     const y = (e.clientY - rect.top - viewport.y) / viewport.zoom;
 
-    if (e.button === 1 || (e.button === 0 && e.spaceKey)) {
+    if (e.button === 1) { // Middle click for pan
       setIsPanning(true);
       setDragStart({ x: e.clientX, y: e.clientY });
       return;
@@ -111,10 +111,14 @@ export default function Canvas() {
       const dx = x - dragStart.x;
       const dy = y - dragStart.y;
       
-      updateObject(selection[0], {
-        x: objects.find(o => o.id === selection[0])!.x + dx,
-        y: objects.find(o => o.id === selection[0])!.y + dy
-      });
+      const target = objects.find(o => o.id === selection[0]);
+      if (target) {
+        updateObject(selection[0], {
+          x: target.x + dx,
+          y: target.y + dy
+        });
+      }
+
       setDragStart({ x, y });
     }
   };
