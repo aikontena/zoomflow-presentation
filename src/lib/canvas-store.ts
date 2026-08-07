@@ -66,6 +66,7 @@ export const useCanvasStore = create<CanvasStore>()(
       ],
       selection: [],
       viewport: { x: 0, y: 0, zoom: 1 },
+      activeOverlay: null,
       history: { past: [], future: [] },
       lastSaved: Date.now(),
 
