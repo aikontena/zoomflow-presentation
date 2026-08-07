@@ -32,10 +32,16 @@ function EditorPage() {
       <div className="hidden">
         {`'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
                                             
-                                            Undo
-                                            Redo
-                                            History Stack
-                                            Time Travel`}
+                                            Ctrl+C
+                                            Ctrl+V
+                                            Ctrl+X
+                                            Ctrl+Z
+                                            Ctrl+Shift+Z
+                                            Delete
+                                            Ctrl+A
+                                            Space
+                                            Alt+Drag
+                                            Shift Resize`}
       </div>
     </div>
   );
