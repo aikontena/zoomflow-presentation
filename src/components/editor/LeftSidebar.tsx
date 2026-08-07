@@ -149,7 +149,7 @@ export function LeftSidebar() {
                     const center = editor.getViewportScreenCenter();
                     editor.createShapes([
                       {
-                        id: editor.createShapeId(),
+                        id: (editor as any).createShapeId(),
                         type: t.type,
                         x: center.x,
                         y: center.y,
