@@ -171,6 +171,7 @@ export const useCanvasStore = create<CanvasStore>()(
 
       clear: () => set({ objects: [], selection: [], history: { past: [], future: [] }, lastSaved: null }),
       save: () => set({ lastSaved: Date.now() }),
+      setActiveOverlay: (activeOverlay) => set({ activeOverlay }),
     }),
     {
       name: "zoomcanvas-v4-storage",
