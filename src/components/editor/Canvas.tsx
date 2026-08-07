@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { Tldraw, Editor } from "tldraw";
+import { Tldraw, Editor, getSnapshot } from "tldraw";
 import { useEditor } from "@/lib/editor-store";
 import { PathEditor } from "./PathEditor";
 
@@ -19,6 +19,24 @@ export function Canvas() {
     if (!editor) return;
     editor.updateInstanceState({ isGridMode: showGrid });
   }, [editor, showGrid]);
+
+  useEffect(() => {
+    if (!editor) return;
+    const saveCanvas = () => {
+      try {
+        window.localStorage.setItem("zoomcanvas-canvas-v2", JSON.stringify(getSnapshot(editor.store)));
+      } catch (error) {
+        console.warn("Canvas could not be saved locally", error);
+      }
+    };
+    const interval = window.setInterval(saveCanvas, 1000);
+    window.addEventListener("pagehide", saveCanvas);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("pagehide", saveCanvas);
+      saveCanvas();
+    };
+  }, [editor]);
 
   const handleMount = useCallback((editor: Editor) => {
     setEditor(editor);

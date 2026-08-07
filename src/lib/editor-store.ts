@@ -226,14 +226,6 @@ export const useEditor = create<EditorState>((set, get) => ({
 
     editor.store.listen(syncFromEditor, { source: 'user', scope: 'presence' });
     editor.store.listen(syncFromEditor, { source: 'remote', scope: 'presence' }); // Catch programmatic changes too
-    editor.store.listen(() => {
-      if (typeof window === "undefined") return;
-      try {
-        window.localStorage.setItem("zoomcanvas-canvas-v2", JSON.stringify(getSnapshot(editor.store)));
-      } catch (error) {
-        console.warn("Canvas could not be saved locally", error);
-      }
-    }, { scope: 'document' });
   },
   setTitle: (title) => set((s) => ({ title, doc: { ...s.doc, title }, dirty: true })),
   setBackground: (background) => set({ background, dirty: true }),
