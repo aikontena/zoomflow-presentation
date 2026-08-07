@@ -17,7 +17,6 @@ export interface Page {
   notes: string;
 }
 
-// Temporary types to satisfy existing components while migrating
 export type ObjectType = any;
 export type CanvasObject = any;
 export type AnimationName = any;
@@ -41,7 +40,6 @@ interface EditorState {
   lastSavedAt: number | null;
   dirty: boolean;
   
-  // Legacy compatibility props
   doc: EditorDoc;
   viewport: { x: number, y: number, zoom: number };
   tool: string;
@@ -60,7 +58,6 @@ interface EditorState {
   setViewport: (v: any) => void;
   select: (ids: string[]) => void;
   
-  // Page management
   addPage: () => void;
   removePage: (id: string) => void;
   renamePage: (id: string, name: string) => void;
@@ -68,7 +65,6 @@ interface EditorState {
   setActivePage: (id: string) => void;
   capturePageFrame: (id: string, frame: Page["frame"]) => void;
 
-  // History & Actions
   undo: () => void;
   redo: () => void;
   markSaved: () => void;
@@ -81,7 +77,6 @@ interface EditorState {
   updateSelected: (patch: any) => void;
   loadTemplate: (doc: any) => void;
   
-  // Data
   exportToJson: () => string;
   importFromJson: (json: string) => void;
 }
@@ -92,7 +87,7 @@ export const gridSize = 20;
 
 export const useEditor = create<EditorState>((set, get) => ({
   editor: null,
-  store: createTLStore({ shapeUtils: defaultShapeUtils as any }),
+  store: createTLStore({ shapeUtils: [...defaultShapeUtils] as any }),
   activePageId: "p1",
   pages: [
     { id: "p1", name: "Opening", frame: { x: 0, y: 0, width: 960, height: 540 }, notes: "Welcome the room." },
@@ -106,7 +101,6 @@ export const useEditor = create<EditorState>((set, get) => ({
   lastSavedAt: null,
   dirty: false,
 
-  // Legacy state mocks
   doc: { title: "Untitled presentation", pages: [], objects: [] },
   viewport: { x: 0, y: 0, zoom: 1 },
   tool: "select",
@@ -227,7 +221,6 @@ export const useEditor = create<EditorState>((set, get) => ({
     const s = get();
     if (!s.editor) return "";
     const id = uid();
-    // Simplified mapping for now
     return id;
   },
   updateObject: (id, patch) => set({ dirty: true }),
