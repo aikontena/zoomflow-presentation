@@ -4,7 +4,7 @@ import { lazy, Suspense } from "react";
 import { Loader2 } from "lucide-react";
 
 
-const Canvas = lazy(() => import("@/components/editor/Canvas").then(m => ({ default: m.default })));
+const Canvas = lazy(() => import("@/components/editor/Canvas"));
 
 function CanvasFallback() {
   return (
