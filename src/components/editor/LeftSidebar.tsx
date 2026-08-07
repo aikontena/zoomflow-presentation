@@ -17,6 +17,7 @@ import {
   LayoutGrid
 } from 'lucide-react';
 import { IconLibrary } from './IconLibrary';
+import { useCanvasStore } from '@/lib/canvas-store';
 
 const TABS = [
   { id: 'pages', label: 'Pages', icon: FileText },
