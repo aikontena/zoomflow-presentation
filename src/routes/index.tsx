@@ -4,6 +4,11 @@ import { lazy, Suspense } from "react";
 const Canvas = lazy(() => import("@/components/editor/Canvas"));
 const LeftSidebar = lazy(() => import("@/components/editor/LeftSidebar"));
 const RightSidebar = lazy(() => import("@/components/editor/RightSidebar"));
+const TemplateLibrary = lazy(() => import("@/components/editor/templates/TemplateLibrary"));
+
+import { useCanvasStore } from "@/lib/canvas-store";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   component: EditorPage,
