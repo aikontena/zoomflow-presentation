@@ -19,6 +19,7 @@ export interface CanvasObject {
 
 interface CanvasStore {
   objects: CanvasObject[];
+  frames: { id: string; name: string; order: number }[];
   selection: string[];
   viewport: { x: number; y: number; zoom: number };
   
@@ -54,6 +55,12 @@ export const useCanvasStore = create<CanvasStore>()(
   persist(
     (set, get) => ({
       objects: [],
+      frames: [
+        { id: 'f1', name: 'Frame 1', order: 0 },
+        { id: 'f2', name: 'Frame 2', order: 1 },
+        { id: 'f3', name: 'Frame 3', order: 2 },
+        { id: 'f4', name: 'Frame 4', order: 3 },
+      ],
       selection: [],
       viewport: { x: 0, y: 0, zoom: 1 },
       history: { past: [], future: [] },

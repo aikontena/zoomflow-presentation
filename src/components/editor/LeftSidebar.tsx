@@ -87,10 +87,26 @@ export default function LeftSidebar() {
           </div>
           <div className="flex-1 p-4 text-sm text-neutral-500">
             {activeTab === 'pages' && (
-              <div className="space-y-2">
-                <div className="p-3 bg-neutral-50 rounded-lg border border-neutral-200 text-neutral-900 font-medium">Page 1</div>
-                <button className="w-full py-2 border-2 border-dashed border-neutral-200 rounded-lg hover:border-neutral-300 hover:bg-neutral-50 transition-colors">
-                  + Add Page
+              <div className="space-y-4">
+                <div className="flex flex-col gap-4">
+                  {[1, 2, 3, 4].map(i => (
+                    <React.Fragment key={i}>
+                      <div className="group relative flex flex-col gap-2">
+                        <div className="p-3 bg-white rounded-lg border border-neutral-200 text-neutral-900 font-medium shadow-sm flex items-center justify-between hover:border-primary transition-colors cursor-pointer">
+                          <span>Frame {i}</span>
+                          <span className="text-[10px] text-neutral-400">1920x1080</span>
+                        </div>
+                        {i < 4 && (
+                          <div className="flex justify-center text-neutral-300">
+                            <ChevronRight className="rotate-90" size={16} />
+                          </div>
+                        )}
+                      </div>
+                    </React.Fragment>
+                  ))}
+                </div>
+                <button className="w-full py-2 border-2 border-dashed border-neutral-200 rounded-lg hover:border-neutral-300 hover:bg-neutral-50 transition-colors text-neutral-400 font-medium">
+                  + Add New Frame
                 </button>
               </div>
             )}
