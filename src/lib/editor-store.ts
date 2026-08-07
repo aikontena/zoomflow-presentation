@@ -190,12 +190,12 @@ export const useEditor = create<EditorState>((set, get) => ({
     set({ editor });
     
     // Sync store tool with editor tool
-    editor.store.listen((entry) => {
-      const toolState = editor.getInstanceState();
+    editor.store.listen(() => {
+      const toolState = editor.getInstanceState() as any;
       if (toolState) {
-        let currentTool = toolState.activeToolId;
+        let currentTool = toolState.activeToolId || 'select';
         if (currentTool === 'geo') {
-          const props = (toolState as any).propsForNextShape;
+          const props = toolState.propsForNextShape;
           if (props?.geo === 'rectangle') currentTool = 'geo-rect';
           else if (props?.geo === 'ellipse') currentTool = 'geo-circle';
         }
@@ -203,7 +203,7 @@ export const useEditor = create<EditorState>((set, get) => ({
           set({ tool: currentTool });
         }
       }
-    }, { source: 'user', scope: 'local' });
+    }, { source: 'user', scope: 'presence' });
   },
   setTitle: (title) => set((s) => ({ title, doc: { ...s.doc, title }, dirty: true })),
   setBackground: (background) => set({ background, dirty: true }),
