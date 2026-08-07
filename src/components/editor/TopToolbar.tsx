@@ -18,21 +18,25 @@ import {
   StickyNote,
   Code2,
   Image as ImageIcon,
+  Video,
+  FileText,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useEditor, type ObjectType } from "@/lib/editor-store";
+import { useEditor } from "@/lib/editor-store";
 
-const TOOLS: { id: ObjectType | "select"; icon: typeof MousePointer2; label: string }[] = [
-  { id: "select", icon: MousePointer2, label: "Select" },
-  { id: "heading", icon: Type, label: "Heading" },
-  { id: "rect", icon: Square, label: "Rectangle" },
-  { id: "circle", icon: Circle, label: "Circle" },
-  { id: "arrow", icon: ArrowRight, label: "Arrow" },
-  { id: "sticky", icon: StickyNote, label: "Sticky" },
-  { id: "code", icon: Code2, label: "Code" },
+const TOOLS = [
+  { id: "select", icon: MousePointer2, label: "Select (V)" },
+  { id: "text", icon: Type, label: "Text (T)" },
+  { id: "draw", icon: MousePointer2, label: "Draw (D)", hidden: true }, // Placeholder if needed
+  { id: "geo-rect", icon: Square, label: "Rectangle (R)" },
+  { id: "geo-circle", icon: Circle, label: "Circle (O)" },
+  { id: "arrow", icon: ArrowRight, label: "Arrow (A)" },
+  { id: "note", icon: StickyNote, label: "Sticky Note (N)" },
   { id: "image", icon: ImageIcon, label: "Image" },
+  { id: "video", icon: Video, label: "Video" },
+  { id: "pdf", icon: FileText, label: "PDF" },
 ];
 
 export function TopToolbar({ onPresent }: { onPresent: () => void }) {
