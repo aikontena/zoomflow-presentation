@@ -231,10 +231,10 @@ export const useEditor = create<EditorState>((set, get) => ({
       editor.setCurrentTool('select');
     } else if (tool === 'geo-rect') {
       editor.setCurrentTool('geo');
-      (editor as any).updateInstanceState({ propsForNextShape: { geo: 'rectangle' } });
+      editor.updateInstanceState({ propsForNextShape: { geo: 'rectangle' } } as any);
     } else if (tool === 'geo-circle') {
       editor.setCurrentTool('geo');
-      (editor as any).updateInstanceState({ propsForNextShape: { geo: 'ellipse' } });
+      editor.updateInstanceState({ propsForNextShape: { geo: 'ellipse' } } as any);
     } else if (['text', 'arrow', 'note', 'draw'].includes(tool)) {
       editor.setCurrentTool(tool);
     }
