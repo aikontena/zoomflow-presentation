@@ -59,6 +59,7 @@ export function TopToolbar({ onPresent }: { onPresent: () => void }) {
     setViewport,
     viewport,
     addObject,
+    setActivePath,
   } = useEditor();
   const [savedLabel, setSavedLabel] = useState("Not saved yet");
 
@@ -152,10 +153,10 @@ export function TopToolbar({ onPresent }: { onPresent: () => void }) {
       </div>
 
       <div className="ml-auto flex items-center gap-0.5">
-        <button className={iconBtn} title="Version history" onClick={() => toast("Version history lands with the backend phase.")}>
+        <button className={iconBtn} title="Version history" onClick={() => setActivePath(null)}>
           <History size={16} />
         </button>
-        <button className={iconBtn} title="Settings" onClick={() => toast.info("Settings modal coming soon. Use the left sidebar 'Pages' and 'Templates' for now.")}>
+        <button className={iconBtn} title="Settings" onClick={() => toast.info("Settings modal in development. Use left sidebar for configuration.")}>
           <Settings size={16} />
         </button>
         <button
