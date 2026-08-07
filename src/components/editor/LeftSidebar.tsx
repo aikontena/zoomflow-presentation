@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   FileText, 
   Layers, 
@@ -8,13 +8,11 @@ import {
   Sparkles, 
   Box,
   ChevronLeft,
-  ChevronRight,
-  Settings,
   Undo2,
   Redo2,
-  History,
+  Settings,
   Clock,
-  LayoutGrid
+  History
 } from 'lucide-react';
 import { IconLibrary } from './IconLibrary';
 import { useCanvasStore } from '@/lib/canvas-store';
@@ -29,7 +27,6 @@ const TABS = [
   { id: 'icons', label: 'Icons', icon: Box },
   { id: 'history', label: 'History', icon: History },
 ];
-
 
 export default function LeftSidebar() {
   const { 
@@ -47,9 +44,7 @@ export default function LeftSidebar() {
   } = useCanvasStore();
 
   const [activeTab, setActiveTab] = useState<string | null>(null);
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
-
+  
   return (
     <div className="flex h-full bg-white border-r border-neutral-200">
       {/* Icon Bar */}
@@ -83,16 +78,19 @@ export default function LeftSidebar() {
           >
             <Redo2 size={20} />
           </button>
-          <button className="p-3 text-neutral-500 hover:text-neutral-900 transition-colors">
+          <button 
+            onClick={() => setActiveOverlay('settings')}
+            className="p-3 text-neutral-500 hover:text-neutral-900 transition-colors"
+          >
             <Settings size={20} />
           </button>
         </div>
       </div>
 
       {/* Expanded Panel */}
-      {activeTab && !isCollapsed && (
+      {activeTab && (
         <div className="w-[320px] flex flex-col animate-in slide-in-from-left duration-200 bg-white shadow-xl z-10 border-r border-neutral-100">
-          <div className="p-4 border-bottom border-neutral-100 flex items-center justify-between">
+          <div className="p-4 border-b border-neutral-100 flex items-center justify-between">
             <h2 className="font-semibold text-neutral-900 capitalize">{activeTab}</h2>
             <button 
               onClick={() => setActiveTab(null)}
@@ -101,20 +99,20 @@ export default function LeftSidebar() {
               <ChevronLeft size={16} />
             </button>
           </div>
-          <div className="flex-1 p-4 text-sm text-neutral-500">
+          <div className="flex-1 p-4 text-sm text-neutral-500 overflow-y-auto">
             {activeTab === 'pages' && (
               <div className="space-y-4">
                 <div className="flex flex-col gap-4">
-                  {useCanvasStore.getState().presentationPath.length > 0 ? (
-                    useCanvasStore.getState().presentationPath.map((frameId, index) => {
-                      const frame = useCanvasStore.getState().objects.find(o => o.id === frameId);
+                  {presentationPath.length > 0 ? (
+                    presentationPath.map((frameId, index) => {
+                      const frame = objects.find(o => o.id === frameId);
                       if (!frame) return null;
                       return (
                         <div key={frameId} className="group relative flex flex-col gap-2">
                           <div 
-                            onClick={() => useCanvasStore.getState().setSelection([frameId])}
+                            onClick={() => setSelection([frameId])}
                             className={`aspect-video bg-neutral-100 rounded-lg border-2 overflow-hidden relative transition-all cursor-pointer shadow-sm ${
-                              useCanvasStore.getState().selection.includes(frameId) ? 'border-primary' : 'border-neutral-200 hover:border-neutral-300'
+                              selection.includes(frameId) ? 'border-primary' : 'border-neutral-200 hover:border-neutral-300'
                             }`}
                           >
                             <div className="absolute inset-0 flex items-center justify-center text-neutral-300">
@@ -125,7 +123,7 @@ export default function LeftSidebar() {
                               <span className="text-neutral-400 font-mono">#{index + 1}</span>
                             </div>
                           </div>
-                          {index < useCanvasStore.getState().presentationPath.length - 1 && (
+                          {index < presentationPath.length - 1 && (
                             <div className="flex justify-center text-neutral-200">
                               <div className="w-px h-4 bg-neutral-200" />
                             </div>
@@ -141,7 +139,7 @@ export default function LeftSidebar() {
                 </div>
                 <button 
                   onClick={() => {
-                    useCanvasStore.getState().addObject({
+                    addObject({
                       type: 'frame',
                       x: 100,
                       y: 100,
@@ -156,11 +154,22 @@ export default function LeftSidebar() {
                 >
                   + Add New Frame
                 </button>
-
               </div>
             )}
-
-            {activeTab === 'layers' && <p>No layers yet. Create some objects!</p>}
+            {activeTab === 'layers' && (
+              <div className="space-y-2">
+                {objects.map(obj => (
+                  <div 
+                    key={obj.id} 
+                    onClick={() => setSelection([obj.id])}
+                    className={`p-2 rounded border text-xs cursor-pointer flex justify-between ${selection.includes(obj.id) ? 'bg-primary/5 border-primary/20 text-primary' : 'hover:bg-neutral-50 border-transparent'}`}
+                  >
+                    <span className="capitalize">{obj.type}</span>
+                    <span className="text-[10px] text-neutral-400 font-mono">{obj.id.slice(0, 8)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
             {activeTab === 'assets' && <p>Browse your media assets here.</p>}
             {activeTab === 'templates' && (
               <div className="space-y-4">
