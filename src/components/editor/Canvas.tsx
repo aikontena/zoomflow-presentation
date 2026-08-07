@@ -116,8 +116,11 @@ export default function Canvas() {
       setDragStart({ x: e.clientX, y: e.clientY });
     } else if (isDragging && selection.length > 0) {
       const pos = getPointerPos(e);
-      const dx = pos.x - dragStart.x;
-      const dy = pos.y - dragStart.y;
+      let dx = pos.x - dragStart.x;
+      let dy = pos.y - dragStart.y;
+      
+      // Alt+Drag: Duplicate on move (simplified logic: just move originals, 
+      // but if we wanted to true alt-drag duplicate we'd spawn new ones on mousedown)
       
       selection.forEach(id => {
         const target = objects.find(o => o.id === id);
@@ -138,6 +141,12 @@ export default function Canvas() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Space for Panning
+    if (e.code === 'Space' && !isPanning) {
+      setIsPanning(true);
+      return;
+    }
+
     if (e.key === 'Backspace' || e.key === 'Delete') {
       deleteObjects(selection);
     } else if (e.key === 'z' && (e.metaKey || e.ctrlKey)) {
@@ -147,6 +156,9 @@ export default function Canvas() {
       setClipboard(selection);
     } else if (e.key === 'v' && (e.metaKey || e.ctrlKey)) {
       if (clipboard.length > 0) duplicateObjects(clipboard);
+    } else if (e.key === 'x' && (e.metaKey || e.ctrlKey)) {
+      setClipboard(selection);
+      deleteObjects(selection);
     } else if (e.key === 'd' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       duplicateObjects(selection);
@@ -156,10 +168,17 @@ export default function Canvas() {
     }
   };
 
+  const handleKeyUp = (e: React.KeyboardEvent) => {
+    if (e.code === 'Space') {
+      setIsPanning(false);
+    }
+  };
+
   return (
     <div className="relative h-full w-full overflow-hidden bg-[#f8f9fa] outline-none" 
          tabIndex={0}
-         onKeyDown={handleKeyDown}>
+         onKeyDown={handleKeyDown}
+         onKeyUp={handleKeyUp}>
       
       {/* Toolbars & Overlays */}
       <div className="absolute left-1/2 top-4 z-10 flex -translate-x-1/2 gap-2 rounded-xl bg-white p-1 shadow-lg border border-neutral-200">
