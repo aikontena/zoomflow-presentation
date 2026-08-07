@@ -40,6 +40,8 @@ export function LeftSidebar() {
     setViewport,
     loadTemplate,
     addObject,
+    tool,
+    setTool,
     updateObject,
     selectedIds,
     viewport,
@@ -146,6 +148,10 @@ export function LeftSidebar() {
                 <button
                   key={t.id}
                   onClick={() => {
+                    if (t.type !== "asset") {
+                      setTool(t.id);
+                      return;
+                    }
                     if (!editor) return;
                     const center = editor.screenToPage(editor.getViewportScreenCenter());
                     editor.createShapes([
@@ -162,7 +168,11 @@ export function LeftSidebar() {
                       } as any
                     ]);
                   }}
-                  className="rounded-xl border border-border bg-card/60 px-3 py-3 text-xs capitalize transition-colors hover:border-primary/50 hover:bg-primary/10"
+                  className={`rounded-xl border px-3 py-3 text-xs capitalize transition-colors ${
+                    tool === t.id
+                      ? "border-primary bg-primary/20 text-primary"
+                      : "border-border bg-card/60 hover:border-primary/50 hover:bg-primary/10"
+                  }`}
                 >
                   {t.label}
                 </button>
