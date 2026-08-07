@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FileText, 
   Layers, 
@@ -33,7 +33,13 @@ const TABS = [
 
 export default function LeftSidebar() {
   const { undo, redo, history, lastSaved, save, setActiveOverlay } = useCanvasStore();
-  const [activeTab, setActiveTab] = useState<string | null>('icons');
+  const [activeTab, setActiveTab] = useState<string | null>(null);
+  
+  // Set icons tab as default after mount to avoid SSR issues
+  useEffect(() => {
+    setActiveTab('icons');
+  }, []);
+
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
