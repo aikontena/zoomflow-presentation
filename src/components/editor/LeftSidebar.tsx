@@ -13,8 +13,10 @@ import {
   Undo2,
   Redo2,
   History,
-  Clock
+  Clock,
+  LayoutGrid
 } from 'lucide-react';
+import { IconLibrary } from './IconLibrary';
 
 const TABS = [
   { id: 'pages', label: 'Pages', icon: FileText },
@@ -75,7 +77,7 @@ export default function LeftSidebar() {
 
       {/* Expanded Panel */}
       {activeTab && !isCollapsed && (
-        <div className="w-64 flex flex-col animate-in slide-in-from-left duration-200">
+        <div className="w-[320px] flex flex-col animate-in slide-in-from-left duration-200">
           <div className="p-4 border-bottom border-neutral-100 flex items-center justify-between">
             <h2 className="font-semibold text-neutral-900 capitalize">{activeTab}</h2>
             <button 
@@ -154,7 +156,7 @@ export default function LeftSidebar() {
                 </button>
               </div>
             )}
-            {activeTab === 'icons' && <p>Search thousands of icons.</p>}
+            {activeTab === 'icons' && <IconLibrary />}
             {activeTab === 'history' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-neutral-900 font-medium mb-2">
