@@ -132,18 +132,34 @@ export function LeftSidebar() {
           <div className="space-y-3">
             <h3 className="text-sm font-semibold">Objects</h3>
             <div className="grid grid-cols-2 gap-2">
-              {(["heading", "text", "rect", "circle", "arrow", "sticky", "code", "table", "chart", "image", "video", "pdf"] as ObjectType[]).map((t) => (
+              {[
+                { id: "text", label: "Text", type: "text" },
+                { id: "geo-rect", label: "Rectangle", type: "geo", geo: "rectangle" },
+                { id: "geo-circle", label: "Circle", type: "geo", geo: "ellipse" },
+                { id: "arrow", label: "Arrow", type: "arrow" },
+                { id: "note", label: "Sticky Note", type: "note" },
+                { id: "image", label: "Image", type: "asset" },
+                { id: "video", label: "Video", type: "asset" },
+                { id: "pdf", label: "PDF", type: "asset" },
+              ].map((t) => (
                 <button
-                  key={t}
+                  key={t.id}
                   onClick={() => {
-                    const id = addObject(t);
-                    if (editor && id) {
-                      editor.select(id as any);
-                    }
+                    if (!editor) return;
+                    const center = editor.getViewportScreenCenter();
+                    editor.createShapes([
+                      {
+                        id: editor.createShapeId(),
+                        type: t.type,
+                        x: center.x,
+                        y: center.y,
+                        props: t.geo ? { geo: t.geo } : {},
+                      } as any
+                    ]);
                   }}
                   className="rounded-xl border border-border bg-card/60 px-3 py-3 text-xs capitalize transition-colors hover:border-primary/50 hover:bg-primary/10"
                 >
-                  {t}
+                  {t.label}
                 </button>
               ))}
             </div>
