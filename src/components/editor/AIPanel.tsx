@@ -7,7 +7,7 @@ import { useServerFn } from "@tanstack/react-start";
 
 export function AIPanel() {
   const { setGenerating, isGenerating, aiProgress, applyGeneration } = useEditor();
-  const [prompt, setPrompt] = useState("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                            \n                                            editor setting also still not active. please active it. canvas sill cannot be use.");
+  const [prompt, setPrompt] = useState("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                            \n                                            dah rasa putus asa. anda tak boleh solve masalah screen yang blank. can u restart develope the aplication. make it white theme too");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [metadata, setMetadata] = useState({
     title: "",
