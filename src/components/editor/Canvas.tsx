@@ -97,9 +97,9 @@ export function Canvas() {
   }, []);
 
   const onBackgroundPointerDown = (e: React.PointerEvent) => {
-    if (e.button === 1 || e.button === 2 || tool === "select") {
+    const isPanGesture = e.button === 1 || e.button === 2 || tool === "select";
+    if (isPanGesture) {
       if (e.currentTarget === e.target || e.button === 1) {
-        if (tool !== "select" && e.button === 0) return;
         select([]);
         setEditingId(null);
         setDrag({ mode: "pan", startX: e.clientX, startY: e.clientY, vx: viewport.x, vy: viewport.y });
@@ -107,11 +107,12 @@ export function Canvas() {
       }
       return;
     }
-    if (tool !== "select") {
+    if (tool !== "select" && e.currentTarget === e.target) {
       const p = toWorld(e.clientX, e.clientY);
       addObject(tool, p);
     }
   };
+
 
   const onPointerMove = (e: React.PointerEvent) => {
     if (!drag) return;
