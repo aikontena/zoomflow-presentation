@@ -30,7 +30,7 @@ const TABS = [
 import { useCanvasStore } from '@/lib/canvas-store';
 
 export default function LeftSidebar() {
-  const { undo, redo, history, lastSaved, save } = useCanvasStore();
+  const { undo, redo, history, lastSaved, save, setActiveOverlay } = useCanvasStore();
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
