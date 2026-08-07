@@ -186,7 +186,25 @@ export const useEditor = create<EditorState>((set, get) => ({
   aiProgress: 0,
 
 
-  setEditor: (editor) => set({ editor }),
+  setEditor: (editor) => {
+    set({ editor });
+    
+    // Sync store tool with editor tool
+    editor.store.listen((entry) => {
+      const toolState = editor.getInstanceState();
+      if (toolState) {
+        let currentTool = toolState.activeToolId;
+        if (currentTool === 'geo') {
+          const props = (toolState as any).propsForNextShape;
+          if (props?.geo === 'rectangle') currentTool = 'geo-rect';
+          else if (props?.geo === 'ellipse') currentTool = 'geo-circle';
+        }
+        if (get().tool !== currentTool) {
+          set({ tool: currentTool });
+        }
+      }
+    }, { source: 'user', scope: 'local' });
+  },
   setTitle: (title) => set((s) => ({ title, doc: { ...s.doc, title }, dirty: true })),
   setBackground: (background) => set({ background, dirty: true }),
   setCustomBackgroundColor: (customBackgroundColor) => set({ customBackgroundColor, dirty: true }),
@@ -202,7 +220,27 @@ export const useEditor = create<EditorState>((set, get) => ({
   
   setGridSize: (gridSize) => set({ gridSize, dirty: true }),
   toggleSnap: () => set((s) => ({ snapToGrid: !s.snapToGrid, dirty: true })),
-  setTool: (tool) => set({ tool }),
+  setTool: (tool) => {
+    const { editor } = get();
+    if (!editor) {
+      set({ tool });
+      return;
+    }
+
+    if (tool === 'select') {
+      editor.setCurrentTool('select');
+    } else if (tool === 'geo-rect') {
+      editor.setCurrentTool('geo');
+      (editor as any).updateInstanceState({ propsForNextShape: { geo: 'rectangle' } });
+    } else if (tool === 'geo-circle') {
+      editor.setCurrentTool('geo');
+      (editor as any).updateInstanceState({ propsForNextShape: { geo: 'ellipse' } });
+    } else if (['text', 'arrow', 'note', 'draw'].includes(tool)) {
+      editor.setCurrentTool(tool);
+    }
+    
+    set({ tool });
+  },
   setViewport: (v) => set((s) => ({ viewport: typeof v === "function" ? v(s.viewport) : v })),
   select: (selectedIds) => set({ selectedIds }),
 
