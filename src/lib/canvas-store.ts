@@ -34,12 +34,26 @@ export interface PresentationSettings {
 
 interface CanvasStore {
   objects: CanvasObject[];
-  frames: { id: string; name: string; order: number }[];
+  frames: { id: string; name: string; order: number }[]; // Keeping legacy frames for now if needed
   selection: string[];
   viewport: { x: number; y: number; zoom: number };
-  activeOverlay: 'templates' | 'export' | 'settings' | null;
+  activeOverlay: 'templates' | 'export' | 'settings' | 'presentation' | null;
   snapEnabled: boolean;
   setSnapEnabled: (enabled: boolean) => void;
+  
+  // Presentation State
+  isPresenting: boolean;
+  currentFrameIndex: number;
+  presentationPath: string[]; // List of object IDs that are frames, in order
+  presentationSettings: PresentationSettings;
+  startPresentation: (startFromFrameId?: string) => void;
+  stopPresentation: () => void;
+  nextFrame: () => void;
+  prevFrame: () => void;
+  goToFrame: (index: number) => void;
+  setPresentationPath: (path: string[]) => void;
+  updatePresentationSettings: (settings: Partial<PresentationSettings>) => void;
+
   
   // Basic Actions
   addObject: (obj: Omit<CanvasObject, "id">) => string;
