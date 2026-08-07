@@ -7,7 +7,7 @@ import { useServerFn } from "@tanstack/react-start";
 
 export function AIPanel() {
   const { setGenerating, isGenerating, aiProgress, applyGeneration } = useEditor();
-  const [prompt, setPrompt] = useState("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                            \n                                            active the editor setting. i still not understand to use this aplication");
+  const [prompt, setPrompt] = useState("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                            \n                                            the icon and object still cannot choose and atif");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [metadata, setMetadata] = useState({
     title: "",
