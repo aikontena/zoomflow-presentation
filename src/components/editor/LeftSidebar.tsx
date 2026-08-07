@@ -23,6 +23,7 @@ const TABS = [
   { id: "icons", label: "Icons", icon: Shapes },
   { id: "templates", label: "Templates", icon: LayoutTemplate },
   { id: "ai", label: "AI", icon: Sparkles },
+  { id: "settings", label: "Settings", icon: Settings },
 ] as const;
 
 const ICON_NAMES = ["Sparkles", "Rocket", "Target", "Lightbulb", "TrendingUp", "Users", "Globe", "Zap", "Star", "Heart", "Shield", "Brain"];
@@ -62,6 +63,7 @@ export function LeftSidebar() {
         {TABS.map((t) => (
           <button
             key={t.id}
+            data-tab={t.id}
             onClick={() => setTab(t.id)}
             title={t.label}
             className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${
@@ -267,6 +269,58 @@ export function LeftSidebar() {
 
         {tab === "ai" && (
           <AIPanel />
+        )}
+        
+        {tab === "settings" && (
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold">Settings</h3>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-[11px] font-medium text-muted-foreground uppercase">Environment</label>
+                <div className="rounded-xl border border-border bg-card/60 p-3 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs">Show Grid</span>
+                    <button 
+                      onClick={useEditor.getState().toggleGrid}
+                      className={`h-4 w-8 rounded-full transition-colors ${useEditor.getState().showGrid ? 'bg-primary' : 'bg-secondary'}`}
+                    >
+                      <div className={`h-3 w-3 rounded-full bg-white transition-transform ${useEditor.getState().showGrid ? 'translate-x-4' : 'translate-x-1'}`} />
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs">Snap to Grid</span>
+                    <button 
+                      onClick={useEditor.getState().toggleSnap}
+                      className={`h-4 w-8 rounded-full transition-colors ${useEditor.getState().snapToGrid ? 'bg-primary' : 'bg-secondary'}`}
+                    >
+                      <div className={`h-3 w-3 rounded-full bg-white transition-transform ${useEditor.getState().snapToGrid ? 'translate-x-4' : 'translate-x-1'}`} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[11px] font-medium text-muted-foreground uppercase">Background</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(["white", "dark-grid", "light-grid", "plain"] as const).map((bg) => (
+                    <button
+                      key={bg}
+                      onClick={() => useEditor.getState().setBackground(bg)}
+                      className={`rounded-lg border p-2 text-[10px] capitalize transition-colors ${
+                        useEditor.getState().background === bg ? "border-primary bg-primary/10" : "border-border hover:bg-secondary"
+                      }`}
+                    >
+                      {bg.replace("-", " ")}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-border">
+                <p className="text-[10px] text-muted-foreground">ZoomCanvas v3.0.4 - Architecture Stabilized</p>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </aside>
