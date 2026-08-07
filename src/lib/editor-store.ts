@@ -482,15 +482,16 @@ export const useEditor = create<EditorState>((set, get) => ({
           type: 'text',
           x: currentX + 50,
           y: currentY + 50,
-          props: { text: f.title, font: 'draw', size: 'l' }
+          props: { text: f.title, font: 'draw', size: 'l' } as any
         },
         {
           id: `shape:${uid()}` as any,
           type: 'text',
           x: currentX + 50,
           y: currentY + 120,
-          props: { text: f.description, font: 'sans', size: 'm' }
+          props: { text: f.description, font: 'sans', size: 'm' } as any
         }
+
       ]);
       
       currentX += frameWidth + gap;
