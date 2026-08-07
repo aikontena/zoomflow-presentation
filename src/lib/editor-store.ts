@@ -186,7 +186,25 @@ export const useEditor = create<EditorState>((set, get) => ({
   aiProgress: 0,
 
 
-  setEditor: (editor) => set({ editor }),
+  setEditor: (editor) => {
+    set({ editor });
+    
+    // Sync store tool with editor tool
+    editor.store.listen(() => {
+      const toolState = editor.getInstanceState() as any;
+      if (toolState) {
+        let currentTool = toolState.activeToolId || 'select';
+        if (currentTool === 'geo') {
+          const props = toolState.propsForNextShape;
+          if (props?.geo === 'rectangle') currentTool = 'geo-rect';
+          else if (props?.geo === 'ellipse') currentTool = 'geo-circle';
+        }
+        if (get().tool !== currentTool) {
+          set({ tool: currentTool });
+        }
+      }
+    }, { source: 'user', scope: 'presence' });
+  },
   setTitle: (title) => set((s) => ({ title, doc: { ...s.doc, title }, dirty: true })),
   setBackground: (background) => set({ background, dirty: true }),
   setCustomBackgroundColor: (customBackgroundColor) => set({ customBackgroundColor, dirty: true }),
@@ -202,7 +220,27 @@ export const useEditor = create<EditorState>((set, get) => ({
   
   setGridSize: (gridSize) => set({ gridSize, dirty: true }),
   toggleSnap: () => set((s) => ({ snapToGrid: !s.snapToGrid, dirty: true })),
-  setTool: (tool) => set({ tool }),
+  setTool: (tool) => {
+    const { editor } = get();
+    if (!editor) {
+      set({ tool });
+      return;
+    }
+
+    if (tool === 'select') {
+      editor.setCurrentTool('select');
+    } else if (tool === 'geo-rect') {
+      editor.setCurrentTool('geo');
+      editor.updateInstanceState({ propsForNextShape: { geo: 'rectangle' } } as any);
+    } else if (tool === 'geo-circle') {
+      editor.setCurrentTool('geo');
+      editor.updateInstanceState({ propsForNextShape: { geo: 'ellipse' } } as any);
+    } else if (['text', 'arrow', 'note', 'draw'].includes(tool)) {
+      editor.setCurrentTool(tool);
+    }
+    
+    set({ tool });
+  },
   setViewport: (v) => set((s) => ({ viewport: typeof v === "function" ? v(s.viewport) : v })),
   select: (selectedIds) => set({ selectedIds }),
 
@@ -403,7 +441,7 @@ export const useEditor = create<EditorState>((set, get) => ({
   addObject: (type, at) => {
     const s = get();
     if (!s.editor) return "";
-    const id = `shape:${uid()}` as any;
+    const id = (s.editor as any).createShapeId();
     const center = s.editor.getViewportScreenCenter();
     const pos = at || { x: center.x, y: center.y };
 
@@ -416,6 +454,7 @@ export const useEditor = create<EditorState>((set, get) => ({
               type === 'arrow' ? 'arrow' : 
               type === 'sticky' ? 'note' : 
               type === 'code' ? 'text' :
+              type === 'text' ? 'text' :
               'text',
         x: pos.x,
         y: pos.y,
@@ -426,7 +465,7 @@ export const useEditor = create<EditorState>((set, get) => ({
                {}
       } as any
     ]);
-    return id;
+    return id as string;
   },
   updateObject: (id, patch) => {
     const s = get();
