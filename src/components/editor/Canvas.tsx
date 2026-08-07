@@ -175,11 +175,33 @@ export default function Canvas() {
     }
   };
 
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const iconName = e.dataTransfer.getData('iconName');
+    if (iconName) {
+      const pos = getPointerPos(e as any);
+      addObject({
+        type: 'icon',
+        iconName,
+        x: pos.x - 24,
+        y: pos.y - 24,
+        width: 48,
+        height: 48,
+        rotation: 0,
+        fill: '#3b82f6',
+        opacity: 1
+      });
+      toast.success('Icon dropped onto canvas');
+    }
+  };
+
   return (
     <div className="relative h-full w-full overflow-hidden bg-[#f8f9fa] outline-none" 
          tabIndex={0}
          onKeyDown={handleKeyDown}
-         onKeyUp={handleKeyUp}>
+         onKeyUp={handleKeyUp}
+         onDragOver={(e) => e.preventDefault()}
+         onDrop={handleDrop}>
       
       {/* Toolbars & Overlays */}
       <div className="absolute left-1/2 top-4 z-10 flex -translate-x-1/2 gap-2 rounded-xl bg-white p-1 shadow-lg border border-neutral-200">
