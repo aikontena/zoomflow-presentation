@@ -6,6 +6,8 @@ import { RightSidebar } from "@/components/editor/RightSidebar";
 import { TopToolbar } from "@/components/editor/TopToolbar";
 import { MiniMap } from "@/components/editor/MiniMap";
 import { PresentMode } from "@/components/editor/PresentMode";
+import { Timeline } from "@/components/editor/Timeline";
+
 
 const title = "ZoomCanvas AI — Infinite canvas presentation editor";
 const description =
@@ -38,17 +40,18 @@ function EditorPage() {
           <LeftSidebar />
         </div>
 
-        <main className="relative min-w-0 flex-1">
-          <Canvas />
-          <div className="pointer-events-none absolute bottom-4 right-4 hidden sm:block">
-            <div className="pointer-events-auto">
-              <MiniMap />
+          <main className="relative min-w-0 flex-1">
+            <Canvas />
+            <div className="pointer-events-none absolute bottom-4 right-4 hidden sm:block">
+              <div className="pointer-events-auto">
+                <MiniMap />
+              </div>
             </div>
-          </div>
-          <div className="glass pointer-events-none absolute bottom-4 left-4 rounded-xl px-3 py-2 text-[11px] text-muted-foreground">
-            Scroll to pan · ⌘/Ctrl + scroll to zoom · double-click to edit text
-          </div>
-        </main>
+            <div className="glass pointer-events-none absolute bottom-4 left-4 rounded-xl px-3 py-2 text-[11px] text-muted-foreground">
+              Scroll to pan · ⌘/Ctrl + scroll to zoom · double-click to edit text
+            </div>
+            <Timeline />
+          </main>
 
         <RightSidebar />
       </div>
