@@ -8,6 +8,7 @@ import {
   GeoShapeGeoStyle,
   getSnapshot,
   loadSnapshot,
+  toRichText,
 } from "tldraw";
 
 export type CanvasBackground = "white" | "light-grid" | "dot-grid" | "dark-grid" | "plain" | "custom";
@@ -472,10 +473,10 @@ export const useEditor = create<EditorState>((set, get) => ({
               'text',
         x: pos.x,
         y: pos.y,
-        props: type === 'heading' ? { text: 'New Heading', size: 'l' } :
+        props: type === 'heading' ? { richText: toRichText('New Heading'), size: 'l' } :
                type === 'rect' ? { geo: 'rectangle' } :
                type === 'circle' ? { geo: 'ellipse' } :
-               type === 'code' ? { text: 'console.log("hello")', font: 'mono' } :
+               type === 'code' ? { richText: toRichText('console.log("hello")'), font: 'mono' } :
                {}
       } as any
     ]);
@@ -581,14 +582,14 @@ export const useEditor = create<EditorState>((set, get) => ({
           type: 'text',
           x: currentX + 50,
           y: currentY + 50,
-          props: { text: f.title, font: 'draw', size: 'l' } as any
+          props: { richText: toRichText(String(f.title ?? 'Untitled')), font: 'draw', size: 'l' } as any
         },
         {
           id: `shape:${uid()}` as any,
           type: 'text',
           x: currentX + 50,
           y: currentY + 120,
-          props: { text: f.description, font: 'sans', size: 'm' } as any
+          props: { richText: toRichText(String(f.description ?? '')), font: 'sans', size: 'm' } as any
         }
 
       ]);

@@ -14,7 +14,7 @@ import {
 import { useEditor, type ObjectType } from "@/lib/editor-store";
 import { templates } from "@/lib/templates";
 import { AIPanel } from "./AIPanel";
-import { createShapeId } from "tldraw";
+import { createShapeId, toRichText } from "tldraw";
 
 const TABS = [
   { id: "pages", label: "Pages", icon: Layers },
@@ -157,7 +157,7 @@ export function LeftSidebar() {
                         props: t.geo
                           ? { geo: t.geo }
                           : t.type === "asset"
-                            ? { text: `${t.label} — upload or drop a file here` }
+                            ? { richText: toRichText(`${t.label} — upload or drop a file here`) }
                             : {},
                       } as any
                     ]);
@@ -192,7 +192,7 @@ export function LeftSidebar() {
                       type: 'note',
                       x: center.x,
                       y: center.y,
-                      props: { text: `Uploaded image: ${file.name}\n${url}` }
+                      props: { richText: toRichText(`Uploaded image: ${file.name}\n${url}`) }
                     } as any]);
                   }
                 }}
@@ -226,7 +226,7 @@ export function LeftSidebar() {
                         type: 'text',
                         x: center.x,
                         y: center.y,
-                        props: { text: name, font: 'serif', size: 'm' }
+                        props: { richText: toRichText(name), font: 'serif', size: 'm' }
                       } as any]);
                     }
                   }}
