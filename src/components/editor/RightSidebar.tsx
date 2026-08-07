@@ -16,8 +16,9 @@ export function RightSidebar() {
     setFocusMode
   } = useEditor();
 
-  
-  const hasSelection = editor ? editor.getSelectedShapeIds().length > 0 : false;
+  const selectedShapes = editor ? editor.getSelectedShapes() : [];
+  const hasSelection = selectedShapes.length > 0;
+  const firstSelected = selectedShapes[0];
 
   return (
     <aside className="h-full w-[280px] shrink-0 border-l border-border bg-sidebar/70 p-4 backdrop-blur-xl flex flex-col gap-6">
@@ -104,22 +105,32 @@ export function RightSidebar() {
              <div className="space-y-4">
                {/* Metadata / Content */}
                <div className="space-y-2">
-                 <label className="text-[11px] font-medium text-muted-foreground">Name / Label</label>
-                 <input 
-                   type="text"
-                   className="w-full bg-background/50 border border-border rounded-lg px-2 py-1.5 text-xs outline-none"
-                   placeholder="Object name..."
-                 />
+                 <label className="text-[11px] font-medium text-muted-foreground">Type</label>
+                 <div className="w-full bg-background/50 border border-border rounded-lg px-2 py-1.5 text-xs text-muted-foreground">
+                   {firstSelected?.type}
+                 </div>
                </div>
 
                <div className="grid grid-cols-2 gap-3">
                  <div className="space-y-2">
                     <label className="text-[11px] font-medium text-muted-foreground">Opacity</label>
-                    <input type="range" className="w-full accent-primary" min="0" max="100" />
+                    <input 
+                      type="range" 
+                      className="w-full accent-primary" 
+                      min="0" 
+                      max="1" 
+                      step="0.1"
+                      value={(firstSelected?.props as any)?.opacity ?? 1}
+                      onChange={(e) => {
+                        editor?.updateShapes([{ id: firstSelected.id, props: { opacity: parseFloat(e.target.value) } }]);
+                      }}
+                    />
                  </div>
                  <div className="space-y-2">
                     <label className="text-[11px] font-medium text-muted-foreground">Rotation</label>
-                    <input type="number" className="w-full bg-background/50 border border-border rounded-lg px-2 py-1 text-xs" />
+                    <div className="w-full bg-background/50 border border-border rounded-lg px-2 py-1 text-xs">
+                      {Math.round((firstSelected?.rotation ?? 0) * (180 / Math.PI))}°
+                    </div>
                  </div>
                </div>
              </div>
