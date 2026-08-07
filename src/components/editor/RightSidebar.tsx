@@ -150,22 +150,60 @@ export default function RightSidebar() {
           </InputRow>
         </Section>
 
-        {selectedObject.type === 'text' && (
-          <Section title="Typography">
-            <InputRow label="Font Size">
-              <input 
-                type="number" 
-                value={selectedObject.fontSize || 16}
-                onChange={(e) => handleChange('fontSize', parseInt(e.target.value))}
-                className="w-12 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary text-right"
-              />
-            </InputRow>
-            <div className="grid grid-cols-2 gap-1 mt-2">
-              <button className="p-1.5 bg-neutral-50 border border-neutral-200 rounded hover:bg-neutral-100 transition-colors">
-                <Type size={14} className="mx-auto" />
-              </button>
-              <button className="p-1.5 bg-neutral-50 border border-neutral-200 rounded hover:bg-neutral-100 transition-colors font-bold">B</button>
-            </div>
+        {(selectedObject.type === 'text' || selectedObject.type === 'icon') && (
+          <Section title={selectedObject.type === 'text' ? "Typography" : "Icon Settings"}>
+            {selectedObject.type === 'text' ? (
+              <>
+                <InputRow label="Font Size">
+                  <input 
+                    type="number" 
+                    value={selectedObject.fontSize || 16}
+                    onChange={(e) => handleChange('fontSize', parseInt(e.target.value))}
+                    className="w-12 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary text-right"
+                  />
+                </InputRow>
+                <div className="grid grid-cols-2 gap-1 mt-2">
+                  <button className="p-1.5 bg-neutral-50 border border-neutral-200 rounded hover:bg-neutral-100 transition-colors">
+                    <Type size={14} className="mx-auto" />
+                  </button>
+                  <button className="p-1.5 bg-neutral-50 border border-neutral-200 rounded hover:bg-neutral-100 transition-colors font-bold">B</button>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-neutral-500">Current Icon</span>
+                  <div className="flex items-center gap-2 bg-neutral-50 border border-neutral-100 rounded-lg p-2">
+                    <IconRenderer name={selectedObject.iconName || 'help-circle'} size={20} color={selectedObject.fill} />
+                    <span className="text-[10px] font-medium text-neutral-700 truncate w-24 capitalize">
+                      {(selectedObject.iconName || '').replace(/-/g, ' ')}
+                    </span>
+                  </div>
+                </div>
+                
+                <InputRow label="Stroke Width">
+                  <input 
+                    type="number" 
+                    min="0.5"
+                    max="4"
+                    step="0.5"
+                    value={selectedObject.strokeWidth || 2}
+                    onChange={(e) => handleChange('strokeWidth', parseFloat(e.target.value))}
+                    className="w-12 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary text-right"
+                  />
+                </InputRow>
+
+                <div className="pt-2">
+                  <button 
+                    onClick={() => toast.info("Use the Left Sidebar to search and click an icon to replace.")}
+                    className="w-full flex items-center justify-center gap-2 py-2 border border-neutral-200 rounded-lg text-xs font-medium text-neutral-600 hover:bg-neutral-50 transition-colors"
+                  >
+                    <RefreshCw size={14} />
+                    Replace Icon
+                  </button>
+                </div>
+              </div>
+            )}
           </Section>
         )}
 
