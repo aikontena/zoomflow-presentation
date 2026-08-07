@@ -128,9 +128,7 @@ export default function LeftSidebar() {
                 </div>
                 <button 
                   onClick={() => {
-                    const id = `frame-${Date.now()}`;
                     useCanvasStore.getState().addObject({
-                      id,
                       type: 'frame',
                       x: 100,
                       y: 100,
@@ -145,6 +143,7 @@ export default function LeftSidebar() {
                 >
                   + Add New Frame
                 </button>
+
               </div>
             )}
 
