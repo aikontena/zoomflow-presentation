@@ -135,7 +135,12 @@ export function LeftSidebar() {
               {(["heading", "text", "rect", "circle", "arrow", "sticky", "code", "table", "chart", "image", "video", "pdf"] as ObjectType[]).map((t) => (
                 <button
                   key={t}
-                  onClick={() => addObject(t)}
+                  onClick={() => {
+                    const id = addObject(t);
+                    if (editor && id) {
+                      editor.select(id as any);
+                    }
+                  }}
                   className="rounded-xl border border-border bg-card/60 px-3 py-3 text-xs capitalize transition-colors hover:border-primary/50 hover:bg-primary/10"
                 >
                   {t}
