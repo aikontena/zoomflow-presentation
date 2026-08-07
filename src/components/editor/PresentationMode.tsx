@@ -5,7 +5,7 @@ import PresentationControls from './PresentationControls';
 import LaserPointer from './LaserPointer';
 import ProgressBar from './ProgressBar';
 import PresenterView from './PresenterView';
-import { Maximize2, Minimize2, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
 export default function PresentationMode() {
   const { 
@@ -25,66 +25,6 @@ export default function PresentationMode() {
   const [showPresenterNotes, setShowPresenterNotes] = useState(false);
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Handle navigation keyboard shortcuts
-  useEffect(() => {
-    if (!isPresenting) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      switch (e.key) {
-        case 'ArrowRight':
-        case 'ArrowDown':
-        case ' ':
-        case 'PageDown':
-          e.preventDefault();
-          nextFrame();
-          break;
-        case 'ArrowLeft':
-        case 'ArrowUp':
-        case 'PageUp':
-          e.preventDefault();
-          prevFrame();
-          break;
-        case 'Home':
-          e.preventDefault();
-          goToFrame(0);
-          break;
-        case 'End':
-          e.preventDefault();
-          goToFrame(presentationPath.length - 1);
-          break;
-        case 'Escape':
-          e.preventDefault();
-          stopPresentation();
-          break;
-        case 'F5':
-          e.preventDefault();
-          // Presentation already active, maybe toggle fullscreen?
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPresenting, nextFrame, prevFrame, goToFrame, stopPresentation, presentationPath.length]);
-
-  // Animate camera when frame changes
-  useEffect(() => {
-    if (isPresenting && presentationPath[currentFrameIndex]) {
-      zoomToFrame(presentationPath[currentFrameIndex], presentationSettings.transitionDuration);
-    }
-  }, [currentFrameIndex, isPresenting, presentationPath, zoomToFrame, presentationSettings.transitionDuration]);
-
-  // Auto-play logic
-  useEffect(() => {
-    if (isPresenting && presentationSettings.autoPlay) {
-      const interval = setInterval(() => {
-        nextFrame();
-      }, presentationSettings.autoPlayInterval);
-      return () => clearInterval(interval);
-    }
-  }, [isPresenting, presentationSettings.autoPlay, presentationSettings.autoPlayInterval, nextFrame]);
-
-  // Hide controls after inactivity
   const handleMouseMove = useCallback(() => {
     setShowControls(true);
     if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
@@ -93,7 +33,35 @@ export default function PresentationMode() {
     }, 3000);
   }, []);
 
-  if (!isPresenting) return null;
+  useEffect(() => {
+    if (!isPresenting) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextFrame();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevFrame();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        stopPresentation();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPresenting, nextFrame, prevFrame, stopPresentation]);
+
+  useEffect(() => {
+    if (isPresenting && presentationPath[currentFrameIndex]) {
+      zoomToFrame(presentationPath[currentFrameIndex], presentationSettings.transitionDuration);
+    }
+  }, [currentFrameIndex, isPresenting, presentationPath, zoomToFrame, presentationSettings.transitionDuration]);
+
+  if (!isPresenting) {
+    return null;
+  }
 
   const currentFrameId = presentationPath[currentFrameIndex];
   const currentFrame = objects.find(o => o.id === currentFrameId);
@@ -103,12 +71,9 @@ export default function PresentationMode() {
       className={`fixed inset-0 z-[100] flex flex-col overflow-hidden select-none transition-colors duration-500 ${presentationSettings.darkBackground ? 'bg-neutral-950' : 'bg-white'}`}
       onMouseMove={handleMouseMove}
     >
-      {/* Background/Audience View Area */}
       <div className="flex-1 relative overflow-hidden">
-        {/* Laser pointer overlay */}
         <LaserPointer />
         
-        {/* Frame Title Overlay (if enabled) */}
         {presentationSettings.showFrameTitles && currentFrame && (
           <div className={`absolute top-8 left-1/2 -translate-x-1/2 px-6 py-2 rounded-full backdrop-blur-md border animate-in fade-in slide-in-from-top-4 duration-500 ${presentationSettings.darkBackground ? 'bg-white/10 border-white/20 text-white' : 'bg-black/5 border-black/10 text-black'}`}>
             <h2 className="text-lg font-medium">{currentFrame.text || `Frame ${currentFrameIndex + 1}`}</h2>
@@ -116,7 +81,6 @@ export default function PresentationMode() {
         )}
       </div>
 
-      {/* Progress Bar (if enabled) */}
       {presentationSettings.showProgressBar && (
         <ProgressBar 
           current={currentFrameIndex + 1} 
@@ -125,7 +89,6 @@ export default function PresentationMode() {
         />
       )}
 
-      {/* Floating Controls */}
       <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 transition-all duration-300 transform ${showControls ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
         <PresentationControls 
           onToggleNotes={() => setShowPresenterNotes(!showPresenterNotes)}
@@ -133,7 +96,6 @@ export default function PresentationMode() {
         />
       </div>
 
-      {/* Presenter View Overlay */}
       {showPresenterNotes && (
         <PresenterView 
           onClose={() => setShowPresenterNotes(false)}
@@ -141,11 +103,9 @@ export default function PresentationMode() {
         />
       )}
 
-      {/* Quick Exit Button (Top Right) */}
       <button 
         onClick={stopPresentation}
         className={`fixed top-4 right-4 p-2 rounded-full transition-all duration-300 transform ${showControls ? 'opacity-100 scale-100' : 'opacity-0 scale-75'} hover:bg-black/10 ${presentationSettings.darkBackground ? 'text-white hover:bg-white/10' : 'text-black'}`}
-        title="Exit Presentation (Esc)"
       >
         <X size={24} />
       </button>
