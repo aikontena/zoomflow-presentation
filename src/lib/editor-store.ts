@@ -4,6 +4,8 @@ import {
   TLStore, 
   createTLStore, 
   defaultShapeUtils,
+  createShapeId,
+  GeoShapeGeoStyle,
   getSnapshot,
   loadSnapshot,
 } from "tldraw";
@@ -176,7 +178,13 @@ export const useEditor = create<EditorState>((set, get) => ({
   focusMode: false,
   spotlightId: null,
 
-  doc: { title: "Untitled presentation", pages: [], objects: [], paths: [], bookmarks: [] },
+  doc: {
+    title: "Untitled presentation",
+    pages: [{ id: "p1", name: "Opening", frame: { x: 0, y: 0, width: 960, height: 540 }, notes: "Welcome the room.", preset: "cinematic", transition: "zoom", duration: 1000 }],
+    objects: [],
+    paths: [],
+    bookmarks: [],
+  },
   viewport: { x: 0, y: 0, zoom: 1 },
   tool: "select",
   past: [],
@@ -195,9 +203,7 @@ export const useEditor = create<EditorState>((set, get) => ({
       if (toolState) {
         let currentTool = toolState.activeToolId || 'select';
         if (currentTool === 'geo') {
-          const props = toolState.propsForNextShape;
-          if (props?.geo === 'rectangle') currentTool = 'geo-rect';
-          else if (props?.geo === 'ellipse') currentTool = 'geo-circle';
+          currentTool = get().tool === 'geo-circle' ? 'geo-circle' : 'geo-rect';
         }
         if (get().tool !== currentTool) {
           set({ tool: currentTool });
@@ -238,11 +244,11 @@ export const useEditor = create<EditorState>((set, get) => ({
     if (tool === 'select') {
       editor.setCurrentTool('select');
     } else if (tool === 'geo-rect') {
+      editor.setStyleForNextShapes(GeoShapeGeoStyle, 'rectangle');
       editor.setCurrentTool('geo');
-      editor.updateInstanceState({ propsForNextShape: { geo: 'rectangle' } } as any);
     } else if (tool === 'geo-circle') {
+      editor.setStyleForNextShapes(GeoShapeGeoStyle, 'ellipse');
       editor.setCurrentTool('geo');
-      editor.updateInstanceState({ propsForNextShape: { geo: 'ellipse' } } as any);
     } else if (['text', 'arrow', 'note', 'draw'].includes(tool)) {
       editor.setCurrentTool(tool);
     }
@@ -449,8 +455,8 @@ export const useEditor = create<EditorState>((set, get) => ({
   addObject: (type, at) => {
     const s = get();
     if (!s.editor) return "";
-    const id = (s.editor as any).createShapeId();
-    const center = s.editor.getViewportScreenCenter();
+    const id = createShapeId();
+    const center = s.editor.screenToPage(s.editor.getViewportScreenCenter());
     const pos = at || { x: center.x, y: center.y };
 
     s.editor.createShapes([
