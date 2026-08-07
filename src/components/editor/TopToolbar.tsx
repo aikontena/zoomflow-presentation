@@ -54,6 +54,7 @@ export function TopToolbar({ onPresent }: { onPresent: () => void }) {
     dirty,
     setViewport,
     viewport,
+    addObject,
   } = useEditor();
   const [savedLabel, setSavedLabel] = useState("Not saved yet");
 
@@ -106,7 +107,7 @@ export function TopToolbar({ onPresent }: { onPresent: () => void }) {
             title={t.label}
             onClick={() => {
               if (t.id === "select") {
-                editor?.setSelectedShapeIds([]);
+                editor?.selectNone();
                 setTool("select");
               } else {
                 addObject(t.id);
