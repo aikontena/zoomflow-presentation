@@ -97,7 +97,8 @@ export function Canvas() {
   }, []);
 
   const onBackgroundPointerDown = (e: React.PointerEvent) => {
-    const isPanGesture = e.button === 1 || e.button === 2 || tool === "select";
+    const currentTool: typeof tool = tool;
+    const isPanGesture = e.button === 1 || e.button === 2 || currentTool === "select";
     if (isPanGesture) {
       if (e.currentTarget === e.target || e.button === 1) {
         select([]);
@@ -107,11 +108,12 @@ export function Canvas() {
       }
       return;
     }
-    if (tool !== "select" && e.currentTarget === e.target) {
+    if (currentTool !== "select" && e.currentTarget === e.target) {
       const p = toWorld(e.clientX, e.clientY);
-      addObject(tool, p);
+      addObject(currentTool, p);
     }
   };
+
 
 
   const onPointerMove = (e: React.PointerEvent) => {
