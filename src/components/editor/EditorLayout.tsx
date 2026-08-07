@@ -15,17 +15,22 @@ export default function EditorLayout() {
 
 
   return (
-    <div className="h-screen w-full overflow-hidden bg-white flex flex-col">
+    <div className="h-screen w-full overflow-hidden bg-white flex flex-col relative">
+      {!isPresenting && <TopToolbar />}
+      
       <div className="flex-1 flex overflow-hidden">
-        <LeftSidebar />
+        {!isPresenting && <LeftSidebar />}
         
         <div className="flex-1 relative flex overflow-hidden">
           <div className="flex-1 relative overflow-hidden">
             <Canvas />
           </div>
-          <RightSidebar />
+          {!isPresenting && <RightSidebar />}
         </div>
       </div>
+
+      <PresentationMode />
+
 
       {activeOverlay === 'templates' && (
         <div className="fixed inset-0 z-50 bg-white animate-in fade-in zoom-in duration-200 flex flex-col">
