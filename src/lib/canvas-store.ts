@@ -101,9 +101,81 @@ export const useCanvasStore = create<CanvasStore>()(
       viewport: { x: 0, y: 0, zoom: 1 },
       activeOverlay: null,
       snapEnabled: true,
+      isPresenting: false,
+      currentFrameIndex: 0,
+      presentationPath: [],
+      presentationSettings: {
+        transitionDuration: 800,
+        autoPlay: false,
+        autoPlayInterval: 5000,
+        loop: false,
+        showProgressBar: true,
+        showFrameTitles: true,
+        darkBackground: false,
+      },
       setSnapEnabled: (snapEnabled) => set({ snapEnabled }),
       history: { past: [], future: [] },
       lastSaved: Date.now(),
+
+      startPresentation: (startFromFrameId) => {
+        const { objects, presentationPath } = get();
+        let path = presentationPath;
+        
+        // If path is empty, auto-generate from frames sorted by x/y
+        if (path.length === 0) {
+          path = objects
+            .filter(o => o.type === 'frame')
+            .sort((a, b) => (a.y - b.y) || (a.x - b.x))
+            .map(o => o.id);
+        }
+
+        if (path.length === 0) {
+          return;
+        }
+
+        const startIndex = startFromFrameId 
+          ? path.indexOf(startFromFrameId) 
+          : 0;
+
+        set({ 
+          isPresenting: true, 
+          currentFrameIndex: startIndex === -1 ? 0 : startIndex,
+          presentationPath: path,
+          activeOverlay: 'presentation'
+        });
+      },
+
+      stopPresentation: () => set({ isPresenting: false, activeOverlay: null }),
+
+      nextFrame: () => {
+        const { currentFrameIndex, presentationPath, presentationSettings } = get();
+        if (currentFrameIndex < presentationPath.length - 1) {
+          set({ currentFrameIndex: currentFrameIndex + 1 });
+        } else if (presentationSettings.loop) {
+          set({ currentFrameIndex: 0 });
+        }
+      },
+
+      prevFrame: () => {
+        const { currentFrameIndex } = get();
+        if (currentFrameIndex > 0) {
+          set({ currentFrameIndex: currentFrameIndex - 1 });
+        }
+      },
+
+      goToFrame: (index) => {
+        const { presentationPath } = get();
+        if (index >= 0 && index < presentationPath.length) {
+          set({ currentFrameIndex: index });
+        }
+      },
+
+      setPresentationPath: (presentationPath) => set({ presentationPath }),
+      
+      updatePresentationSettings: (settings) => set((state) => ({
+        presentationSettings: { ...state.presentationSettings, ...settings }
+      })),
+
 
       addObject: (obj) => {
         const id = Math.random().toString(36).substring(7);
