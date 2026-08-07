@@ -150,8 +150,23 @@ export default function RightSidebar() {
           </InputRow>
         </Section>
 
+        {selectedObject.type === 'frame' && (
+          <Section title="Speaker Notes">
+            <textarea 
+              value={selectedObject.speakerNotes || ''}
+              onChange={(e) => handleChange('speakerNotes', e.target.value)}
+              placeholder="Add notes for this frame..."
+              className="w-full h-32 bg-neutral-50 border border-neutral-200 rounded px-2 py-2 text-xs outline-none focus:border-primary resize-none font-medium leading-relaxed"
+            />
+            <p className="text-[10px] text-neutral-400">
+              These notes will be visible only in Presenter View.
+            </p>
+          </Section>
+        )}
+
         {(selectedObject.type === 'text' || selectedObject.type === 'icon') && (
           <Section title={selectedObject.type === 'text' ? "Typography" : "Icon Settings"}>
+
             {selectedObject.type === 'text' ? (
               <>
                 <InputRow label="Font Size">
