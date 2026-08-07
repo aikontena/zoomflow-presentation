@@ -22,6 +22,7 @@ interface CanvasStore {
   frames: { id: string; name: string; order: number }[];
   selection: string[];
   viewport: { x: number; y: number; zoom: number };
+  activeOverlay: 'templates' | 'export' | 'settings' | null;
   
   // Basic Actions
   addObject: (obj: Omit<CanvasObject, "id">) => string;
