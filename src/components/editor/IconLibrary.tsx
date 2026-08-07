@@ -15,7 +15,12 @@ export const IconLibrary: React.FC = () => {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [recent, setRecent] = useState<string[]>([]);
   
-  const addObject = useCanvasStore(state => state.addObject);
+  const { addObject, updateObject, selection, objects } = useCanvasStore(state => ({
+    addObject: state.addObject,
+    updateObject: state.updateObject,
+    selection: state.selection,
+    objects: state.objects
+  }));
 
   // Load favorites and recent from localStorage
   useEffect(() => {
