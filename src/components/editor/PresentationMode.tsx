@@ -27,9 +27,9 @@ export default function PresentationMode() {
 
   // Handle navigation keyboard shortcuts
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isPresenting) return;
+    if (!isPresenting) return;
 
+    const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'ArrowRight':
         case 'ArrowDown':
@@ -56,11 +56,9 @@ export default function PresentationMode() {
           e.preventDefault();
           stopPresentation();
           break;
-        case 'f':
-          if (e.ctrlKey || e.metaKey) {
-            e.preventDefault();
-            toggleFullscreen();
-          }
+        case 'F5':
+          e.preventDefault();
+          // Presentation already active, maybe toggle fullscreen?
           break;
       }
     };
@@ -95,18 +93,7 @@ export default function PresentationMode() {
     }, 3000);
   }, []);
 
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
-    }
-  };
-
   if (!isPresenting) return null;
-
 
   const currentFrameId = presentationPath[currentFrameIndex];
   const currentFrame = objects.find(o => o.id === currentFrameId);
@@ -118,8 +105,7 @@ export default function PresentationMode() {
     >
       {/* Background/Audience View Area */}
       <div className="flex-1 relative overflow-hidden">
-        {/* The canvas content is rendered by the main Canvas component, 
-            but we might want to overlay a laser pointer or special UI here */}
+        {/* Laser pointer overlay */}
         <LaserPointer />
         
         {/* Frame Title Overlay (if enabled) */}
@@ -147,7 +133,7 @@ export default function PresentationMode() {
         />
       </div>
 
-      {/* Presenter View Modal/Overlay */}
+      {/* Presenter View Overlay */}
       {showPresenterNotes && (
         <PresenterView 
           onClose={() => setShowPresenterNotes(false)}
