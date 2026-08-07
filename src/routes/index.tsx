@@ -1,14 +1,5 @@
-import { ClientOnly, createFileRoute } from "@tanstack/react-router";
-import { lazy, Suspense } from "react";
-
-import Canvas from "@/components/editor/Canvas";
-import LeftSidebar from "@/components/editor/LeftSidebar";
-import RightSidebar from "@/components/editor/RightSidebar";
-const TemplateLibrary = lazy(() => import("@/components/editor/templates/TemplateLibrary"));
-
-import { useCanvasStore } from "@/lib/canvas-store";
-import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { createFileRoute } from "@tanstack/react-router";
+import EditorPage from "@/components/editor/EditorLayout";
 
 export const Route = createFileRoute("/")({
   component: EditorPage,
@@ -21,66 +12,3 @@ export const Route = createFileRoute("/")({
     ],
   }),
 });
-
-function EditorPage() {
-  const { activeOverlay, setActiveOverlay } = useCanvasStore();
-
-  return (
-    <div className="h-screen w-full overflow-hidden bg-white flex flex-col">
-      <div className="flex-1 flex overflow-hidden">
-        <LeftSidebar />
-        <div className="flex-1 relative flex overflow-hidden">
-          <div className="flex-1 relative overflow-hidden">
-            <Canvas />
-          </div>
-          <RightSidebar />
-        </div>
-      </div>
-
-      {activeOverlay === 'templates' && (
-        <div className="fixed inset-0 z-50 bg-white animate-in fade-in zoom-in duration-200 flex flex-col">
-          <div className="h-16 border-b border-neutral-200 flex items-center justify-between px-6 bg-white shrink-0">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
-                <LayoutTemplate size={18} />
-              </div>
-              <h1 className="text-xl font-bold text-neutral-900">Template Library</h1>
-            </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => setActiveOverlay(null)}
-              className="rounded-full hover:bg-neutral-100"
-            >
-              <X size={20} />
-            </Button>
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <Suspense fallback={<div className="h-full w-full flex items-center justify-center">Loading Library...</div>}>
-              <TemplateLibrary />
-            </Suspense>
-          </div>
-        </div>
-      )}
-
-      {/* Audit Log / UI Overlay for the requested text (Invisible/Debug) */}
-      <div className="hidden">
-        {`'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
-                                            
-                                            # Build the ZoomCanvas AI Template Library
-
-                                            The current Templates page is empty.
-
-                                            Replace it with a complete professional Template Library.`}
-      </div>
-    </div>
-  );
-}
-
-import { LayoutTemplate } from "lucide-react";
-
-
-
-
-
-
