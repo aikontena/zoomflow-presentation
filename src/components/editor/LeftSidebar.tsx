@@ -92,32 +92,62 @@ export default function LeftSidebar() {
             {activeTab === 'pages' && (
               <div className="space-y-4">
                 <div className="flex flex-col gap-4">
-                  {[1, 2, 3, 4].map(i => (
-                    <React.Fragment key={i}>
-                      <div className="group relative flex flex-col gap-2">
-                        <div className="aspect-video bg-neutral-100 rounded-lg border border-neutral-200 overflow-hidden relative group-hover:border-primary transition-colors cursor-pointer shadow-sm">
-                          <div className="absolute inset-0 flex items-center justify-center text-neutral-300">
-                            <span className="text-2xl font-thin">□</span>
+                  {useCanvasStore.getState().presentationPath.length > 0 ? (
+                    useCanvasStore.getState().presentationPath.map((frameId, index) => {
+                      const frame = useCanvasStore.getState().objects.find(o => o.id === frameId);
+                      if (!frame) return null;
+                      return (
+                        <div key={frameId} className="group relative flex flex-col gap-2">
+                          <div 
+                            onClick={() => useCanvasStore.getState().setSelection([frameId])}
+                            className={`aspect-video bg-neutral-100 rounded-lg border-2 overflow-hidden relative transition-all cursor-pointer shadow-sm ${
+                              useCanvasStore.getState().selection.includes(frameId) ? 'border-primary' : 'border-neutral-200 hover:border-neutral-300'
+                            }`}
+                          >
+                            <div className="absolute inset-0 flex items-center justify-center text-neutral-300">
+                              <span className="text-2xl font-thin">□</span>
+                            </div>
+                            <div className="absolute bottom-0 inset-x-0 bg-white/90 backdrop-blur-sm p-2 text-[10px] font-medium border-t border-neutral-100 flex justify-between items-center">
+                              <span className="truncate max-w-[180px]">{frame.text || `Frame ${index + 1}`}</span>
+                              <span className="text-neutral-400 font-mono">#{index + 1}</span>
+                            </div>
                           </div>
-                          <div className="absolute bottom-0 inset-x-0 bg-white/90 backdrop-blur-sm p-2 text-[10px] font-medium border-t border-neutral-100 flex justify-between items-center">
-                            <span>Frame {i}</span>
-                            <span className="opacity-0 group-hover:opacity-100 transition-opacity">Edit</span>
-                          </div>
+                          {index < useCanvasStore.getState().presentationPath.length - 1 && (
+                            <div className="flex justify-center text-neutral-200">
+                              <div className="w-px h-4 bg-neutral-200" />
+                            </div>
+                          )}
                         </div>
-                        {i < 4 && (
-                          <div className="flex justify-center text-neutral-200">
-                            <div className="w-px h-4 bg-neutral-200" />
-                          </div>
-                        )}
-                      </div>
-                    </React.Fragment>
-                  ))}
+                      );
+                    })
+                  ) : (
+                    <div className="text-center py-8 px-4 border-2 border-dashed border-neutral-100 rounded-xl">
+                      <p className="text-xs text-neutral-400">Add frames to your canvas to create a presentation path.</p>
+                    </div>
+                  )}
                 </div>
-                <button className="w-full py-2 border-2 border-dashed border-neutral-200 rounded-lg hover:border-neutral-300 hover:bg-neutral-50 transition-colors text-neutral-400 font-medium">
+                <button 
+                  onClick={() => {
+                    const id = `frame-${Date.now()}`;
+                    useCanvasStore.getState().addObject({
+                      id,
+                      type: 'frame',
+                      x: 100,
+                      y: 100,
+                      width: 800,
+                      height: 450,
+                      rotation: 0,
+                      fill: '#ffffff',
+                      text: `New Frame`
+                    });
+                  }}
+                  className="w-full py-2 border-2 border-dashed border-neutral-200 rounded-lg hover:border-neutral-300 hover:bg-neutral-50 transition-colors text-neutral-400 font-medium"
+                >
                   + Add New Frame
                 </button>
               </div>
             )}
+
             {activeTab === 'layers' && <p>No layers yet. Create some objects!</p>}
             {activeTab === 'assets' && <p>Browse your media assets here.</p>}
             {activeTab === 'templates' && (
