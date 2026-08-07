@@ -226,6 +226,9 @@ export default function Canvas() {
         <div className="pointer-events-auto">
           <ZoomControls />
         </div>
+        <div className="pointer-events-auto">
+          <MiniMap />
+        </div>
       </div>
 
       <div className="absolute bottom-4 right-4 z-20 pointer-events-auto">
