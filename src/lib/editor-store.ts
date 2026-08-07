@@ -139,7 +139,7 @@ export const useEditor = create<EditorState>((set, get) => ({
   lastSavedAt: null,
   dirty: false,
 
-  doc: { title: "Untitled presentation", pages: [], objects: [] },
+  doc: { title: "Untitled presentation", pages: [], objects: [], paths: [], bookmarks: [] },
   viewport: { x: 0, y: 0, zoom: 1 },
   tool: "select",
   past: [],
