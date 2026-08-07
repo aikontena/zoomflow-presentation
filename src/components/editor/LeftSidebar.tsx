@@ -30,7 +30,7 @@ const TABS = [
 import { useCanvasStore } from '@/lib/canvas-store';
 
 export default function LeftSidebar() {
-  const { undo, redo, history, lastSaved, save } = useCanvasStore();
+  const { undo, redo, history, lastSaved, save, setActiveOverlay } = useCanvasStore();
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -118,10 +118,22 @@ export default function LeftSidebar() {
             {activeTab === 'layers' && <p>No layers yet. Create some objects!</p>}
             {activeTab === 'assets' && <p>Browse your media assets here.</p>}
             {activeTab === 'templates' && (
-              <div className="grid grid-cols-2 gap-2">
-                {[1, 2, 3, 4].map(i => (
-                  <div key={i} className="aspect-video bg-neutral-100 rounded-md border border-neutral-200 hover:border-primary cursor-pointer transition-colors" />
-                ))}
+              <div className="space-y-4">
+                <p className="text-xs text-neutral-400">Choose a professional template to start your presentation.</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[1, 2, 3, 4].map(i => (
+                    <div key={i} className="aspect-video bg-neutral-100 rounded-md border border-neutral-200 hover:border-primary cursor-pointer transition-colors overflow-hidden">
+                      <img src={`https://picsum.photos/seed/${i + 50}/200/120`} className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                </div>
+                <button 
+                  onClick={() => setActiveOverlay('templates')}
+                  className="w-full py-2 bg-primary text-white rounded-lg font-medium shadow-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2 mt-4"
+                >
+                  <LayoutTemplate size={16} />
+                  Browse Library
+                </button>
               </div>
             )}
             {activeTab === 'uploads' && (

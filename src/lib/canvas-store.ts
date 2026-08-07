@@ -22,6 +22,7 @@ interface CanvasStore {
   frames: { id: string; name: string; order: number }[];
   selection: string[];
   viewport: { x: number; y: number; zoom: number };
+  activeOverlay: 'templates' | 'export' | 'settings' | null;
   
   // Basic Actions
   addObject: (obj: Omit<CanvasObject, "id">) => string;
@@ -51,6 +52,8 @@ interface CanvasStore {
   lastSaved: number | null;
   clear: () => void;
   save: () => void;
+  setActiveOverlay: (overlay: 'templates' | 'export' | 'settings' | null) => void;
+  loadTemplate: (objects: CanvasObject[]) => void;
 }
 
 export const useCanvasStore = create<CanvasStore>()(
@@ -65,6 +68,7 @@ export const useCanvasStore = create<CanvasStore>()(
       ],
       selection: [],
       viewport: { x: 0, y: 0, zoom: 1 },
+      activeOverlay: null,
       history: { past: [], future: [] },
       lastSaved: Date.now(),
 
@@ -168,6 +172,13 @@ export const useCanvasStore = create<CanvasStore>()(
 
       clear: () => set({ objects: [], selection: [], history: { past: [], future: [] }, lastSaved: null }),
       save: () => set({ lastSaved: Date.now() }),
+      setActiveOverlay: (activeOverlay) => set({ activeOverlay }),
+      loadTemplate: (objects) => set((state) => ({
+        objects,
+        selection: [],
+        history: { past: [...state.history.past, state.objects], future: [] },
+        activeOverlay: null
+      })),
     }),
     {
       name: "zoomcanvas-v4-storage",
