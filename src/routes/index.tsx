@@ -9,15 +9,12 @@ export const Route = createFileRoute("/")({
 
 function EditorPage() {
   return (
-    <div className="h-screen w-full overflow-hidden bg-white">
-      <ClientOnly>
-        <Suspense fallback={<div>Loading Canvas...</div>}>
-          <Canvas />
-        </Suspense>
-      </ClientOnly>
+    <div className="h-screen w-full overflow-hidden bg-red-500 flex items-center justify-center">
+      <h1 className="text-white text-4xl">TEST RENDER</h1>
     </div>
   );
 }
+
 
 
 
