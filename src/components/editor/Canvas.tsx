@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useCanvasStore, CanvasObject } from '@/lib/canvas-store';
+import { IconRenderer } from './IconRenderer';
 
 export default function Canvas() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -236,18 +237,19 @@ export default function Canvas() {
                   width: obj.width,
                   height: obj.height,
                   transform: `rotate(${obj.rotation || 0}deg)`,
-                  backgroundColor: (obj.type !== 'text' && obj.type !== 'frame') ? obj.fill : (obj.type === 'frame' ? '#ffffff' : 'transparent'),
+                  backgroundColor: (obj.type !== 'text' && obj.type !== 'frame' && obj.type !== 'icon') ? obj.fill : (obj.type === 'frame' ? '#ffffff' : 'transparent'),
                   border: obj.type === 'frame' ? '1px solid #e2e8f0' : 'none',
                   borderRadius: obj.type === 'circle' ? '50%' : '0',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'black',
+                  color: obj.fill || 'black',
                   fontSize: obj.fontSize || (obj.type === 'frame' ? 12 : 16),
                   pointerEvents: 'none',
                   userSelect: 'none',
                   boxShadow: isSelected ? '0 0 0 2px #3b82f6' : (obj.type === 'frame' ? '0 4px 6px -1px rgb(0 0 0 / 0.1)' : 'none'),
-                  zIndex: obj.type === 'frame' ? -1 : 0
+                  zIndex: obj.type === 'frame' ? -1 : 0,
+                  opacity: obj.opacity ?? 1,
                 }}>
                 {obj.type === 'frame' && (
                   <div className="absolute -top-6 left-0 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
@@ -255,6 +257,14 @@ export default function Canvas() {
                   </div>
                 )}
                 {obj.type === 'text' && obj.text}
+                {obj.type === 'icon' && obj.iconName && (
+                  <IconRenderer 
+                    name={obj.iconName} 
+                    size="100%" 
+                    color={obj.fill} 
+                    strokeWidth={obj.strokeWidth || 2}
+                  />
+                )}
                 
                 {/* Selection Handles (Visual only for now) */}
                 {isSelected && (
