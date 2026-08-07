@@ -32,10 +32,23 @@ const TABS = [
 
 
 export default function LeftSidebar() {
-  const { undo, redo, history, lastSaved, save, setActiveOverlay } = useCanvasStore();
+  const { 
+    undo, 
+    redo, 
+    history, 
+    lastSaved, 
+    save, 
+    setActiveOverlay,
+    presentationPath,
+    objects,
+    selection,
+    setSelection,
+    addObject
+  } = useCanvasStore();
+
   const [activeTab, setActiveTab] = useState<string | null>(null);
-  
   const [isCollapsed, setIsCollapsed] = useState(false);
+
 
   return (
     <div className="flex h-full bg-white border-r border-neutral-200">
