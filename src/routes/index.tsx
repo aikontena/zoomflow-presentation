@@ -1,4 +1,4 @@
-import { ClientOnly, createFileRoute, Head } from "@tanstack/react-router";
+import { ClientOnly, createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
 
 const Canvas = lazy(() => import("@/components/editor/Canvas"));
