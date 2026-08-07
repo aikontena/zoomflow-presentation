@@ -1,12 +1,12 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useCanvasStore } from "@/lib/canvas-store";
 import { X, LayoutTemplate } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
-const Canvas = lazy(() => import("@/components/editor/Canvas"));
-const LeftSidebar = lazy(() => import("@/components/editor/LeftSidebar"));
-const RightSidebar = lazy(() => import("@/components/editor/RightSidebar"));
-const TemplateLibrary = lazy(() => import("@/components/editor/templates/TemplateLibrary"));
+// Standard imports instead of lazy to avoid bundle issues
+import Canvas from "./Canvas";
+import LeftSidebar from "./LeftSidebar";
+import RightSidebar from "./RightSidebar";
+const TemplateLibrary = lazy(() => import("./templates/TemplateLibrary"));
 
 export default function EditorPage() {
   const { activeOverlay, setActiveOverlay } = useCanvasStore();
@@ -30,20 +30,13 @@ export default function EditorPage() {
   return (
     <div className="h-screen w-full overflow-hidden bg-white flex flex-col">
       <div className="flex-1 flex overflow-hidden">
-        <Suspense fallback={<div className="w-16 h-full bg-neutral-50 border-r border-neutral-200" />}>
-          <LeftSidebar />
-        </Suspense>
+        <LeftSidebar />
         
         <div className="flex-1 relative flex overflow-hidden">
           <div className="flex-1 relative overflow-hidden">
-            <Suspense fallback={<div className="h-full w-full flex items-center justify-center text-neutral-400">Loading Canvas...</div>}>
-              <Canvas />
-            </Suspense>
+            <Canvas />
           </div>
-          
-          <Suspense fallback={<div className="w-64 h-full bg-white border-l border-neutral-200" />}>
-            <RightSidebar />
-          </Suspense>
+          <RightSidebar />
         </div>
       </div>
 
@@ -56,14 +49,12 @@ export default function EditorPage() {
               </div>
               <h1 className="text-xl font-bold text-neutral-900">Template Library</h1>
             </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <button 
               onClick={() => setActiveOverlay(null)}
-              className="rounded-full hover:bg-neutral-100"
+              className="p-2 rounded-full hover:bg-neutral-100 transition-colors"
             >
               <X size={20} />
-            </Button>
+            </button>
           </div>
           <div className="flex-1 overflow-hidden">
             <Suspense fallback={<div className="h-full w-full flex items-center justify-center">Loading Library...</div>}>
