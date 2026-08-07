@@ -53,6 +53,7 @@ interface CanvasStore {
   clear: () => void;
   save: () => void;
   setActiveOverlay: (overlay: 'templates' | 'export' | 'settings' | null) => void;
+  loadTemplate: (objects: CanvasObject[]) => void;
 }
 
 export const useCanvasStore = create<CanvasStore>()(
