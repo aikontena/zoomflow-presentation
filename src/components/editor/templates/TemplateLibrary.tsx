@@ -270,11 +270,24 @@ export default function TemplateLibrary() {
           </ScrollArea>
 
           <div className="p-6 bg-white border-t border-neutral-200 space-y-3">
-            <Button className="w-full bg-primary hover:bg-primary/90 text-white h-11 text-lg font-medium shadow-lg shadow-primary/20 group">
+            <Button 
+              onClick={() => {
+                loadTemplate(selectedTemplate.objects);
+                toast.success(`Loaded ${selectedTemplate.name}`);
+              }}
+              className="w-full bg-primary hover:bg-primary/90 text-white h-11 text-lg font-medium shadow-lg shadow-primary/20 group"
+            >
               Use Template
               <ArrowRight className="ml-2 transition-transform group-hover:translate-x-1" size={18} />
             </Button>
-            <Button variant="outline" className="w-full h-11 font-medium">
+            <Button 
+              variant="outline" 
+              className="w-full h-11 font-medium"
+              onClick={() => {
+                loadTemplate(selectedTemplate.objects);
+                toast.info(`Duplicated ${selectedTemplate.name} as draft`);
+              }}
+            >
               Duplicate as Draft
             </Button>
           </div>
