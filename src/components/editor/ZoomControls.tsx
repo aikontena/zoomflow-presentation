@@ -36,8 +36,7 @@ export default function ZoomControls() {
   };
 
   return (
-    <div className="flex items-center gap-6 px-6 bg-white border-t border-neutral-200 w-full h-10 shrink-0">
-
+    <div className="flex items-center gap-6">
       <div className="flex items-center gap-1">
         <button
           onClick={handleZoomOut}
@@ -76,10 +75,10 @@ export default function ZoomControls() {
 
       <div className="w-px h-5 bg-neutral-200" />
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <button
           onClick={fitToScreen}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 hover:bg-neutral-100 rounded-md transition-colors text-neutral-600 text-xs font-medium"
+          className="flex items-center gap-1.5 px-2 py-1 hover:bg-neutral-100 rounded-md transition-colors text-neutral-600 text-xs font-medium"
           title="Fit to Screen"
         >
           <Maximize size={14} />
@@ -88,7 +87,7 @@ export default function ZoomControls() {
 
         <button
           onClick={resetZoom}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 hover:bg-neutral-100 rounded-md transition-colors text-neutral-600 text-xs font-medium"
+          className="flex items-center gap-1.5 px-2 py-1 hover:bg-neutral-100 rounded-md transition-colors text-neutral-600 text-xs font-medium"
           title="Reset to 100% (Ctrl 0)"
         >
           <RefreshCw size={14} />
@@ -97,7 +96,7 @@ export default function ZoomControls() {
 
         <button
           onClick={toggleFullscreen}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 hover:bg-neutral-100 rounded-md transition-colors text-neutral-600 text-xs font-medium"
+          className="flex items-center gap-1.5 px-2 py-1 hover:bg-neutral-100 rounded-md transition-colors text-neutral-600 text-xs font-medium"
           title="Toggle Fullscreen"
         >
           <Maximize2 size={14} />
