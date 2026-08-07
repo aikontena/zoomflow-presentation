@@ -12,19 +12,38 @@ export interface Template {
   objects: any[];
 }
 
+const CATEGORIES = [
+  'Business', 'Education', 'Academic', 'Research', 'Training', 'Workshop', 
+  'Marketing', 'Startup Pitch', 'Investor Deck', 'Project Proposal', 
+  'Seminar', 'Conference', 'Timeline', 'Mind Map', 'Flowchart', 
+  'Infographic', 'Portfolio', 'Resume', 'Financial Report', 'Government', 
+  'Technology', 'Healthcare', 'Legal', 'Creative', 'Minimal', 'Modern', 'Dark Theme'
+];
+
 export const TEMPLATES: Template[] = Array.from({ length: 40 }).map((_, i) => {
-  const categories = ['Business', 'Education', 'Creative', 'Research', 'Marketing'];
+  const diffs: ('Beginner' | 'Intermediate' | 'Advanced')[] = ['Beginner', 'Intermediate', 'Advanced'];
   return {
     id: `template-${i}`,
-    name: i === 0 ? "Business Proposal" : i === 1 ? "Startup Pitch" : i === 2 ? "Academic Poster" : `Template ${i + 1}`,
-    category: categories[i % categories.length],
-    description: 'Professional layout for your next presentation with high impact visuals.',
-    framesCount: 5 + (i % 5),
-    estimatedDuration: 10 + (i % 20),
-    difficulty: i % 3 === 0 ? 'Beginner' : i % 3 === 1 ? 'Intermediate' : 'Advanced' as const,
-    popularity: Math.floor(Math.random() * 100),
-    tags: ['modern', 'dark', 'business'],
-    thumbnail: `https://picsum.photos/seed/${i}/400/225`,
+    name: [
+      "Business Proposal", "Startup Pitch", "Sales Presentation", "Company Profile", 
+      "Annual Report", "Marketing Strategy", "Project Timeline", "Research Presentation",
+      "Journal Article", "Thesis Defense", "Seminar", "Workshop", "Lecture Notes",
+      "Training Course", "SWOT Analysis", "PESTLE Analysis", "Business Model Canvas",
+      "Project Charter", "Product Launch", "Roadmap", "Case Study", "Meeting Presentation",
+      "Portfolio", "Resume", "Academic Poster", "Mind Map", "Timeline", "Flowchart",
+      "Infographic", "Process Diagram", "Healthcare Report", "Government Briefing",
+      "Financial Dashboard", "Technology Overview", "Software Architecture",
+      "Educational Lesson", "Course Outline", "Data Analysis", "AI Presentation",
+      "Digital Transformation"
+    ][i] || `Template ${i + 1}`,
+    category: CATEGORIES[i % CATEGORIES.length]!,
+    description: 'Professional layout for your next presentation with high impact visuals and structured content placeholders.',
+    framesCount: 5 + (i % 8),
+    estimatedDuration: 10 + (i % 15),
+    difficulty: diffs[i % 3]!,
+    popularity: Math.floor(Math.random() * 1000),
+    tags: ['modern', 'presentation', CATEGORIES[i % CATEGORIES.length]!.toLowerCase()],
+    thumbnail: `https://picsum.photos/seed/${i + 100}/800/450`,
     objects: []
   };
 });
