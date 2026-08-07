@@ -191,8 +191,15 @@ export default function Canvas() {
           </button>
         ))}
         <div className="w-px h-4 bg-neutral-200 self-center mx-1" />
-        <button onClick={undo} className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs">Undo</button>
-        <button onClick={redo} className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs">Redo</button>
+        <button onClick={undo} className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs" title="Undo (Ctrl+Z)">Undo</button>
+        <button onClick={redo} className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs" title="Redo (Ctrl+Shift+Z)">Redo</button>
+        <div className="w-px h-4 bg-neutral-200 self-center mx-1" />
+        <button 
+          onClick={() => setViewport({ x: 0, y: 0, zoom: 1 })}
+          className="px-2 py-1.5 hover:bg-neutral-100 rounded-lg text-xs text-primary font-medium"
+        >
+          Reset View
+        </button>
       </div>
 
       <div 
