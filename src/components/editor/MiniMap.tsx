@@ -1,10 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useCanvasStore } from '@/lib/canvas-store';
 import { ChevronUp, ChevronDown, Map as MapIcon } from 'lucide-react';
 
 export default function MiniMap() {
   const { objects, viewport, setViewport } = useCanvasStore();
-  console.log('MiniMap rendering', { objectsCount: objects.length });
   const [isCollapsed, setIsCollapsed] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
 
@@ -12,20 +11,27 @@ export default function MiniMap() {
   const MAP_SIZE = 160;
   const PADDING = 20;
 
-  // Calculate content bounds
-  const getBounds = () => {
-    if (objects.length === 0) return { minX: -500, minY: -500, maxX: 500, maxY: 500 };
-    const minX = Math.min(...objects.map(o => o.x)) - 100;
-    const minY = Math.min(...objects.map(o => o.y)) - 100;
-    const maxX = Math.max(...objects.map(o => o.x + o.width)) + 100;
-    const maxY = Math.max(...objects.map(o => o.y + o.height)) + 100;
-    return { minX, minY, maxX, maxY };
-  };
+  // Calculate content bounds with memoization
+  const bounds = useMemo(() => {
+    if (!objects || objects.length === 0) {
+      return { minX: -500, minY: -500, maxX: 500, maxY: 500 };
+    }
+    const xCoords = objects.map(o => o.x);
+    const yCoords = objects.map(o => o.y);
+    const xFarCoords = objects.map(o => o.x + o.width);
+    const yFarCoords = objects.map(o => o.y + o.height);
 
-  const bounds = getBounds();
+    const minX = Math.min(...xCoords) - 100;
+    const minY = Math.min(...yCoords) - 100;
+    const maxX = Math.max(...xFarCoords) + 100;
+    const maxY = Math.max(...yFarCoords) + 100;
+    
+    return { minX, minY, maxX, maxY };
+  }, [objects]);
+
   const worldWidth = bounds.maxX - bounds.minX;
   const worldHeight = bounds.maxY - bounds.minY;
-  const maxDim = Math.max(worldWidth, worldHeight);
+  const maxDim = Math.max(worldWidth, worldHeight, 1);
   const scale = (MAP_SIZE - PADDING * 2) / maxDim;
 
   const toMapCoord = (x: number, y: number) => ({
@@ -42,18 +48,25 @@ export default function MiniMap() {
     const worldX = (mapX - PADDING) / scale + bounds.minX;
     const worldY = (mapY - PADDING) / scale + bounds.minY;
 
+    // Use safe window dimensions
+    const winWidth = typeof window !== 'undefined' ? window.innerWidth : 1000;
+    const winHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
+
     setViewport({
       ...viewport,
-      x: window.innerWidth / 2 - worldX * viewport.zoom,
-      y: window.innerHeight / 2 - worldY * viewport.zoom
+      x: winWidth / 2 - worldX * viewport.zoom,
+      y: winHeight / 2 - worldY * viewport.zoom
     });
   };
 
+  const winWidth = typeof window !== 'undefined' ? window.innerWidth : 1000;
+  const winHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
+
   const viewportRect = {
-    x: -viewport.x / viewport.zoom,
-    y: -viewport.y / viewport.zoom,
-    width: window.innerWidth / viewport.zoom,
-    height: window.innerHeight / viewport.zoom
+    x: -viewport.x / (viewport.zoom || 1),
+    y: -viewport.y / (viewport.zoom || 1),
+    width: winWidth / (viewport.zoom || 1),
+    height: winHeight / (viewport.zoom || 1)
   };
 
   const vMap = toMapCoord(viewportRect.x, viewportRect.y);
@@ -63,15 +76,18 @@ export default function MiniMap() {
   };
 
   return (
-    <div className="bg-white/90 backdrop-blur-sm border border-neutral-200 rounded-lg shadow-lg overflow-hidden transition-all duration-300">
+    <div className="bg-white/90 backdrop-blur-sm border border-neutral-200 rounded-lg shadow-lg overflow-hidden transition-all duration-300 pointer-events-auto">
       <div className="flex items-center justify-between px-2 py-1.5 border-b border-neutral-100 bg-neutral-50/50">
         <div className="flex items-center gap-1.5 text-[10px] font-bold text-neutral-500 uppercase tracking-wider">
           <MapIcon size={12} />
           Navigator
         </div>
         <button 
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1 hover:bg-neutral-200 rounded transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsCollapsed(!isCollapsed);
+          }}
+          className="p-1 hover:bg-neutral-200 rounded transition-colors pointer-events-auto"
         >
           {isCollapsed ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
         </button>
@@ -85,7 +101,7 @@ export default function MiniMap() {
           style={{ width: MAP_SIZE, height: MAP_SIZE }}
         >
           {/* Objects */}
-          {objects.map(obj => {
+          {objects && objects.map(obj => {
             const pos = toMapCoord(obj.x, obj.y);
             return (
               <div 
@@ -107,8 +123,8 @@ export default function MiniMap() {
             style={{
               left: vMap.x,
               top: vMap.y,
-              width: vMapSize.width,
-              height: vMapSize.height,
+              width: Math.max(4, vMapSize.width),
+              height: Math.max(4, vMapSize.height),
             }}
           />
         </div>
