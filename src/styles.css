@@ -13,6 +13,13 @@
   background-color: transparent !important;
 }
 
+/* tldraw paints its own opaque page behind every shape. Keep that layer
+ * transparent so the selected ZoomCanvas background cannot flash white or
+ * black while the editor mounts, focuses, or changes tools. */
+.tl-background {
+  background-color: transparent !important;
+}
+
 
 @custom-variant dark (&:is(.dark *));
 

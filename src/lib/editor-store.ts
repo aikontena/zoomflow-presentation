@@ -1,9 +1,6 @@
 import { create } from "zustand";
 import { 
   Editor, 
-  TLStore, 
-  createTLStore, 
-  defaultShapeUtils,
   createShapeId,
   GeoShapeGeoStyle,
   getSnapshot,
@@ -71,7 +68,6 @@ export interface EditorDoc {
 
 interface EditorState {
   editor: Editor | null;
-  store: TLStore;
   activePageId: string;
   pages: Page[];
   title: string;
@@ -158,7 +154,6 @@ export const gridSize = 20;
 
 export const useEditor = create<EditorState>((set, get) => ({
   editor: null,
-  store: createTLStore({ shapeUtils: [...defaultShapeUtils] as any }),
   activePageId: "p1",
   pages: [
     { id: "p1", name: "Opening", frame: { x: 0, y: 0, width: 960, height: 540 }, notes: "Welcome the room.", preset: 'cinematic', transition: 'zoom', duration: 1000 },
@@ -196,6 +191,18 @@ export const useEditor = create<EditorState>((set, get) => ({
 
 
   setEditor: (editor) => {
+    if (typeof window !== "undefined") {
+      const savedSnapshot = window.localStorage.getItem("zoomcanvas-canvas-v2");
+      if (savedSnapshot) {
+        try {
+          loadSnapshot(editor.store, JSON.parse(savedSnapshot));
+        } catch (error) {
+          window.localStorage.removeItem("zoomcanvas-canvas-v2");
+          console.warn("Removed invalid saved canvas data", error);
+        }
+      }
+    }
+
     set({ editor });
     
     // Sync store tool with editor tool
