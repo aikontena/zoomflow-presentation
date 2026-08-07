@@ -36,7 +36,8 @@ export default function ZoomControls() {
   };
 
   return (
-    <div className="flex items-center gap-4 px-4 py-2 bg-white/95 backdrop-blur-sm border-t border-neutral-200 w-full h-12 shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
+    <div className="flex items-center gap-6 px-6 bg-white border-t border-neutral-200 w-full h-10 shrink-0">
+
       <div className="flex items-center gap-1">
         <button
           onClick={handleZoomOut}
