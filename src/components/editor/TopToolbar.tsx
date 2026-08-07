@@ -105,25 +105,38 @@ export function TopToolbar({ onPresent }: { onPresent: () => void }) {
       </div>
 
       <div className="mx-1 flex items-center gap-0.5 rounded-2xl border border-border bg-background/40 p-1">
-        {TOOLS.map((t) => (
-          <button
-            key={t.id}
-            title={t.label}
-            onClick={() => {
-              if (t.id === "select") {
-                editor?.selectNone();
-                setTool("select");
-              } else {
-                addObject(t.id);
-              }
-            }}
-            className={`flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
-              (t.id === "select" && tool === "select") ? "bg-primary/25 text-primary" : "text-muted-foreground hover:bg-secondary"
-            }`}
-          >
-            <t.icon size={16} />
-          </button>
-        ))}
+        {TOOLS.filter(t => !t.hidden).map((t) => {
+          const isActive = tool === t.id;
+          return (
+            <button
+              key={t.id}
+              title={t.label}
+              onClick={() => {
+                setTool(t.id);
+                if (editor) {
+                  if (t.id === "select") {
+                    editor.setCurrentTool("select");
+                  } else if (t.id.startsWith("geo-")) {
+                    editor.setCurrentTool("geo");
+                    editor.updateInstanceState({ 
+                      propsForNextShape: { ...editor.getInstanceState().propsForNextShape, geo: t.id.replace("geo-", "") === "rect" ? "rectangle" : "ellipse" } 
+                    });
+                  } else if (["text", "arrow", "note", "draw", "line"].includes(t.id)) {
+                    editor.setCurrentTool(t.id);
+                  } else if (["image", "video", "pdf"].includes(t.id)) {
+                    toast.info(`Click on canvas to place ${t.label}`);
+                    editor.setCurrentTool("asset"); // Custom logic or just handle via upload
+                  }
+                }
+              }}
+              className={`flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
+                isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary"
+              }`}
+            >
+              <t.icon size={16} />
+            </button>
+          );
+        })}
       </div>
 
       <div className="flex items-center gap-0.5">
