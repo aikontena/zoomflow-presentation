@@ -6,6 +6,7 @@ import { PathEditor } from "./PathEditor";
 
 export function Canvas() {
   const { 
+    editor,
     setEditor, 
     showGrid, 
     activePageId, 
