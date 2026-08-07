@@ -9,7 +9,11 @@ import {
   Box,
   ChevronLeft,
   ChevronRight,
-  Settings
+  Settings,
+  Undo2,
+  Redo2,
+  History,
+  Clock
 } from 'lucide-react';
 
 const TABS = [
@@ -20,9 +24,13 @@ const TABS = [
   { id: 'uploads', label: 'Uploads', icon: Upload },
   { id: 'ai', label: 'AI', icon: Sparkles },
   { id: 'icons', label: 'Icons', icon: Box },
+  { id: 'history', label: 'History', icon: History },
 ];
 
+import { useCanvasStore } from '@/lib/canvas-store';
+
 export default function LeftSidebar() {
+  const { undo, redo, history } = useCanvasStore();
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -44,7 +52,21 @@ export default function LeftSidebar() {
             <tab.icon size={20} />
           </button>
         ))}
-        <div className="mt-auto flex flex-col items-center gap-4">
+        <div className="mt-auto flex flex-col items-center gap-4 mb-4">
+          <button 
+            onClick={() => undo()}
+            className="p-3 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-xl transition-colors"
+            title="Undo (Ctrl+Z)"
+          >
+            <Undo2 size={20} />
+          </button>
+          <button 
+            onClick={() => redo()}
+            className="p-3 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-xl transition-colors"
+            title="Redo (Ctrl+Shift+Z)"
+          >
+            <Redo2 size={20} />
+          </button>
           <button className="p-3 text-neutral-500 hover:text-neutral-900 transition-colors">
             <Settings size={20} />
           </button>
@@ -100,6 +122,32 @@ export default function LeftSidebar() {
               </div>
             )}
             {activeTab === 'icons' && <p>Search thousands of icons.</p>}
+            {activeTab === 'history' && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-neutral-900 font-medium mb-2">
+                  <Clock size={16} />
+                  <span>Time Travel</span>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs uppercase tracking-wider text-neutral-400 font-bold">History Stack</p>
+                  <div className="space-y-1">
+                    {history.past.map((_, i) => (
+                      <div key={`past-${i}`} className="p-2 text-xs rounded border border-transparent hover:border-neutral-200 hover:bg-neutral-50 cursor-pointer">
+                        Version {i + 1}
+                      </div>
+                    )).reverse()}
+                    <div className="p-2 text-xs rounded bg-primary/5 text-primary border border-primary/20 font-medium">
+                      Current State
+                    </div>
+                    {history.future.map((_, i) => (
+                      <div key={`future-${i}`} className="p-2 text-xs rounded border border-transparent hover:border-neutral-200 hover:bg-neutral-50 cursor-pointer text-neutral-300">
+                        Redo Version {i + 1}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
