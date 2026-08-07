@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useCanvasStore, CanvasObject } from '@/lib/canvas-store';
 import { IconRenderer } from './IconRenderer';
+import { toast } from 'sonner';
 
 export default function Canvas() {
   const containerRef = useRef<HTMLDivElement>(null);
