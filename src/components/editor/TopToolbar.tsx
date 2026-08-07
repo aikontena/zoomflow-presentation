@@ -83,6 +83,9 @@ export function TopToolbar({ onPresent }: { onPresent: () => void }) {
     if (editor) {
       if (k > 1) editor.zoomIn();
       else editor.zoomOut();
+      // Ensure sync back to store
+      const camera = editor.getCamera();
+      useEditor.getState().setViewport({ x: camera.x, y: camera.y, zoom: camera.z });
     }
   };
 
