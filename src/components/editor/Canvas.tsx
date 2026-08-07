@@ -302,10 +302,6 @@ export default function Canvas() {
           <MiniMap />
         </div>
 
-        <div className="absolute bottom-4 left-4 z-50 pointer-events-auto">
-          <StatusBar />
-        </div>
-
         {/* Main Tool Selector */}
         <div className="absolute left-1/2 top-4 z-10 flex -translate-x-1/2 gap-2 rounded-xl bg-white p-1 shadow-lg border border-neutral-200">
           {(['select', 'rect', 'circle', 'text', 'frame'] as const).map(t => (
@@ -323,7 +319,15 @@ export default function Canvas() {
       </div>
 
       {/* Footer Bar */}
-      <ZoomControls />
+      <div className="flex items-center justify-between px-4 bg-white border-t border-neutral-200 h-10 shrink-0">
+        <div className="flex items-center">
+          <StatusBar />
+        </div>
+        <div className="flex-1 flex justify-center">
+          <ZoomControls />
+        </div>
+        <div className="w-[120px]" /> {/* Spacer to balance status bar */}
+      </div>
     </div>
   );
 }
