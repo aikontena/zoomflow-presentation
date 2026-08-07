@@ -441,7 +441,7 @@ export const useEditor = create<EditorState>((set, get) => ({
   addObject: (type, at) => {
     const s = get();
     if (!s.editor) return "";
-    const id = `shape:${uid()}` as any;
+    const id = (s.editor as any).createShapeId();
     const center = s.editor.getViewportScreenCenter();
     const pos = at || { x: center.x, y: center.y };
 
@@ -454,6 +454,7 @@ export const useEditor = create<EditorState>((set, get) => ({
               type === 'arrow' ? 'arrow' : 
               type === 'sticky' ? 'note' : 
               type === 'code' ? 'text' :
+              type === 'text' ? 'text' :
               'text',
         x: pos.x,
         y: pos.y,
@@ -464,7 +465,7 @@ export const useEditor = create<EditorState>((set, get) => ({
                {}
       } as any
     ]);
-    return id;
+    return id as string;
   },
   updateObject: (id, patch) => {
     const s = get();
