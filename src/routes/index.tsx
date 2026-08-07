@@ -1,7 +1,16 @@
-import { ClientOnly, createFileRoute } from "@tanstack/react-router";
-import React, { lazy, Suspense } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 
 const EditorLayout = lazy(() => import("@/components/editor/EditorLayout"));
+
+function ClientOnly({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  if (!mounted) return null;
+  return <>{children}</>;
+}
 
 export const Route = createFileRoute("/")({
   component: () => (
