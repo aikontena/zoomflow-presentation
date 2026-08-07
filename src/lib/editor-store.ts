@@ -403,12 +403,58 @@ export const useEditor = create<EditorState>((set, get) => ({
   addObject: (type, at) => {
     const s = get();
     if (!s.editor) return "";
-    const id = uid();
+    const id = `shape:${uid()}` as any;
+    const center = s.editor.getViewportScreenCenter();
+    const pos = at || { x: center.x, y: center.y };
+
+    s.editor.createShapes([
+      {
+        id,
+        type: type === 'heading' ? 'text' : 
+              type === 'rect' ? 'geo' : 
+              type === 'circle' ? 'geo' : 
+              type === 'arrow' ? 'arrow' : 
+              type === 'sticky' ? 'note' : 
+              type === 'code' ? 'text' :
+              'text',
+        x: pos.x,
+        y: pos.y,
+        props: type === 'heading' ? { text: 'New Heading', size: 'l' } :
+               type === 'rect' ? { geo: 'rectangle' } :
+               type === 'circle' ? { geo: 'ellipse' } :
+               type === 'code' ? { text: 'console.log("hello")', font: 'mono' } :
+               {}
+      } as any
+    ]);
     return id;
   },
-  updateObject: (id, patch) => set({ dirty: true }),
-  updateSelected: (patch) => set({ dirty: true }),
-  loadTemplate: (doc) => set({ dirty: true }),
+  updateObject: (id, patch) => {
+    const s = get();
+    if (s.editor) {
+      s.editor.updateShapes([{ id: id as any, ...patch }]);
+    }
+    set({ dirty: true });
+  },
+  updateSelected: (patch) => {
+    const s = get();
+    if (s.editor) {
+      const ids = s.editor.getSelectedShapeIds();
+      s.editor.updateShapes(ids.map(id => ({ id, ...patch })));
+    }
+    set({ dirty: true });
+  },
+  loadTemplate: (doc) => {
+    const s = get();
+    if (doc.snapshot && s.editor) {
+      loadSnapshot(s.editor.store, doc.snapshot);
+    }
+    set({ 
+      title: doc.title || s.title,
+      pages: doc.pages || s.pages,
+      background: doc.background || s.background,
+      dirty: true 
+    });
+  },
 
   exportToJson: () => {
     const s = get();
