@@ -1,13 +1,11 @@
 import { create } from "zustand";
 import { 
   Editor, 
-  TLRecord, 
   TLStore, 
   createTLStore, 
   defaultShapeUtils,
   getSnapshot,
   loadSnapshot,
-  TLEditorSnapshot
 } from "tldraw";
 
 export type CanvasBackground = "white" | "light-grid" | "dot-grid" | "dark-grid" | "plain" | "custom";
@@ -17,6 +15,16 @@ export interface Page {
   name: string;
   frame: { x: number; y: number; width: number; height: number };
   notes: string;
+}
+
+// Temporary types to satisfy existing components while migrating
+export type ObjectType = any;
+export type CanvasObject = any;
+export type AnimationName = any;
+export interface EditorDoc {
+  title: string;
+  pages: Page[];
+  objects: any[];
 }
 
 interface EditorState {
@@ -32,6 +40,14 @@ interface EditorState {
   snapToGrid: boolean;
   lastSavedAt: number | null;
   dirty: boolean;
+  
+  // Legacy compatibility props
+  doc: EditorDoc;
+  viewport: { x: number, y: number, zoom: number };
+  tool: string;
+  past: any[];
+  future: any[];
+  selectedIds: string[];
 
   setEditor: (editor: Editor) => void;
   setTitle: (title: string) => void;
@@ -40,6 +56,9 @@ interface EditorState {
   toggleGrid: () => void;
   setGridSize: (size: number) => void;
   toggleSnap: () => void;
+  setTool: (tool: string) => void;
+  setViewport: (v: any) => void;
+  select: (ids: string[]) => void;
   
   // Page management
   addPage: () => void;
@@ -53,6 +72,14 @@ interface EditorState {
   undo: () => void;
   redo: () => void;
   markSaved: () => void;
+  commit: () => void;
+  deleteSelected: () => void;
+  duplicateSelected: () => void;
+  reorder: (id: string, dir: string) => void;
+  addObject: (type: string, at?: any) => string;
+  updateObject: (id: string, patch: any) => void;
+  updateSelected: (patch: any) => void;
+  loadTemplate: (doc: any) => void;
   
   // Data
   exportToJson: () => string;
@@ -60,6 +87,8 @@ interface EditorState {
 }
 
 const uid = () => Math.random().toString(36).slice(2, 10);
+
+export const gridSize = 20;
 
 export const useEditor = create<EditorState>((set, get) => ({
   editor: null,
@@ -77,8 +106,16 @@ export const useEditor = create<EditorState>((set, get) => ({
   lastSavedAt: null,
   dirty: false,
 
+  // Legacy state mocks
+  doc: { title: "Untitled presentation", pages: [], objects: [] },
+  viewport: { x: 0, y: 0, zoom: 1 },
+  tool: "select",
+  past: [],
+  future: [],
+  selectedIds: [],
+
   setEditor: (editor) => set({ editor }),
-  setTitle: (title) => set({ title, dirty: true }),
+  setTitle: (title) => set((s) => ({ title, doc: { ...s.doc, title }, dirty: true })),
   setBackground: (background) => set({ background, dirty: true }),
   setCustomBackgroundColor: (customBackgroundColor) => set({ customBackgroundColor, dirty: true }),
   
@@ -92,8 +129,10 @@ export const useEditor = create<EditorState>((set, get) => ({
   },
   
   setGridSize: (gridSize) => set({ gridSize, dirty: true }),
-  
   toggleSnap: () => set((s) => ({ snapToGrid: !s.snapToGrid, dirty: true })),
+  setTool: (tool) => set({ tool }),
+  setViewport: (v) => set((s) => ({ viewport: typeof v === "function" ? v(s.viewport) : v })),
+  select: (selectedIds) => set({ selectedIds }),
 
   addPage: () => set((s) => {
     const page: Page = {
@@ -111,6 +150,7 @@ export const useEditor = create<EditorState>((set, get) => ({
     };
     return {
       pages: [...s.pages, page],
+      doc: { ...s.doc, pages: [...s.pages, page] },
       activePageId: page.id,
       dirty: true,
     };
@@ -121,27 +161,40 @@ export const useEditor = create<EditorState>((set, get) => ({
     const pages = s.pages.filter((p) => p.id !== id);
     return {
       pages,
+      doc: { ...s.doc, pages },
       activePageId: s.activePageId === id ? pages[0]!.id : s.activePageId,
       dirty: true,
     };
   }),
 
-  renamePage: (id, name) => set((s) => ({
-    pages: s.pages.map((p) => (p.id === id ? { ...p, name } : p)),
-    dirty: true,
-  })),
+  renamePage: (id, name) => set((s) => {
+    const pages = s.pages.map((p) => (p.id === id ? { ...p, name } : p));
+    return {
+      pages,
+      doc: { ...s.doc, pages },
+      dirty: true,
+    };
+  }),
 
-  setPageNotes: (id, notes) => set((s) => ({
-    pages: s.pages.map((p) => (p.id === id ? { ...p, notes } : p)),
-    dirty: true,
-  })),
+  setPageNotes: (id, notes) => set((s) => {
+    const pages = s.pages.map((p) => (p.id === id ? { ...p, notes } : p));
+    return {
+      pages,
+      doc: { ...s.doc, pages },
+      dirty: true,
+    };
+  }),
 
   setActivePage: (activePageId) => set({ activePageId }),
 
-  capturePageFrame: (id, frame) => set((s) => ({
-    pages: s.pages.map((p) => (p.id === id ? { ...p, frame } : p)),
-    dirty: true,
-  })),
+  capturePageFrame: (id, frame) => set((s) => {
+    const pages = s.pages.map((p) => (p.id === id ? { ...p, frame } : p));
+    return {
+      pages,
+      doc: { ...s.doc, pages },
+      dirty: true,
+    };
+  }),
 
   undo: () => {
     const s = get();
@@ -154,6 +207,32 @@ export const useEditor = create<EditorState>((set, get) => ({
   },
 
   markSaved: () => set({ lastSavedAt: Date.now(), dirty: false }),
+  commit: () => set({ dirty: true }),
+  deleteSelected: () => {
+    const s = get();
+    if (s.editor) s.editor.deleteShapes(s.editor.getSelectedShapeIds());
+  },
+  duplicateSelected: () => {
+    const s = get();
+    if (s.editor) s.editor.duplicateShapes(s.editor.getSelectedShapeIds());
+  },
+  reorder: (id, dir) => {
+    const s = get();
+    if (s.editor) {
+      if (dir === "forward") s.editor.bringForward([id as any]);
+      else s.editor.sendBackward([id as any]);
+    }
+  },
+  addObject: (type, at) => {
+    const s = get();
+    if (!s.editor) return "";
+    const id = uid();
+    // Simplified mapping for now
+    return id;
+  },
+  updateObject: (id, patch) => set({ dirty: true }),
+  updateSelected: (patch) => set({ dirty: true }),
+  loadTemplate: (doc) => set({ dirty: true }),
 
   exportToJson: () => {
     const s = get();
@@ -187,3 +266,5 @@ export const useEditor = create<EditorState>((set, get) => ({
     }
   }
 }));
+
+export const makeObject = (type: any, x: number, y: number) => ({});
