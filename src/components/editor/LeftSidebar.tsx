@@ -13,8 +13,10 @@ import {
   Undo2,
   Redo2,
   History,
-  Clock
+  Clock,
+  LayoutGrid
 } from 'lucide-react';
+import { IconLibrary } from './IconLibrary';
 
 const TABS = [
   { id: 'pages', label: 'Pages', icon: FileText },
