@@ -305,6 +305,167 @@ export type Database = {
           },
         ]
       }
+      template_categories: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      template_favorites: {
+        Row: {
+          created_at: string | null
+          template_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          template_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          template_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_favorites_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_tags: {
+        Row: {
+          created_at: string | null
+          id: string
+          tag: string
+          template_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          tag: string
+          template_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          tag?: string
+          template_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_tags_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_usage: {
+        Row: {
+          id: string
+          template_id: string | null
+          used_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          template_id?: string | null
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          template_id?: string | null
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_usage_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      templates: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          created_by: string | null
+          data: Json | null
+          description: string | null
+          difficulty: string | null
+          estimated_duration: number | null
+          frame_count: number | null
+          id: string
+          is_public: boolean | null
+          name: string
+          popularity: number | null
+          thumbnail_url: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          data?: Json | null
+          description?: string | null
+          difficulty?: string | null
+          estimated_duration?: number | null
+          frame_count?: number | null
+          id?: string
+          is_public?: boolean | null
+          name: string
+          popularity?: number | null
+          thumbnail_url?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          data?: Json | null
+          description?: string | null
+          difficulty?: string | null
+          estimated_duration?: number | null
+          frame_count?: number | null
+          id?: string
+          is_public?: boolean | null
+          name?: string
+          popularity?: number | null
+          thumbnail_url?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "templates_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "template_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
