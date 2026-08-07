@@ -13,7 +13,8 @@ import {
   ArrowRight,
   TrendingUp,
   Layout,
-  Sparkles
+  Sparkles,
+  X
 } from 'lucide-react';
 import { TEMPLATES, Template } from '@/lib/templates';
 import { Button } from '@/components/ui/button';
@@ -27,9 +28,86 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
-
 import { useCanvasStore } from '@/lib/canvas-store';
 import { toast } from 'sonner';
+
+interface TemplateCardProps {
+  template: Template;
+  viewMode: 'grid' | 'list';
+  isSelected: boolean;
+  isFavorite: boolean;
+  onClick: () => void;
+  onFavorite: (e: React.MouseEvent) => void;
+}
+
+function TemplateCard({ template, viewMode, isSelected, isFavorite, onClick, onFavorite }: TemplateCardProps) {
+  return (
+    <div 
+      onClick={onClick}
+      className={`group cursor-pointer transition-all ${
+        viewMode === 'grid' 
+          ? 'flex flex-col bg-white border border-neutral-200 rounded-xl overflow-hidden hover:shadow-xl hover:-translate-y-1' 
+          : 'flex items-center gap-4 p-3 bg-white border border-neutral-100 rounded-lg hover:border-primary'
+      } ${isSelected ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+    >
+      <div className={`relative bg-neutral-100 overflow-hidden ${viewMode === 'grid' ? 'aspect-video' : 'w-32 aspect-video rounded-md shrink-0'}`}>
+        <img 
+          src={template.thumbnail} 
+          alt={template.name}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+          <Button 
+            variant="secondary" 
+            size="sm" 
+            className="opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all shadow-lg"
+          >
+            Quick View
+          </Button>
+        </div>
+        <button 
+          onClick={onFavorite}
+          className={`absolute top-2 right-2 p-1.5 rounded-full backdrop-blur-md transition-all ${
+            isFavorite 
+              ? 'bg-yellow-400 text-white' 
+              : 'bg-white/80 text-neutral-400 opacity-0 group-hover:opacity-100 hover:text-yellow-500'
+          }`}
+        >
+          <Star size={14} fill={isFavorite ? "currentColor" : "none"} />
+        </button>
+      </div>
+
+      <div className="flex-1 p-4 flex flex-col gap-1 min-w-0">
+        <div className="flex justify-between items-start gap-2">
+          <h3 className="font-semibold text-neutral-900 leading-tight truncate">{template.name}</h3>
+          <Badge variant="outline" className="text-[10px] uppercase tracking-wider h-5 shrink-0">
+            {template.difficulty}
+          </Badge>
+        </div>
+        <p className="text-xs text-neutral-500 line-clamp-2 mt-1">
+          {template.description}
+        </p>
+        <div className="mt-auto pt-3 flex items-center gap-4 text-[11px] text-neutral-400">
+          <div className="flex items-center gap-1">
+            <Layout size={12} />
+            {template.framesCount} Frames
+          </div>
+          <div className="flex items-center gap-1">
+            <Clock size={12} />
+            {template.estimatedDuration}m
+          </div>
+          {viewMode === 'grid' && (
+            <div className="flex items-center gap-1 ml-auto">
+              <TrendingUp size={12} />
+              {template.popularity}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function TemplateLibrary() {
   const { setActiveOverlay, loadTemplate } = useCanvasStore();
@@ -127,74 +205,55 @@ export default function TemplateLibrary() {
 
         {/* Content: Template Grid */}
         <ScrollArea className="flex-1">
-          <div className={`p-6 ${viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'flex flex-col gap-3'}`}>
-            {filteredTemplates.map(template => (
-              <div 
-                key={template.id}
-                onClick={() => setSelectedTemplate(template)}
-                className={`group cursor-pointer transition-all ${
-                  viewMode === 'grid' 
-                    ? 'flex flex-col bg-white border border-neutral-200 rounded-xl overflow-hidden hover:shadow-xl hover:-translate-y-1' 
-                    : 'flex items-center gap-4 p-3 bg-white border border-neutral-100 rounded-lg hover:border-primary'
-                } ${selectedTemplate?.id === template.id ? 'ring-2 ring-primary ring-offset-2' : ''}`}
-              >
-                <div className={`relative bg-neutral-100 overflow-hidden ${viewMode === 'grid' ? 'aspect-video' : 'w-32 aspect-video rounded-md'}`}>
-                  <img 
-                    src={template.thumbnail} 
-                    alt={template.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                    <Button 
-                      variant="secondary" 
-                      size="sm" 
-                      className="opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all shadow-lg"
-                    >
-                      Quick View
-                    </Button>
-                  </div>
-                  <button 
-                    onClick={(e) => toggleFavorite(e, template.id)}
-                    className={`absolute top-2 right-2 p-1.5 rounded-full backdrop-blur-md transition-all ${
-                      favorites.includes(template.id) 
-                        ? 'bg-yellow-400 text-white' 
-                        : 'bg-white/80 text-neutral-400 opacity-0 group-hover:opacity-100 hover:text-yellow-500'
-                    }`}
-                  >
-                    <Star size={14} fill={favorites.includes(template.id) ? "currentColor" : "none"} />
-                  </button>
+          <div className="p-6 space-y-8">
+            {/* Favorites Section */}
+            {favorites.length > 0 && searchQuery === '' && activeCategory === 'All' && (
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 text-neutral-900">
+                  <Star size={18} className="text-yellow-400 fill-current" />
+                  <h2 className="text-lg font-bold">Your Favorites</h2>
                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {TEMPLATES.filter(t => favorites.includes(t.id)).map(template => (
+                    <TemplateCard 
+                      key={template.id} 
+                      template={template} 
+                      viewMode={viewMode}
+                      isSelected={selectedTemplate?.id === template.id}
+                      isFavorite={true}
+                      onClick={() => setSelectedTemplate(template)}
+                      onFavorite={(e) => toggleFavorite(e, template.id)}
+                    />
+                  ))}
+                </div>
+                <Separator />
+              </section>
+            )}
 
-                <div className="flex-1 p-4 flex flex-col gap-1">
-                  <div className="flex justify-between items-start gap-2">
-                    <h3 className="font-semibold text-neutral-900 leading-tight truncate">{template.name}</h3>
-                    <Badge variant="outline" className="text-[10px] uppercase tracking-wider h-5">
-                      {template.difficulty}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-neutral-500 line-clamp-2 mt-1">
-                    {template.description}
-                  </p>
-                  {viewMode === 'grid' && (
-                    <div className="mt-auto pt-3 flex items-center gap-4 text-[11px] text-neutral-400">
-                      <div className="flex items-center gap-1">
-                        <Layout size={12} />
-                        {template.framesCount} Frames
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock size={12} />
-                        {template.estimatedDuration}m
-                      </div>
-                      <div className="flex items-center gap-1 ml-auto">
-                        <TrendingUp size={12} />
-                        {template.popularity}
-                      </div>
-                    </div>
-                  )}
-                </div>
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-bold text-neutral-900">
+                  {activeCategory === 'All' ? 'All Templates' : `${activeCategory} Templates`}
+                </h2>
+                <span className="text-xs text-neutral-400 font-medium">
+                  Showing {filteredTemplates.length} results
+                </span>
               </div>
-            ))}
+              
+              <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'flex flex-col gap-3'}>
+                {filteredTemplates.map(template => (
+                  <TemplateCard 
+                    key={template.id} 
+                    template={template} 
+                    viewMode={viewMode}
+                    isSelected={selectedTemplate?.id === template.id}
+                    isFavorite={favorites.includes(template.id)}
+                    onClick={() => setSelectedTemplate(template)}
+                    onFavorite={(e) => toggleFavorite(e, template.id)}
+                  />
+                ))}
+              </div>
+            </section>
           </div>
         </ScrollArea>
       </div>
@@ -288,7 +347,7 @@ export default function TemplateLibrary() {
                 toast.info(`Duplicated ${selectedTemplate.name} as draft`);
               }}
             >
-              Duplicate as Draft
+              Duplicate Template
             </Button>
           </div>
         </div>
