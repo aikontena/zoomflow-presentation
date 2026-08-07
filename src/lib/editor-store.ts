@@ -92,7 +92,7 @@ export const gridSize = 20;
 
 export const useEditor = create<EditorState>((set, get) => ({
   editor: null,
-  store: createTLStore({ shapeUtils: defaultShapeUtils }),
+  store: createTLStore({ shapeUtils: [...defaultShapeUtils] }),
   activePageId: "p1",
   pages: [
     { id: "p1", name: "Opening", frame: { x: 0, y: 0, width: 960, height: 540 }, notes: "Welcome the room." },
