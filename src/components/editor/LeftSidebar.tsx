@@ -44,8 +44,12 @@ export function LeftSidebar() {
   } = useEditor();
   const [query, setQuery] = useState("");
 
+  const { editor } = useEditor();
   const gotoPage = (frame: { x: number; y: number; width: number; height: number }) => {
-    setViewport({ x: -frame.x * 0.8 + 120, y: -frame.y * 0.8 + 80, zoom: 0.8 });
+    if (editor) {
+      editor.zoomToFit();
+      // For more precise framing in the future we can use editor.zoomToSelection or similar
+    }
   };
 
   return (

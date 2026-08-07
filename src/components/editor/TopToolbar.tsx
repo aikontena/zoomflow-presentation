@@ -73,8 +73,14 @@ export function TopToolbar({ onPresent }: { onPresent: () => void }) {
     );
   }, [dirty, lastSavedAt]);
 
-  const zoomBy = (k: number) =>
-    setViewport({ ...viewport, zoom: Math.min(5, Math.max(0.1, viewport.zoom * k)) });
+  const { editor } = useEditor();
+  const zoomBy = (k: number) => {
+    if (editor) {
+      const center = editor.getViewportScreenCenter();
+      if (k > 1) editor.zoomIn(center.x, center.y);
+      else editor.zoomOut(center.x, center.y);
+    }
+  };
 
   const iconBtn = "flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:opacity-35";
 

@@ -1,56 +1,49 @@
 import { useEditor } from "@/lib/editor-store";
-
-const W = 200;
-const H = 130;
+import { useEffect, useState } from "react";
 
 export function MiniMap() {
-  const { doc, viewport, setViewport } = useEditor();
-  const objs = doc.objects;
-  if (!objs.length) return null;
+  const { editor } = useEditor();
+  const [zoom, setZoom] = useState(100);
 
-  const minX = Math.min(...objs.map((o) => o.x)) - 100;
-  const minY = Math.min(...objs.map((o) => o.y)) - 100;
-  const maxX = Math.max(...objs.map((o) => o.x + o.width)) + 100;
-  const maxY = Math.max(...objs.map((o) => o.y + o.height)) + 100;
-  const scale = Math.min(W / (maxX - minX), H / (maxY - minY));
+  useEffect(() => {
+    if (!editor) return;
+    const updateZoom = () => {
+      setZoom(Math.round(editor.getZoomLevel() * 100));
+    };
+    editor.on("tick", updateZoom);
+    return () => {
+      editor.off("tick", updateZoom);
+    };
+  }, [editor]);
+
+  if (!editor) return null;
 
   return (
-    <div className="glass overflow-hidden rounded-xl p-2 shadow-lg" style={{ width: W + 16 }}>
-      <div className="relative" style={{ width: W, height: H }}>
-        {objs.map((o) => (
-          <div
-            key={o.id}
-            className="absolute rounded-[2px] bg-primary/60"
-            style={{
-              left: (o.x - minX) * scale,
-              top: (o.y - minY) * scale,
-              width: Math.max(2, o.width * scale),
-              height: Math.max(2, o.height * scale),
-            }}
-          />
-        ))}
-        {doc.pages.map((p, i) => (
-          <button
-            key={p.id}
-            title={p.name}
-            onClick={() =>
-              setViewport({ x: -p.frame.x * 0.8 + 80, y: -p.frame.y * 0.8 + 60, zoom: 0.8 })
-            }
-            className="absolute rounded border border-accent/70 text-[8px] text-accent"
-            style={{
-              left: (p.frame.x - minX) * scale,
-              top: (p.frame.y - minY) * scale,
-              width: p.frame.width * scale,
-              height: p.frame.height * scale,
-            }}
-          >
-            {i + 1}
-          </button>
-        ))}
+    <div className="glass overflow-hidden rounded-xl p-3 shadow-lg flex flex-col items-center gap-2 border border-border bg-sidebar/70 backdrop-blur-xl">
+      <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+        Navigation
       </div>
-      <p className="mt-1 text-center text-[10px] text-muted-foreground">
-        {Math.round(viewport.zoom * 100)}% · minimap
-      </p>
+      <div className="flex items-center gap-3">
+        <button 
+          onClick={() => editor.zoomOut()}
+          className="h-6 w-6 rounded-md hover:bg-secondary flex items-center justify-center text-muted-foreground"
+        >
+          -
+        </button>
+        <span className="text-[11px] font-medium min-w-[32px] text-center">{zoom}%</span>
+        <button 
+          onClick={() => editor.zoomIn()}
+          className="h-6 w-6 rounded-md hover:bg-secondary flex items-center justify-center text-muted-foreground"
+        >
+          +
+        </button>
+      </div>
+      <button 
+        onClick={() => editor.zoomToFit()}
+        className="text-[9px] px-2 py-1 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+      >
+        Zoom to Fit
+      </button>
     </div>
   );
 }
