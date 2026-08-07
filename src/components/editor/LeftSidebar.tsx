@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FileText, 
   Layers, 
@@ -34,6 +34,12 @@ const TABS = [
 export default function LeftSidebar() {
   const { undo, redo, history, lastSaved, save, setActiveOverlay } = useCanvasStore();
   const [activeTab, setActiveTab] = useState<string | null>(null);
+  
+  // Set icons tab as default after mount to avoid SSR issues
+  useEffect(() => {
+    setActiveTab('icons');
+  }, []);
+
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
@@ -77,7 +83,7 @@ export default function LeftSidebar() {
 
       {/* Expanded Panel */}
       {activeTab && !isCollapsed && (
-        <div className="w-[320px] flex flex-col animate-in slide-in-from-left duration-200">
+        <div className="w-[320px] flex flex-col animate-in slide-in-from-left duration-200 bg-white shadow-xl z-10 border-r border-neutral-100">
           <div className="p-4 border-bottom border-neutral-100 flex items-center justify-between">
             <h2 className="font-semibold text-neutral-900 capitalize">{activeTab}</h2>
             <button 

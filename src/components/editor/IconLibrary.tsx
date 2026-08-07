@@ -88,7 +88,7 @@ export const IconLibrary: React.FC = () => {
   }, [favorites]);
 
   return (
-    <div className="flex flex-col h-full bg-white border-r border-neutral-200 w-80">
+    <div className="flex flex-col h-full bg-white w-full">
       <div className="p-4 border-b border-neutral-100 space-y-4">
         <h2 className="text-lg font-bold flex items-center gap-2">
           <Grid className="w-5 h-5 text-primary" />
