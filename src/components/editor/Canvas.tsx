@@ -108,10 +108,11 @@ export function Canvas() {
       }
       return;
     }
-    if (currentTool !== "select" && e.currentTarget === e.target) {
+    if (e.currentTarget === e.target) {
       const p = toWorld(e.clientX, e.clientY);
-      addObject(currentTool, p);
+      addObject(currentTool as Exclude<typeof tool, "select">, p);
     }
+
   };
 
 
