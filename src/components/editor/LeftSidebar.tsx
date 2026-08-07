@@ -10,6 +10,7 @@ import {
   Trash2,
   Crosshair,
   Search,
+  Settings,
 } from "lucide-react";
 import { useEditor, type ObjectType } from "@/lib/editor-store";
 import { templates } from "@/lib/templates";
