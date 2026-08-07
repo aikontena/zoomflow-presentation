@@ -543,7 +543,13 @@ export const useEditor = create<EditorState>((set, get) => ({
       currentX += frameWidth + gap;
     });
 
-    return {
+    set({
+      pages: [...s.pages, ...newPages],
+      doc: { ...s.doc, pages: [...s.pages, ...newPages] },
+      activePageId: newPages[0]?.id || s.activePageId,
+      dirty: true,
+    });
+  },
       pages: [...s.pages, ...newPages],
       doc: { ...s.doc, pages: [...s.pages, ...newPages] },
       dirty: true,
