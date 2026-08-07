@@ -31,6 +31,13 @@ function createColorfulSnapshot(title: string, headline: string, sub: string, co
   
   return {
     store: {
+      ['page:page']: {
+        id: 'page:page',
+        typeName: 'page',
+        name: 'Page 1',
+        index: 'a1',
+        meta: {},
+      },
       [titleId]: {
         id: titleId,
         typeName: 'shape',
@@ -62,7 +69,7 @@ function createColorfulSnapshot(title: string, headline: string, sub: string, co
         parentId: 'page:page' as any,
       }
     } as any,
-    schema: { schemaVersion: 1, sequences: {}, storeVersions: {} } as any
+    schema: { schemaVersion: 2, sequences: {}, storeVersions: {} } as any
   } as unknown as TLEditorSnapshot;
 }
 
