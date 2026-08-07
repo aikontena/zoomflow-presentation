@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { Tldraw, Editor } from "tldraw";
 import { useEditor } from "@/lib/editor-store";
 import { PathEditor } from "./PathEditor";
@@ -14,6 +14,11 @@ export function Canvas() {
     customBackgroundColor 
   } = useEditor();
 
+  useEffect(() => {
+    if (!editor) return;
+    editor.updateInstanceState({ isGridMode: showGrid });
+  }, [editor, showGrid]);
+
   const handleMount = useCallback((editor: Editor) => {
     setEditor(editor);
     editor.updateInstanceState({ isGridMode: showGrid });
@@ -28,15 +33,25 @@ export function Canvas() {
   const bgStyle = background === "custom" 
     ? { backgroundColor: customBackgroundColor }
     : background === "white"
-    ? { backgroundColor: "#ffffff" }
+    ? { backgroundColor: "var(--canvas-light)" }
     : background === "plain"
     ? { backgroundColor: "var(--canvas)" }
     : {};
 
+  const backgroundClass =
+    background === "dark-grid"
+      ? "canvas-grid canvas-grid-dark"
+      : background === "light-grid"
+        ? "canvas-grid canvas-grid-light"
+        : background === "dot-grid"
+          ? "canvas-dots"
+          : "";
+
   return (
-    <div className="relative h-full w-full overflow-hidden" style={bgStyle}>
+    <div className={`relative h-full w-full overflow-hidden ${backgroundClass}`} style={bgStyle}>
       <Tldraw 
         onMount={handleMount}
+        autoFocus
       />
       
       <PathEditor />

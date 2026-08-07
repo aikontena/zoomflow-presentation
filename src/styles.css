@@ -3,9 +3,10 @@
 @import "tw-animate-css";
 @import "tldraw/tldraw.css";
 
-/* Reset tldraw defaults to match cinematic theme */
+/* Keep the drawing surface visible while allowing the app canvas theme through. */
 .tl-container {
-  --tl-background: transparent !important;
+  --tl-background: var(--canvas) !important;
+  background-color: var(--canvas);
 }
 
 .tl-canvas {
@@ -76,6 +77,7 @@
   --background: oklch(0.16 0.03 275);
   --foreground: oklch(0.97 0.005 260);
   --canvas: oklch(0.13 0.028 275);
+  --canvas-light: oklch(0.985 0.004 275);
   --grid: oklch(0.32 0.04 275);
   --surface: oklch(0.21 0.032 275);
   --surface-2: oklch(0.25 0.035 275);
@@ -110,6 +112,31 @@
   --sidebar-accent-foreground: oklch(0.95 0.005 260);
   --sidebar-border: oklch(0.98 0 0 / 10%);
   --sidebar-ring: oklch(0.72 0.17 295);
+}
+
+.canvas-grid,
+.canvas-dots {
+  background-color: var(--canvas);
+}
+
+.canvas-grid-dark {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--grid) 45%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--grid) 45%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.canvas-grid-light {
+  background-color: var(--canvas-light);
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--grid) 26%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--grid) 26%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.canvas-dots {
+  background-image: radial-gradient(circle, color-mix(in oklab, var(--grid) 72%, transparent) 1.2px, transparent 1.2px);
+  background-size: 20px 20px;
 }
 
 @utility glass {
