@@ -1,9 +1,10 @@
 import { ClientOnly, createFileRoute } from "@tanstack/react-router";
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense } from "react";
+
 import { Loader2 } from "lucide-react";
 
 
-const Canvas = lazy(() => import("@/components/editor/Canvas"));
+const Canvas = lazy(() => import("@/components/editor/Canvas").then(m => ({ default: m.default })));
 
 function CanvasFallback() {
   return (
@@ -38,7 +39,7 @@ export const Route = createFileRoute("/")({
 });
 
 function EditorPage() {
-  const [presenting, setPresenting] = useState(false);
+
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-white">
