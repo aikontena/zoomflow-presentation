@@ -1,7 +1,7 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
-@import "tldraw/tldraw.css";
+/* tldraw styles removed for new lightweight canvas */
 
 /* Keep the drawing surface visible while allowing the app canvas theme through. */
 .tl-container {
