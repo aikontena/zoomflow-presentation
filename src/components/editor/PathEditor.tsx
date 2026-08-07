@@ -32,6 +32,7 @@ export function PathEditor() {
       {activePath.keyframes.map((kf, i) => {
         if (i === 0) return null;
         const prevKf = activePath.keyframes[i - 1];
+        if (!prevKf) return null;
         const fromPage = pages.find(p => p.id === prevKf.frameId);
         const toPage = pages.find(p => p.id === kf.frameId);
 
