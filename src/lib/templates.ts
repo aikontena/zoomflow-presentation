@@ -63,7 +63,7 @@ function createColorfulSnapshot(title: string, headline: string, sub: string, co
       }
     } as any,
     schema: { schemaVersion: 1, sequences: {}, storeVersions: {} } as any
-  };
+  } as unknown as TLEditorSnapshot;
 }
 
 export const templates: TemplateDef[] = [
