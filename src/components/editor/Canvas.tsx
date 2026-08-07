@@ -26,9 +26,10 @@ export default function Canvas() {
   const getPointerPos = (e: React.MouseEvent | MouseEvent | Touch) => {
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return { x: 0, y: 0 };
+    const zoom = viewport.zoom || 1;
     return {
-      x: (e.clientX - rect.left - viewport.x) / (viewport.zoom || 1),
-      y: (e.clientY - rect.top - viewport.y) / (viewport.zoom || 1)
+      x: (e.clientX - rect.left - viewport.x) / zoom,
+      y: (e.clientY - rect.top - viewport.y) / zoom
     };
   };
 
@@ -41,14 +42,15 @@ export default function Canvas() {
         e.preventDefault();
         const delta = -e.deltaY;
         const factor = Math.pow(1.1, delta / 100);
-        const newZoom = Math.min(Math.max(viewport.zoom * factor, 0.05), 10);
+        const currentZoom = viewport.zoom || 1;
+        const newZoom = Math.min(Math.max(currentZoom * factor, 0.05), 10);
         
         const rect = container.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
         
-        const worldX = (mouseX - viewport.x) / viewport.zoom;
-        const worldY = (mouseY - viewport.y) / viewport.zoom;
+        const worldX = (mouseX - viewport.x) / currentZoom;
+        const worldY = (mouseY - viewport.y) / currentZoom;
         
         setViewport({
           zoom: newZoom,
@@ -94,8 +96,8 @@ export default function Canvas() {
     }
 
     const clickedObj = [...objects].reverse().find(obj => 
-      pos.x >= obj.x && pos.x <= obj.x + obj.width &&
-      pos.y >= obj.y && pos.y <= obj.y + obj.height
+      pos.x >= obj.x && pos.x <= obj.x + (obj.width || 0) &&
+      pos.y >= obj.y && pos.y <= obj.y + (obj.height || 0)
     );
 
     if (clickedObj) {
@@ -155,10 +157,10 @@ export default function Canvas() {
       deleteObjects(selection);
     } else if (e.key === '=' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
-      zoomTo(viewport.zoom * 1.2);
+      zoomTo((viewport.zoom || 1) * 1.2);
     } else if (e.key === '-' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
-      zoomTo(viewport.zoom / 1.2);
+      zoomTo((viewport.zoom || 1) / 1.2);
     } else if (e.key === '0' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       resetZoom();
@@ -226,9 +228,7 @@ export default function Canvas() {
       </div>
 
       <div className="absolute bottom-4 right-4 z-50 pointer-events-auto">
-        <div className="bg-red-500 text-white p-2">MiniMap Placeholder</div>
         <MiniMap />
-
       </div>
 
       {/* Main Toolbar */}
@@ -256,7 +256,7 @@ export default function Canvas() {
         onMouseLeave={handleMouseUp}
       >
         <div style={{
-          transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+          transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom || 1})`,
           transformOrigin: '0 0'
         }}>
           {/* Grid Background */}

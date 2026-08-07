@@ -13,8 +13,6 @@ export default function EditorLayout() {
 
   return (
     <div className="h-screen w-full overflow-hidden bg-white flex flex-col">
-      <div className="bg-yellow-500 text-black text-xs text-center">DEBUG: EDITOR LAYOUT ACTIVE</div>
-
       <div className="flex-1 flex overflow-hidden">
         <LeftSidebar />
         
