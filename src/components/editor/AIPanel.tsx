@@ -7,7 +7,701 @@ import { useServerFn } from "@tanstack/react-start";
 
 export function AIPanel() {
   const { setGenerating, isGenerating, aiProgress, applyGeneration } = useEditor();
-  const [prompt, setPrompt] = useState("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                            \n                                            # CRITICAL ARCHITECTURE AUDIT\n\n\n\nDo NOT fix random bugs.\n\n\n\nDo NOT add new features.\n\n\n\nDo NOT regenerate the UI.\n\n\n\nYour only task is to perform a COMPLETE ARCHITECTURE AUDIT of the entire project before making any modifications.\n\n\n\nThe current Infinite Canvas frequently crashes, freezes, reloads unexpectedly, or becomes unusable.\n\n\n\nSeveral previous fixes have failed.\n\n\n\nI want a root-cause analysis, not another temporary patch.\n\n\n\n--------------------------------------------------\n\nPHASE 1\n\nFULL PROJECT INSPECTION\n\n--------------------------------------------------\n\n\n\nInspect every file.\n\n\n\nInspect every folder.\n\n\n\nInspect every dependency.\n\n\n\nInspect every route.\n\n\n\nInspect every provider.\n\n\n\nInspect every React component.\n\n\n\nInspect every custom hook.\n\n\n\nInspect every Zustand store.\n\n\n\nInspect every Context Provider.\n\n\n\nInspect every Supabase integration.\n\n\n\nInspect every canvas-related component.\n\n\n\nInspect every event listener.\n\n\n\nInspect every animation.\n\n\n\nInspect every autosave process.\n\n\n\nInspect every database subscription.\n\n\n\nInspect every rendering cycle.\n\n\n\n--------------------------------------------------\n\nPHASE 2\n\nFIND ROOT CAUSE\n\n--------------------------------------------------\n\n\n\nIdentify ALL possible causes of:\n\n\n\nCanvas crash\n\n\n\nBlank canvas\n\n\n\nUnexpected reload\n\n\n\nInfinite render\n\n\n\nInfinite rerender\n\n\n\nInfinite save loop\n\n\n\nMemory leak\n\n\n\nToo many re-renders\n\n\n\nReact warnings\n\n\n\nHydration issues\n\n\n\nZustand update loops\n\n\n\nCircular dependency\n\n\n\nRecursive rendering\n\n\n\nDuplicate subscriptions\n\n\n\nBroken event listeners\n\n\n\nUnreleased listeners\n\n\n\nRace conditions\n\n\n\nSupabase realtime loops\n\n\n\nLarge object serialization\n\n\n\nCanvas object duplication\n\n\n\nGPU overload\n\n\n\nAnimation loops\n\n\n\nUndo history explosion\n\n\n\nAutosave recursion\n\n\n\nMultiple React roots\n\n\n\nContext nesting problems\n\n\n\nLarge component tree\n\n\n\nHeavy object cloning\n\n\n\n--------------------------------------------------\n\nPHASE 3\n\nPERFORMANCE PROFILING\n\n--------------------------------------------------\n\n\n\nProfile:\n\n\n\nReact rendering\n\n\n\nMemory usage\n\n\n\nComponent updates\n\n\n\nLargest components\n\n\n\nLargest state objects\n\n\n\nLargest props\n\n\n\nLargest rerender sources\n\n\n\nFPS bottlenecks\n\n\n\nCPU spikes\n\n\n\nNetwork calls\n\n\n\nAutosave frequency\n\n\n\nDatabase writes\n\n\n\nDatabase reads\n\n\n\n--------------------------------------------------\n\nPHASE 4\n\nDEPENDENCY AUDIT\n\n--------------------------------------------------\n\n\n\nVerify compatibility of:\n\n\n\nReact\n\n\n\nTypeScript\n\n\n\nVite\n\n\n\nTailwind\n\n\n\nshadcn\n\n\n\nZustand\n\n\n\nSupabase\n\n\n\nFramer Motion\n\n\n\ntldraw\n\n\n\nReact Flow\n\n\n\nFabric\n\n\n\nKonva\n\n\n\nAll installed packages\n\n\n\nIdentify conflicting libraries.\n\n\n\nRemove duplicated functionality.\n\n\n\n--------------------------------------------------\n\nPHASE 5\n\nCANVAS AUDIT\n\n--------------------------------------------------\n\n\n\nInspect:\n\n\n\nCanvas Engine\n\n\n\nViewport\n\n\n\nZoom\n\n\n\nPan\n\n\n\nSelection\n\n\n\nLayers\n\n\n\nToolbar\n\n\n\nHistory\n\n\n\nUndo\n\n\n\nRedo\n\n\n\nAutosave\n\n\n\nMiniMap\n\n\n\nFrames\n\n\n\nObjects\n\n\n\nCamera\n\n\n\nPresentation Mode\n\n\n\nEnsure every module is independent.\n\n\n\n--------------------------------------------------\n\nPHASE 6\n\nSTATE MANAGEMENT\n\n--------------------------------------------------\n\n\n\nInspect Zustand.\n\n\n\nFind:\n\n\n\nDuplicate stores\n\n\n\nCircular updates\n\n\n\nDerived state loops\n\n\n\nSelectors causing rerenders\n\n\n\nLarge object mutations\n\n\n\nObject recreation\n\n\n\nNon-memoized selectors\n\n\n\nState synchronization issues\n\n\n\n--------------------------------------------------\n\nPHASE 7\n\nRENDERING\n\n--------------------------------------------------\n\n\n\nFind every component that rerenders unnecessarily.\n\n\n\nMemoize where appropriate.\n\n\n\nSplit large components.\n\n\n\nVirtualize heavy rendering.\n\n\n\nLazy-load nonessential modules.\n\n\n\nAvoid rendering invisible canvas objects.\n\n\n\n--------------------------------------------------\n\nPHASE 8\n\nERROR HANDLING\n\n--------------------------------------------------\n\n\n\nImplement:\n\n\n\nReact Error Boundary\n\n\n\nCanvas Error Boundary\n\n\n\nSafe Recovery\n\n\n\nAutosave Recovery\n\n\n\nCrash Recovery\n\n\n\nState Recovery\n\n\n\nPrevent a single component failure from crashing the editor.\n\n\n\n--------------------------------------------------\n\nPHASE 9\n\nREPORT\n\n--------------------------------------------------\n\n\n\nBefore changing any code,\n\n\n\nproduce a detailed report containing:\n\n\n\n1. Root causes\n\n\n\n2. File locations\n\n\n\n3. Severity\n\n\n\n4. Impact\n\n\n\n5. Recommended solution\n\n\n\n6. Files to modify\n\n\n\n7. Files to delete\n\n\n\n8. Files to refactor\n\n\n\n9. Estimated complexity\n\n\n\n10. Risk level\n\n\n\nDo NOT implement fixes until the report is complete.\n\n\n\n--------------------------------------------------\n\nPHASE 10\n\nREFACTOR PLAN\n\n--------------------------------------------------\n\n\n\nAfter the report,\n\n\n\ncreate a complete refactoring roadmap.\n\n\n\Prioritize:\n\n\n\nStability\n\n\n\nPerformance\n\n\n\nMaintainability\n\n\n\nScalability\n\n\n\nThe application must be stable before any new feature is added.\n\n\n\nNo temporary fixes.\n\n\n\nNo workarounds.\n\n\n\nOnly production-grade solutions.\");
+  const [prompt, setPrompt] = useState(`'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
+                                            
+                                            # CRITICAL ARCHITECTURE AUDIT
+
+
+
+Do NOT fix random bugs.
+
+
+
+Do NOT add new features.
+
+
+
+Do NOT regenerate the UI.
+
+
+
+Your only task is to perform a COMPLETE ARCHITECTURE AUDIT of the entire project before making any modifications.
+
+
+
+The current Infinite Canvas frequently crashes, freezes, reloads unexpectedly, or becomes unusable.
+
+
+
+Several previous fixes have failed.
+
+
+
+I want a root-cause analysis, not another temporary patch.
+
+
+
+--------------------------------------------------
+
+PHASE 1
+
+FULL PROJECT INSPECTION
+
+--------------------------------------------------
+
+
+
+Inspect every file.
+
+
+
+Inspect every folder.
+
+
+
+Inspect every dependency.
+
+
+
+Inspect every route.
+
+
+
+Inspect every provider.
+
+
+
+Inspect every React component.
+
+
+
+Inspect every custom hook.
+
+
+
+Inspect every Zustand store.
+
+
+
+Inspect every Context Provider.
+
+
+
+Inspect every Supabase integration.
+
+
+
+Inspect every canvas-related component.
+
+
+
+Inspect every event listener.
+
+
+
+Inspect every animation.
+
+
+
+Inspect every autosave process.
+
+
+
+Inspect every database subscription.
+
+
+
+Inspect every rendering cycle.
+
+
+
+--------------------------------------------------
+
+PHASE 2
+
+FIND ROOT CAUSE
+
+--------------------------------------------------
+
+
+
+Identify ALL possible causes of:
+
+
+
+Canvas crash
+
+
+
+Blank canvas
+
+
+
+Unexpected reload
+
+
+
+Infinite render
+
+
+
+Infinite rerender
+
+
+
+Infinite save loop
+
+
+
+Memory leak
+
+
+
+Too many re-renders
+
+
+
+React warnings
+
+
+
+Hydration issues
+
+
+
+Zustand update loops
+
+
+
+Circular dependency
+
+
+
+Recursive rendering
+
+
+
+Duplicate subscriptions
+
+
+
+Broken event listeners
+
+
+
+Unreleased listeners
+
+
+
+Race conditions
+
+
+
+Supabase realtime loops
+
+
+
+Large object serialization
+
+
+
+Canvas object duplication
+
+
+
+GPU overload
+
+
+
+Animation loops
+
+
+
+Undo history explosion
+
+
+
+Autosave recursion
+
+
+
+Multiple React roots
+
+
+
+Context nesting problems
+
+
+
+Large component tree
+
+
+
+Heavy object cloning
+
+
+
+--------------------------------------------------
+
+PHASE 3
+
+PERFORMANCE PROFILING
+
+--------------------------------------------------
+
+
+
+Profile:
+
+
+
+React rendering
+
+
+
+Memory usage
+
+
+
+Component updates
+
+
+
+Largest components
+
+
+
+Largest state objects
+
+
+
+Largest props
+
+
+
+Largest rerender sources
+
+
+
+FPS bottlenecks
+
+
+
+CPU spikes
+
+
+
+Network calls
+
+
+
+Autosave frequency
+
+
+
+Database writes
+
+
+
+Database reads
+
+
+
+--------------------------------------------------
+
+PHASE 4
+
+DEPENDENCY AUDIT
+
+--------------------------------------------------
+
+
+
+Verify compatibility of:
+
+
+
+React
+
+
+
+TypeScript
+
+
+
+Vite
+
+
+
+Tailwind
+
+
+
+shadcn
+
+
+
+Zustand
+
+
+
+Supabase
+
+
+
+Framer Motion
+
+
+
+tldraw
+
+
+
+React Flow
+
+
+
+Fabric
+
+
+
+Konva
+
+
+
+All installed packages
+
+
+
+Identify conflicting libraries.
+
+
+
+Remove duplicated functionality.
+
+
+
+--------------------------------------------------
+
+PHASE 5
+
+CANVAS AUDIT
+
+--------------------------------------------------
+
+
+
+Inspect:
+
+
+
+Canvas Engine
+
+
+
+Viewport
+
+
+
+Zoom
+
+
+
+Pan
+
+
+
+Selection
+
+
+
+Layers
+
+
+
+Toolbar
+
+
+
+History
+
+
+
+Undo
+
+
+
+Redo
+
+
+
+Autosave
+
+
+
+MiniMap
+
+
+
+Frames
+
+
+
+Objects
+
+
+
+Camera
+
+
+
+Presentation Mode
+
+
+
+Ensure every module is independent.
+
+
+
+--------------------------------------------------
+
+PHASE 6
+
+STATE MANAGEMENT
+
+--------------------------------------------------
+
+
+
+Inspect Zustand
+
+
+
+Find:
+
+
+
+Duplicate stores
+
+
+
+Circular updates
+
+
+
+Derived state loops
+
+
+
+Selectors causing rerenders
+
+
+
+Large object mutations
+
+
+
+Object recreation
+
+
+
+Non-memoized selectors
+
+
+
+State synchronization issues
+
+
+
+--------------------------------------------------
+
+PHASE 7
+
+RENDERING
+
+--------------------------------------------------
+
+
+
+Find every component that rerenders unnecessarily.
+
+
+
+Memoize where appropriate.
+
+
+
+Split large components.
+
+
+
+Virtualize heavy rendering.
+
+
+
+Lazy-load nonessential modules.
+
+
+
+Avoid rendering invisible canvas objects.
+
+
+
+--------------------------------------------------
+
+PHASE 8
+
+ERROR HANDLING
+
+--------------------------------------------------
+
+
+
+Implement:
+
+
+
+React Error Boundary
+
+
+
+Canvas Error Boundary
+
+
+
+Safe Recovery
+
+
+
+Autosave Recovery
+
+
+
+Crash Recovery
+
+
+
+State Recovery
+
+
+
+Prevent a single component failure from crashing the editor.
+
+
+
+--------------------------------------------------
+
+PHASE 9
+
+REPORT
+
+--------------------------------------------------
+
+
+
+Before changing any code,
+
+
+
+produce a detailed report containing:
+
+
+
+1. Root causes
+
+
+
+2. File locations
+
+
+
+3. Severity
+
+
+
+4. Impact
+
+
+
+5. Recommended solution
+
+
+
+6. Files to modify
+
+
+
+7. Files to delete
+
+
+
+8. Files to refactor
+
+
+
+9. Estimated complexity
+
+
+
+10. Risk level
+
+
+
+Do NOT implement fixes until the report is complete.
+
+
+
+--------------------------------------------------
+
+PHASE 10
+
+REFACTOR PLAN
+
+--------------------------------------------------
+
+
+
+After the report,
+
+
+
+create a complete refactoring roadmap.
+
+
+
+Prioritize:
+
+
+
+Stability
+
+
+
+Performance
+
+
+
+Maintainability
+
+
+
+Scalability
+
+
+
+The application must be stable before any new feature is added.
+
+
+
+No temporary fixes.
+
+
+
+No workarounds.
+
+
+
+Only production-grade solutions.`);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [metadata, setMetadata] = useState({
     title: "",
