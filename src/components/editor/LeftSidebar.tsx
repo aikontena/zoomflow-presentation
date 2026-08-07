@@ -35,11 +35,6 @@ export default function LeftSidebar() {
   const { undo, redo, history, lastSaved, save, setActiveOverlay } = useCanvasStore();
   const [activeTab, setActiveTab] = useState<string | null>(null);
   
-  // Set icons tab as default after mount to avoid SSR issues
-  useEffect(() => {
-    setActiveTab('icons');
-  }, []);
-
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (

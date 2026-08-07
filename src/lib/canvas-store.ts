@@ -81,7 +81,7 @@ export const useCanvasStore = create<CanvasStore>()(
         set((state) => ({
           lastSaved: Date.now(),
           history: {
-            past: [...state.history.past, state.objects],
+            past: [...state.history.past, state.objects].slice(-50),
             future: [],
           },
           objects: [...state.objects, newObj],
@@ -90,9 +90,17 @@ export const useCanvasStore = create<CanvasStore>()(
       },
 
       updateObject: (id, patch) => {
+        const currentObjects = get().objects;
+        const target = currentObjects.find(o => o.id === id);
+        
+        // Skip if no changes
+        if (!target) return;
+        const hasChanges = Object.keys(patch).some(key => (patch as any)[key] !== (target as any)[key]);
+        if (!hasChanges) return;
+
         set((state) => ({
           history: {
-            past: [...state.history.past, state.objects],
+            past: [...state.history.past, state.objects].slice(-50),
             future: [],
           },
           objects: state.objects.map((o) => (o.id === id ? { ...o, ...patch } : o)),
@@ -100,9 +108,10 @@ export const useCanvasStore = create<CanvasStore>()(
       },
 
       deleteObjects: (ids) => {
+        if (ids.length === 0) return;
         set((state) => ({
           history: {
-            past: [...state.history.past, state.objects],
+            past: [...state.history.past, state.objects].slice(-50),
             future: [],
           },
           objects: state.objects.filter((o) => !ids.includes(o.id)),
@@ -110,9 +119,17 @@ export const useCanvasStore = create<CanvasStore>()(
         }));
       },
 
-      setSelection: (selection) => set({ selection }),
+      setSelection: (selection) => {
+        const current = get().selection;
+        if (current.length === selection.length && current.every((id, i) => id === selection[i])) return;
+        set({ selection });
+      },
 
-      setViewport: (viewport) => set({ viewport }),
+      setViewport: (viewport) => {
+        const current = get().viewport;
+        if (current.x === viewport.x && current.y === viewport.y && current.zoom === viewport.zoom) return;
+        set({ viewport });
+      },
 
       undo: () => {
         const { past, future } = get().history;
@@ -125,7 +142,7 @@ export const useCanvasStore = create<CanvasStore>()(
           objects: previous,
           history: {
             past: newPast,
-            future: [state.objects, ...future],
+            future: [state.objects, ...future].slice(0, 50),
           },
         }));
       },
@@ -140,13 +157,14 @@ export const useCanvasStore = create<CanvasStore>()(
         set((state) => ({
           objects: next,
           history: {
-            past: [...past, state.objects],
+            past: [...past, state.objects].slice(-50),
             future: newFuture,
           },
         }));
       },
 
       duplicateObjects: (ids) => {
+        if (ids.length === 0) return;
         const { objects } = get();
         const toDuplicate = objects.filter(o => ids.includes(o.id));
         const newObjects = toDuplicate.map(o => ({
@@ -157,15 +175,13 @@ export const useCanvasStore = create<CanvasStore>()(
         }));
         
         set((state) => ({
-          history: { past: [...state.history.past, state.objects], future: [] },
+          history: { past: [...state.history.past, state.objects].slice(-50), future: [] },
           objects: [...state.objects, ...newObjects],
           selection: newObjects.map(o => o.id)
         }));
       },
 
       groupObjects: (ids) => {
-        // Implementation for grouping would require a new 'group' object type
-        // For now, we'll toast or placeholder
         console.log("Grouping", ids);
       },
 
@@ -179,7 +195,7 @@ export const useCanvasStore = create<CanvasStore>()(
       loadTemplate: (objects) => set((state) => ({
         objects,
         selection: [],
-        history: { past: [...state.history.past, state.objects], future: [] },
+        history: { past: [...state.history.past, state.objects].slice(-50), future: [] },
         activeOverlay: null
       })),
     }),
