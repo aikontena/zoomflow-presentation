@@ -156,7 +156,7 @@ export default function LeftSidebar() {
                 </button>
               </div>
             )}
-            {activeTab === 'icons' && <p>Search thousands of icons.</p>}
+            {activeTab === 'icons' && <IconLibrary />}
             {activeTab === 'history' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-neutral-900 font-medium mb-2">
