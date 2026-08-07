@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { Tldraw, Editor, getSnapshot } from "tldraw";
+import { Tldraw, Editor, getSnapshot, loadSnapshot } from "tldraw";
 import { useEditor } from "@/lib/editor-store";
 import { PathEditor } from "./PathEditor";
 
@@ -41,6 +41,18 @@ export function Canvas() {
   const handleMount = useCallback((editor: Editor) => {
     setEditor(editor);
     editor.updateInstanceState({ isGridMode: showGrid });
+
+    // Explicitly load snapshot on mount to ensure canvas isn't blank
+    if (typeof window !== "undefined") {
+      const savedSnapshot = window.localStorage.getItem("zoomcanvas-canvas-v2");
+      if (savedSnapshot) {
+        try {
+          loadSnapshot(editor.store, JSON.parse(savedSnapshot));
+        } catch (error) {
+          console.warn("Failed to load snapshot on mount", error);
+        }
+      }
+    }
     
     // Focus on initial page if exists
     const activePage = pages.find(p => p.id === activePageId);
