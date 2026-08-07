@@ -61,7 +61,7 @@ function createColorfulSnapshot(title: string, headline: string, sub: string, co
         index: 'a0',
         parentId: 'page:page' as any,
       }
-    },
+    } as any,
     schema: { schemaVersion: 1, sequences: {}, storeVersions: {} } as any
   };
 }
