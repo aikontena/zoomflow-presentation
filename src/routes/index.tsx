@@ -1,8 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import EditorLayout from "@/components/editor/EditorLayout";
+import React from "react";
 
 export const Route = createFileRoute("/")({
-  component: EditorLayout,
+  component: () => (
+    <div className="h-screen w-full flex items-center justify-center bg-white">
+        <h1 className="text-2xl font-bold">ZoomCanvas AI Editor</h1>
+    </div>
+  ),
   head: () => ({
     title: "Editor | ZoomCanvas AI",
     meta: [
