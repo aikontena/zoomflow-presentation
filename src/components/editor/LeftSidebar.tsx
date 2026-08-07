@@ -180,8 +180,16 @@ export function LeftSidebar() {
                   const file = e.target.files?.[0];
                   if (!file) return;
                   const url = URL.createObjectURL(file);
-                  const id = addObject("image");
-                  updateObject(id, { src: url, text: file.name });
+                  if (editor) {
+                    const center = editor.getViewportScreenCenter();
+                    editor.createShapes([{
+                      id: (editor as any).createShapeId(),
+                      type: 'image',
+                      x: center.x,
+                      y: center.y,
+                      props: { w: 400, h: 300, src: url, name: file.name }
+                    } as any]);
+                  }
                 }}
               />
             </label>
