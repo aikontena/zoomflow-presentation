@@ -2,12 +2,10 @@ import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useCanvasStore } from "@/lib/canvas-store";
 import { X, LayoutTemplate } from "lucide-react";
 
-// Using relative imports directly
 import Canvas from "./Canvas";
 import LeftSidebar from "./LeftSidebar";
 import RightSidebar from "./RightSidebar";
 
-// Move the lazy import inside the component or use standard if small
 const TemplateLibrary = lazy(() => import("./templates/TemplateLibrary"));
 
 export default function EditorLayout() {
