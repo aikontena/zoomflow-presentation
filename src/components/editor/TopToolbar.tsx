@@ -104,9 +104,16 @@ export function TopToolbar({ onPresent }: { onPresent: () => void }) {
           <button
             key={t.id}
             title={t.label}
-            onClick={() => setTool(t.id)}
+            onClick={() => {
+              if (t.id === "select") {
+                editor?.setSelectedShapeIds([]);
+                setTool("select");
+              } else {
+                addObject(t.id);
+              }
+            }}
             className={`flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
-              tool === t.id ? "bg-primary/25 text-primary" : "text-muted-foreground hover:bg-secondary"
+              (t.id === "select" && tool === "select") ? "bg-primary/25 text-primary" : "text-muted-foreground hover:bg-secondary"
             }`}
           >
             <t.icon size={16} />
