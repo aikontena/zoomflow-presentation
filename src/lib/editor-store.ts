@@ -15,6 +15,8 @@ export type TransitionEffect = 'zoom' | 'fade' | 'cross-fade' | 'slide' | 'rotat
 export interface Page {
   id: string;
   name: string;
+  subtitle?: string;
+  description?: string;
   frame: { x: number; y: number; width: number; height: number };
   notes: string;
   transition?: TransitionEffect;
