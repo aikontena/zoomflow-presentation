@@ -156,7 +156,11 @@ export function TopToolbar({ onPresent }: { onPresent: () => void }) {
         <button className={iconBtn} title="Version history" onClick={() => setActivePath(null)}>
           <History size={16} />
         </button>
-        <button className={iconBtn} title="Settings" onClick={() => toast.info("Settings modal in development. Use left sidebar for configuration.")}>
+        <button className={iconBtn} title="Settings" onClick={() => {
+          const settingsBtn = document.querySelector('[data-tab="settings"]') as HTMLButtonElement;
+          if (settingsBtn) settingsBtn.click();
+          else toast.info("Settings panel is located in the left sidebar.");
+        }}>
           <Settings size={16} />
         </button>
         <button
