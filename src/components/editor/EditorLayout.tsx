@@ -5,11 +5,14 @@ import { X, LayoutTemplate } from "lucide-react";
 import Canvas from "./Canvas";
 import LeftSidebar from "./LeftSidebar";
 import RightSidebar from "./RightSidebar";
+import TopToolbar from "./TopToolbar";
+import PresentationMode from "./PresentationMode";
 
 const TemplateLibrary = lazy(() => import("./templates/TemplateLibrary"));
 
 export default function EditorLayout() {
-  const { activeOverlay, setActiveOverlay } = useCanvasStore();
+  const { activeOverlay, setActiveOverlay, isPresenting } = useCanvasStore();
+
 
   return (
     <div className="h-screen w-full overflow-hidden bg-white flex flex-col">
