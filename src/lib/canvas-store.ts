@@ -303,7 +303,13 @@ export const useCanvasStore = create<CanvasStore>()(
     }),
     {
       name: "zoomcanvas-v4-storage",
-      partialize: (state) => ({ objects: state.objects, viewport: state.viewport }),
+      partialize: (state) => ({ 
+        objects: state.objects, 
+        viewport: state.viewport,
+        presentationPath: state.presentationPath,
+        presentationSettings: state.presentationSettings
+      }),
+
     }
   )
 );
