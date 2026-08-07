@@ -113,20 +113,8 @@ export function TopToolbar({ onPresent }: { onPresent: () => void }) {
               title={t.label}
               onClick={() => {
                 setTool(t.id);
-                if (editor) {
-                  if (t.id === "select") {
-                    editor.setCurrentTool("select");
-                  } else if (t.id.startsWith("geo-")) {
-                    editor.setCurrentTool("geo");
-                    editor.updateInstanceState({ 
-                      propsForNextShape: { ...editor.getInstanceState().propsForNextShape, geo: t.id.replace("geo-", "") === "rect" ? "rectangle" : "ellipse" } 
-                    });
-                  } else if (["text", "arrow", "note", "draw", "line"].includes(t.id)) {
-                    editor.setCurrentTool(t.id);
-                  } else if (["image", "video", "pdf"].includes(t.id)) {
-                    toast.info(`Click on canvas to place ${t.label}`);
-                    editor.setCurrentTool("asset"); // Custom logic or just handle via upload
-                  }
+                if (t.id === "image" || t.id === "video" || t.id === "pdf") {
+                  toast.info(`Click on canvas to place ${t.label}`);
                 }
               }}
               className={`flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
