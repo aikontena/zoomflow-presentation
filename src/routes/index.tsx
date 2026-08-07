@@ -32,8 +32,8 @@ function EditorPage() {
           <Suspense fallback={<div className="w-16 h-full bg-neutral-50 border-r border-neutral-200" />}>
             <LeftSidebar />
           </Suspense>
-          <div className="flex-1 relative flex">
-            <div className="flex-1 relative">
+          <div className="flex-1 relative flex overflow-hidden">
+            <div className="flex-1 relative overflow-hidden">
               <Suspense fallback={<div className="h-full w-full flex items-center justify-center text-neutral-400">Loading Canvas...</div>}>
                 <Canvas />
               </Suspense>
