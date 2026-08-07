@@ -52,6 +52,7 @@ interface CanvasStore {
   lastSaved: number | null;
   clear: () => void;
   save: () => void;
+  setActiveOverlay: (overlay: 'templates' | 'export' | 'settings' | null) => void;
 }
 
 export const useCanvasStore = create<CanvasStore>()(
