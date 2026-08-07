@@ -2,7 +2,20 @@ import { useEditor } from "@/lib/editor-store";
 import { Trash2, Plus } from "lucide-react";
 
 export function RightSidebar() {
-  const { editor, background, setBackground, customBackgroundColor, setCustomBackgroundColor } = useEditor();
+  const { 
+    editor, 
+    background, 
+    setBackground, 
+    customBackgroundColor, 
+    setCustomBackgroundColor,
+    bookmarks,
+    addBookmark,
+    removeBookmark,
+    applyBookmark,
+    focusMode,
+    setFocusMode
+  } = useEditor();
+
   
   const hasSelection = editor ? editor.getSelectedShapeIds().length > 0 : false;
 
@@ -61,11 +74,11 @@ export function RightSidebar() {
             <div className="space-y-4">
               <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/50">Bookmarks</h3>
               <div className="space-y-2">
-                {useEditor.getState().bookmarks.map(b => (
-                  <div key={b.id} className="group flex items-center justify-between glass p-2 rounded-lg hover:bg-secondary/50 cursor-pointer" onClick={() => useEditor.getState().applyBookmark(b.id)}>
+                {bookmarks.map(b => (
+                  <div key={b.id} className="group flex items-center justify-between glass p-2 rounded-lg hover:bg-secondary/50 cursor-pointer" onClick={() => applyBookmark(b.id)}>
                     <span className="text-[11px] font-medium truncate">{b.name}</span>
                     <button 
-                      onClick={(e) => { e.stopPropagation(); useEditor.getState().removeBookmark(b.id); }}
+                      onClick={(e) => { e.stopPropagation(); removeBookmark(b.id); }}
                       className="opacity-0 group-hover:opacity-100 p-1 hover:text-destructive transition-all"
                     >
                       <Trash2 size={12} />
@@ -75,7 +88,7 @@ export function RightSidebar() {
                 <button 
                   onClick={() => {
                     const name = prompt("Bookmark Name:");
-                    if (name) useEditor.getState().addBookmark(name);
+                    if (name) addBookmark(name);
                   }}
                   className="w-full flex items-center justify-center gap-2 glass p-2 rounded-lg text-[10px] hover:bg-secondary transition-all"
                 >
@@ -118,8 +131,8 @@ export function RightSidebar() {
                  <input 
                   type="checkbox" 
                   className="accent-primary"
-                  checked={useEditor.getState().focusMode}
-                  onChange={(e) => useEditor.getState().setFocusMode(e.target.checked)}
+                  checked={focusMode}
+                  onChange={(e) => setFocusMode(e.target.checked)}
                  />
                </div>
              </div>
