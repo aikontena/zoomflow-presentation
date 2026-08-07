@@ -12,7 +12,7 @@ export default function Canvas() {
   const [isPanning, setIsPanning] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [activeTool, setActiveTool] = useState<'select' | 'rect' | 'circle' | 'text'>('select');
+  const [activeTool, setActiveTool] = useState<'select' | 'rect' | 'circle' | 'text' | 'frame'>('select');
   const [clipboard, setClipboard] = useState<string[]>([]);
 
   const getPointerPos = (e: React.MouseEvent | MouseEvent | Touch) => {
@@ -70,16 +70,16 @@ export default function Canvas() {
     }
 
     if (activeTool !== 'select') {
-      const type = activeTool === 'rect' ? 'rectangle' : activeTool === 'circle' ? 'circle' : 'text';
+      const type = activeTool === 'rect' ? 'rectangle' : activeTool === 'circle' ? 'circle' : activeTool === 'text' ? 'text' : 'frame';
       addObject({
         type: type as any,
-        x: pos.x - 50,
-        y: pos.y - 50,
-        width: 100,
-        height: 100,
+        x: pos.x - (type === 'frame' ? 200 : 50),
+        y: pos.y - (type === 'frame' ? 150 : 50),
+        width: type === 'frame' ? 400 : 100,
+        height: type === 'frame' ? 300 : 100,
         rotation: 0,
-        fill: '#3b82f6',
-        text: type === 'text' ? 'New Text' : undefined
+        fill: type === 'frame' ? '#ffffff' : '#3b82f6',
+        text: type === 'text' ? 'New Text' : (type === 'frame' ? 'Frame Title' : undefined)
       });
       setActiveTool('select');
       return;
@@ -182,7 +182,7 @@ export default function Canvas() {
       
       {/* Toolbars & Overlays */}
       <div className="absolute left-1/2 top-4 z-10 flex -translate-x-1/2 gap-2 rounded-xl bg-white p-1 shadow-lg border border-neutral-200">
-        {(['select', 'rect', 'circle', 'text'] as const).map(t => (
+        {(['select', 'rect', 'circle', 'text', 'frame'] as const).map(t => (
           <button 
             key={t}
             onClick={() => setActiveTool(t)}
@@ -229,17 +229,24 @@ export default function Canvas() {
                   width: obj.width,
                   height: obj.height,
                   transform: `rotate(${obj.rotation || 0}deg)`,
-                  backgroundColor: obj.type !== 'text' ? obj.fill : 'transparent',
+                  backgroundColor: (obj.type !== 'text' && obj.type !== 'frame') ? obj.fill : (obj.type === 'frame' ? '#ffffff' : 'transparent'),
+                  border: obj.type === 'frame' ? '1px solid #e2e8f0' : 'none',
                   borderRadius: obj.type === 'circle' ? '50%' : '0',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: 'black',
-                  fontSize: obj.fontSize || 16,
+                  fontSize: obj.fontSize || (obj.type === 'frame' ? 12 : 16),
                   pointerEvents: 'none',
                   userSelect: 'none',
-                  boxShadow: isSelected ? '0 0 0 2px #3b82f6' : 'none',
+                  boxShadow: isSelected ? '0 0 0 2px #3b82f6' : (obj.type === 'frame' ? '0 4px 6px -1px rgb(0 0 0 / 0.1)' : 'none'),
+                  zIndex: obj.type === 'frame' ? -1 : 0
                 }}>
+                {obj.type === 'frame' && (
+                  <div className="absolute -top-6 left-0 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+                    {obj.text || 'Frame Title'}
+                  </div>
+                )}
                 {obj.type === 'text' && obj.text}
                 
                 {/* Selection Handles (Visual only for now) */}

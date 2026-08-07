@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 
 export interface CanvasObject {
   id: string;
-  type: "rectangle" | "circle" | "text" | "image";
+  type: "rectangle" | "circle" | "text" | "image" | "frame";
   x: number;
   y: number;
   width: number;
@@ -14,6 +14,7 @@ export interface CanvasObject {
   fontSize?: number;
   src?: string;
   opacity?: number;
+  parentId?: string;
 }
 
 interface CanvasStore {
