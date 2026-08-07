@@ -6,21 +6,19 @@ import { TopToolbar } from "@/components/editor/TopToolbar";
 import { MiniMap } from "@/components/editor/MiniMap";
 import { PresentMode } from "@/components/editor/PresentMode";
 import { Timeline } from "@/components/editor/Timeline";
+import { Loader2 } from "lucide-react";
+
+const Canvas = lazy(() => import("@/components/editor/Canvas"));
 
 function CanvasFallback() {
   return (
     <div className="flex h-full w-full flex-col items-center justify-center bg-canvas p-10 text-center">
       <div className="max-w-md space-y-4">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">Canvas Resetting</h2>
+        <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
+        <h2 className="text-xl font-semibold tracking-tight text-foreground">Loading Editor...</h2>
         <p className="text-sm text-muted-foreground">
-          The canvas module is being completely rebuilt to address stability and performance issues. 
-          Please wait for the next update to begin editing.
+          Preparing the infinite canvas for your presentation.
         </p>
-        <div className="mt-8 flex justify-center">
-          <div className="h-1.5 w-full max-w-[200px] overflow-hidden rounded-full bg-secondary">
-            <div className="h-full w-1/3 animate-pulse bg-primary" />
-          </div>
-        </div>
       </div>
     </div>
   );
@@ -58,7 +56,11 @@ function EditorPage() {
         </div>
 
           <main className="relative min-w-0 flex-1">
-            <CanvasFallback />
+            <ClientOnly>
+              <Suspense fallback={<CanvasFallback />}>
+                <Canvas />
+              </Suspense>
+            </ClientOnly>
             <div className="pointer-events-none absolute bottom-4 right-4 hidden sm:block">
               <div className="pointer-events-auto">
                 <MiniMap />
