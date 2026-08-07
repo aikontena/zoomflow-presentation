@@ -30,7 +30,6 @@ const TABS = [
   { id: 'history', label: 'History', icon: History },
 ];
 
-import { useCanvasStore } from '@/lib/canvas-store';
 
 export default function LeftSidebar() {
   const { undo, redo, history, lastSaved, save, setActiveOverlay } = useCanvasStore();
