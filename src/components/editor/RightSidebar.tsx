@@ -1,4 +1,5 @@
 import { useEditor } from "@/lib/editor-store";
+import { Trash2, Plus } from "lucide-react";
 
 export function RightSidebar() {
   const { editor, background, setBackground, customBackgroundColor, setCustomBackgroundColor } = useEditor();
@@ -49,16 +50,79 @@ export function RightSidebar() {
 
       <div className="flex-1 overflow-y-auto">
         {!hasSelection ? (
-          <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-3">
-            <div className="w-12 h-12 rounded-full bg-muted/20 flex items-center justify-center">
-              <span className="text-xl text-muted-foreground/30">?</span>
+          <div className="space-y-6">
+            <div className="h-40 flex flex-col items-center justify-center text-center p-6 space-y-3 bg-background/20 rounded-2xl border border-dashed border-border">
+              <div className="w-10 h-10 rounded-full bg-muted/20 flex items-center justify-center">
+                <span className="text-lg text-muted-foreground/30">?</span>
+              </div>
+              <p className="text-[10px] text-muted-foreground">Select an object or frame to inspect properties</p>
             </div>
-            <p className="text-xs text-muted-foreground">Select an object to inspect properties</p>
+
+            <div className="space-y-4">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/50">Bookmarks</h3>
+              <div className="space-y-2">
+                {useEditor.getState().bookmarks.map(b => (
+                  <div key={b.id} className="group flex items-center justify-between glass p-2 rounded-lg hover:bg-secondary/50 cursor-pointer" onClick={() => useEditor.getState().applyBookmark(b.id)}>
+                    <span className="text-[11px] font-medium truncate">{b.name}</span>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); useEditor.getState().removeBookmark(b.id); }}
+                      className="opacity-0 group-hover:opacity-100 p-1 hover:text-destructive transition-all"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                ))}
+                <button 
+                  onClick={() => {
+                    const name = prompt("Bookmark Name:");
+                    if (name) useEditor.getState().addBookmark(name);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 glass p-2 rounded-lg text-[10px] hover:bg-secondary transition-all"
+                >
+                  <Plus size={12} /> Add Bookmark
+                </button>
+              </div>
+            </div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6 animate-zc-fade-up">
              <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/50">Object Inspector</h3>
-             <p className="text-[11px] text-muted-foreground">Tldraw handles properties via context menu and floating bars. Custom inspector properties coming soon.</p>
+             
+             <div className="space-y-4">
+               {/* Metadata / Content */}
+               <div className="space-y-2">
+                 <label className="text-[11px] font-medium text-muted-foreground">Name / Label</label>
+                 <input 
+                   type="text"
+                   className="w-full bg-background/50 border border-border rounded-lg px-2 py-1.5 text-xs outline-none"
+                   placeholder="Object name..."
+                 />
+               </div>
+
+               <div className="grid grid-cols-2 gap-3">
+                 <div className="space-y-2">
+                    <label className="text-[11px] font-medium text-muted-foreground">Opacity</label>
+                    <input type="range" className="w-full accent-primary" min="0" max="100" />
+                 </div>
+                 <div className="space-y-2">
+                    <label className="text-[11px] font-medium text-muted-foreground">Rotation</label>
+                    <input type="number" className="w-full bg-background/50 border border-border rounded-lg px-2 py-1 text-xs" />
+                 </div>
+               </div>
+             </div>
+
+             <div className="pt-4 border-t border-border">
+               <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground/50 mb-4">Focus Settings</h3>
+               <div className="flex items-center justify-between">
+                 <span className="text-[11px] text-muted-foreground">Dim Surroundings</span>
+                 <input 
+                  type="checkbox" 
+                  className="accent-primary"
+                  checked={useEditor.getState().focusMode}
+                  onChange={(e) => useEditor.getState().setFocusMode(e.target.checked)}
+                 />
+               </div>
+             </div>
           </div>
         )}
       </div>
