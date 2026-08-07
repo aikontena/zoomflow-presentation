@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useEditor, type ObjectType } from "@/lib/editor-store";
 import { templates } from "@/lib/templates";
+import { AIPanel } from "./AIPanel";
 
 const TABS = [
   { id: "pages", label: "Pages", icon: Layers },
@@ -213,23 +214,7 @@ export function LeftSidebar() {
         )}
 
         {tab === "ai" && (
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold">AI assistant</h3>
-            <div className="rounded-xl border border-border bg-card/60 p-3 text-xs text-muted-foreground">
-              Ask for an outline, a rewrite, or a layout. Wiring comes in the next phase — the panel and
-              object model are already built for it.
-            </div>
-            <textarea
-              placeholder="Draft a 5-page pitch about…"
-              className="h-28 w-full resize-none rounded-xl border border-border bg-background/60 p-3 text-xs outline-none focus:border-primary/60"
-            />
-            <button className="w-full rounded-xl bg-primary/90 px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary">
-              Generate
-            </button>
-            <p className="text-[10px] text-muted-foreground">
-              {selectedIds.length} object{selectedIds.length === 1 ? "" : "s"} selected as context
-            </p>
-          </div>
+          <AIPanel />
         )}
       </div>
     </aside>

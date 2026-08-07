@@ -14,6 +14,137 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_generations: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          generated_content: Json
+          id: string
+          model_id: string | null
+          presentation_id: string | null
+          prompt_id: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          generated_content: Json
+          id?: string
+          model_id?: string | null
+          presentation_id?: string | null
+          prompt_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          generated_content?: Json
+          id?: string
+          model_id?: string | null
+          presentation_id?: string | null
+          prompt_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_generations_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_generations_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "ai_prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_models: {
+        Row: {
+          created_at: string | null
+          display_name: string
+          id: string
+          is_active: boolean | null
+          model_name: string
+          provider: string
+        }
+        Insert: {
+          created_at?: string | null
+          display_name: string
+          id?: string
+          is_active?: boolean | null
+          model_name: string
+          provider: string
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string
+          id?: string
+          is_active?: boolean | null
+          model_name?: string
+          provider?: string
+        }
+        Relationships: []
+      }
+      ai_prompts: {
+        Row: {
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          prompt_text: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          prompt_text: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          prompt_text?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      ai_versions: {
+        Row: {
+          content: Json
+          created_at: string | null
+          generation_id: string | null
+          id: string
+          version_number: number
+        }
+        Insert: {
+          content: Json
+          created_at?: string | null
+          generation_id?: string | null
+          id?: string
+          version_number: number
+        }
+        Update: {
+          content?: Json
+          created_at?: string | null
+          generation_id?: string | null
+          id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_versions_generation_id_fkey"
+            columns: ["generation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_generations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       camera_bookmarks: {
         Row: {
           created_at: string | null
