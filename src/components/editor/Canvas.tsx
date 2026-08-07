@@ -63,6 +63,9 @@ export default function Canvas() {
         });
       }
     };
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    return () => container.removeEventListener('wheel', handleWheel);
+  }, [viewport, setViewport]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     const pos = getPointerPos(e);
