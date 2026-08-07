@@ -7,7 +7,7 @@ import { useServerFn } from "@tanstack/react-start";
 
 export function AIPanel() {
   const { setGenerating, isGenerating, aiProgress, applyGeneration } = useEditor();
-  const [prompt, setPrompt] = useState(`'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                            \n                                            please activate this. why should wait.\n\n\n\nAnalyze the file at this link: https://aiframework.cloud/storage/v1/object/public/prompt-images/uploads/1786121644241-558a02f7-89e6-4303-84dd-b8aa5cf14a11.png`);
+  const [prompt, setPrompt] = useState(`'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                            \n                                            the template should be activate and make it colorful and editable\n\n\n\nAnalyze the file at this link: https://aiframework.cloud/storage/v1/object/public/prompt-images/uploads/1786121879434-43b14585-7509-4eeb-add3-e711f6cdb2fe.png`);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [metadata, setMetadata] = useState({
     title: "",
