@@ -10,8 +10,13 @@ import {
   Type, 
   Wind,
   Layers,
-  ChevronDown
+  ChevronDown,
+  RefreshCw,
+  Box
 } from 'lucide-react';
+import { IconRenderer } from './IconRenderer';
+import { ICONS } from '@/lib/icons';
+import { toast } from 'sonner';
 
 export default function RightSidebar() {
   const { objects, selection, updateObject } = useCanvasStore();
