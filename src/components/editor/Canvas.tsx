@@ -1,6 +1,8 @@
 import { useCallback } from "react";
 import { Tldraw, Editor } from "tldraw";
 import { useEditor } from "@/lib/editor-store";
+import { PathEditor } from "./PathEditor";
+
 
 export function Canvas() {
   const { 
@@ -36,6 +38,8 @@ export function Canvas() {
       <Tldraw 
         onMount={handleMount}
       />
+      
+      <PathEditor />
       
       {/* Overlay frames for pages/sections */}
       <div className="pointer-events-none absolute inset-0 z-10">
