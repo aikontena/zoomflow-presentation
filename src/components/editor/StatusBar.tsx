@@ -19,7 +19,7 @@ export default function StatusBar() {
   const canvasY = Math.round((mousePos.y - viewport.y) / viewport.zoom);
 
   return (
-    <div className="flex items-center gap-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-neutral-200 shadow-sm text-[10px] text-neutral-500 font-medium">
+    <div className="flex items-center gap-4 text-[10px] text-neutral-500 font-medium h-full">
       <div className="flex items-center gap-1.5">
         <MousePointer2 size={12} className="text-neutral-400" />
         <span className="tabular-nums">X: {canvasX} Y: {canvasY}</span>
@@ -46,7 +46,7 @@ export default function StatusBar() {
       <div className="w-px h-3 bg-neutral-200" />
 
       <div className="flex items-center gap-1.5">
-        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+        <span className="w-2 h-2 rounded-full bg-green-500" />
         <span className="uppercase tracking-wider font-bold opacity-60">Ready</span>
       </div>
     </div>
