@@ -4,6 +4,7 @@ import { ChevronUp, ChevronDown, Map as MapIcon } from 'lucide-react';
 
 export default function MiniMap() {
   const { objects, viewport, setViewport } = useCanvasStore();
+  console.log('MiniMap rendering', { objectsCount: objects.length });
   const [isCollapsed, setIsCollapsed] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
 
