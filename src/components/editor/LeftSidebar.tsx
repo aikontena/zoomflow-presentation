@@ -214,8 +214,16 @@ export function LeftSidebar() {
                   key={name}
                   title={name}
                   onClick={() => {
-                    const id = addObject("icon");
-                    updateObject(id, { icon: name, text: name });
+                    if (editor) {
+                      const center = editor.getViewportScreenCenter();
+                      editor.createShapes([{
+                        id: (editor as any).createShapeId(),
+                        type: 'text',
+                        x: center.x,
+                        y: center.y,
+                        props: { text: name, font: 'serif', size: 'm' }
+                      } as any]);
+                    }
                   }}
                   className="rounded-lg border border-border p-2 text-[10px] hover:border-primary/50 hover:bg-primary/10"
                 >
