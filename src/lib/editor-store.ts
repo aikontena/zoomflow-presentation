@@ -504,15 +504,15 @@ export const useEditor = create<EditorState>((set, get) => ({
     }
     set({ dirty: true });
   },
-  loadTemplate: (doc) => {
+  loadTemplate: (data) => {
     const s = get();
-    if (doc.snapshot && s.editor) {
-      loadSnapshot(s.editor.store, doc.snapshot);
+    if (data.snapshot && s.editor) {
+      loadSnapshot(s.editor.store, data.snapshot);
     }
     set({ 
-      title: doc.title || s.title,
-      pages: doc.pages || s.pages,
-      background: doc.background || s.background,
+      title: data.title || s.title,
+      pages: data.pages || s.pages,
+      background: data.background || s.background,
       dirty: true 
     });
   },
