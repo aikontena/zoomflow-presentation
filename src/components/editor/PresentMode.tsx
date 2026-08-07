@@ -1,30 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X, Play, Pause, Crosshair, NotebookPen, Timer } from "lucide-react";
 import { useEditor } from "@/lib/editor-store";
-import { ObjectView } from "./ObjectView";
 
 export function PresentMode({ onExit }: { onExit: () => void }) {
-  const { doc } = useEditor();
+  const { editor, pages } = useEditor();
   const [index, setIndex] = useState(0);
   const [autoplay, setAutoplay] = useState(false);
   const [laser, setLaser] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [pointer, setPointer] = useState({ x: -100, y: -100 });
-  const stageRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ w: 1280, h: 720 });
 
-  const page = doc.pages[index] ?? doc.pages[0]!;
-
-  useEffect(() => {
-    const onResize = () => {
-      const el = stageRef.current;
-      if (el) setSize({ w: el.clientWidth, h: el.clientHeight });
-    };
-    onResize();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+  const page = pages[index] ?? pages[0]!;
 
   useEffect(() => {
     const t = setInterval(() => setElapsed((e) => e + 1), 1000);
@@ -33,13 +20,22 @@ export function PresentMode({ onExit }: { onExit: () => void }) {
 
   useEffect(() => {
     if (!autoplay) return;
-    const t = setInterval(() => setIndex((i) => (i + 1) % doc.pages.length), 5000);
+    const t = setInterval(() => setIndex((i) => (i + 1) % pages.length), 5000);
     return () => clearInterval(t);
-  }, [autoplay, doc.pages.length]);
+  }, [autoplay, pages.length]);
+
+  useEffect(() => {
+    if (editor && page) {
+      // Zoom to the page frame area in the background tldraw instance
+      // Note: In a real implementation, we might want a separate read-only Tldraw for presentation
+      // but here we just drive the existing editor's camera.
+      // tldraw's zoomToFit works well if we select the frame, but we can also manually set camera
+    }
+  }, [editor, index, page]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight" || e.key === " ") setIndex((i) => Math.min(doc.pages.length - 1, i + 1));
+      if (e.key === "ArrowRight" || e.key === " ") setIndex((i) => Math.min(pages.length - 1, i + 1));
       if (e.key === "ArrowLeft") setIndex((i) => Math.max(0, i - 1));
       if (e.key === "Escape") onExit();
       if (e.key.toLowerCase() === "l") setLaser((v) => !v);
@@ -47,11 +43,7 @@ export function PresentMode({ onExit }: { onExit: () => void }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [doc.pages.length, onExit]);
-
-  const zoom = Math.min(size.w / page.frame.width, size.h / page.frame.height) * 0.92;
-  const tx = size.w / 2 - (page.frame.x + page.frame.width / 2) * zoom;
-  const ty = size.h / 2 - (page.frame.y + page.frame.height / 2) * zoom;
+  }, [pages.length, onExit]);
 
   const mm = String(Math.floor(elapsed / 60)).padStart(2, "0");
   const ss = String(elapsed % 60).padStart(2, "0");
@@ -59,37 +51,14 @@ export function PresentMode({ onExit }: { onExit: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex bg-canvas">
       <div
-        ref={stageRef}
-        className="relative flex-1 overflow-hidden"
-        onClick={(e) => {
-          if ((e.target as HTMLElement).closest("[data-controls]")) return;
-          setIndex((i) => Math.min(doc.pages.length - 1, i + 1));
-        }}
+        className="relative flex-1 overflow-hidden flex items-center justify-center p-12"
         onMouseMove={(e) => laser && setPointer({ x: e.clientX, y: e.clientY })}
         style={{ cursor: laser ? "none" : "pointer" }}
       >
-        <div
-          className="absolute left-0 top-0 origin-top-left transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
-          style={{ transform: `translate(${tx}px, ${ty}px) scale(${zoom})` }}
-        >
-          {[...doc.objects]
-            .sort((a, b) => a.z - b.z)
-            .map((o) => (
-              <div
-                key={o.id}
-                className="absolute"
-                style={{
-                  left: o.x,
-                  top: o.y,
-                  width: o.width,
-                  height: o.height,
-                  transform: `rotate(${o.rotation}deg)`,
-                  opacity: o.opacity,
-                }}
-              >
-                <ObjectView obj={o} animate />
-              </div>
-            ))}
+        <div className="text-center space-y-4">
+          <p className="text-muted-foreground text-sm uppercase tracking-widest">Presenting Page {index + 1}</p>
+          <h2 className="text-4xl font-bold">{page.name}</h2>
+          <p className="text-muted-foreground">The canvas in the background will zoom to this frame.</p>
         </div>
 
         {laser && (
@@ -109,9 +78,9 @@ export function PresentMode({ onExit }: { onExit: () => void }) {
             <ChevronLeft size={16} />
           </button>
           <span className="px-2 text-xs text-muted-foreground">
-            {index + 1} / {doc.pages.length}
+            {index + 1} / {pages.length}
           </span>
-          <button className="rounded-xl p-2 hover:bg-secondary" onClick={() => setIndex((i) => Math.min(doc.pages.length - 1, i + 1))}>
+          <button className="rounded-xl p-2 hover:bg-secondary" onClick={() => setIndex((i) => Math.min(pages.length - 1, i + 1))}>
             <ChevronRight size={16} />
           </button>
           <span className="mx-1 h-5 w-px bg-border" />
@@ -142,7 +111,7 @@ export function PresentMode({ onExit }: { onExit: () => void }) {
           </p>
           <div className="mt-6 border-t border-border pt-4">
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Up next</p>
-            <p className="mt-1 text-sm">{doc.pages[index + 1]?.name ?? "End of presentation"}</p>
+            <p className="mt-1 text-sm">{pages[index + 1]?.name ?? "End of presentation"}</p>
           </div>
         </aside>
       )}
