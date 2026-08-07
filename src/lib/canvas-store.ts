@@ -18,7 +18,19 @@ export interface CanvasObject {
   iconName?: string;
   opacity?: number;
   parentId?: string;
+  speakerNotes?: string;
 }
+
+export interface PresentationSettings {
+  transitionDuration: number;
+  autoPlay: boolean;
+  autoPlayInterval: number;
+  loop: boolean;
+  showProgressBar: boolean;
+  showFrameTitles: boolean;
+  darkBackground: boolean;
+}
+
 
 interface CanvasStore {
   objects: CanvasObject[];
