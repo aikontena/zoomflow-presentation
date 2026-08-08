@@ -54,6 +54,12 @@ export interface PresentationSettings {
   zoomOutBeforeStart?: boolean;
   autoFit?: boolean;
   backgroundColor?: string;
+  // Manual camera controls (Prezi-style free navigation)
+  zoomSpeed: number; // multiplier for wheel zoom intensity
+  smoothness: string; // easing used for camera button moves
+  manualZoom: boolean;
+  manualPan: boolean;
+  showMiniMap: boolean;
 }
 
 export interface Bookmark {
@@ -156,6 +162,11 @@ export const useCanvasStore = create<CanvasStore>()(
         darkBackground: false,
         type: 'spatial',
         zoomPadding: 0.1,
+        zoomSpeed: 1,
+        smoothness: 'smooth',
+        manualZoom: true,
+        manualPan: true,
+        showMiniMap: true,
       },
       setSnapEnabled: (snapEnabled) => set({ snapEnabled }),
       history: { past: [], future: [] },

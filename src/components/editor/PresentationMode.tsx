@@ -3,9 +3,11 @@ import { useCanvasStore } from '@/lib/canvas-store';
 import { useViewportController } from './ViewportController';
 import { IconRenderer } from './IconRenderer';
 import PresentationControls from './PresentationControls';
+import PresentationMiniMap from './PresentationMiniMap';
 import LaserPointer from './LaserPointer';
 import ProgressBar from './ProgressBar';
 import PresenterView from './PresenterView';
+import { applyCamera, clampZoom, getCamera, normalizedDelta, zoomAtPoint } from '@/lib/camera-utils';
 import { X } from 'lucide-react';
 
 export default function PresentationMode() {
@@ -16,12 +18,15 @@ export default function PresentationMode() {
   const objects = useCanvasStore(state => state.objects);
   const nextFrame = useCanvasStore(state => state.nextFrame);
   const prevFrame = useCanvasStore(state => state.prevFrame);
+  const goToFrame = useCanvasStore(state => state.goToFrame);
   const presentationSettings = useCanvasStore(state => state.presentationSettings);
-  
-  const { zoomToFrame } = useViewportController();
+
+  const { zoomToFrame, fitToScreen, resetZoom, zoomTo } = useViewportController();
   const [showControls, setShowControls] = useState(true);
   const [showPresenterNotes, setShowPresenterNotes] = useState(false);
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const panRef = useRef<{ startX: number; startY: number; camX: number; camY: number; moved: boolean } | null>(null);
 
   const handleMouseMove = useCallback(() => {
     setShowControls(true);
@@ -31,6 +36,22 @@ export default function PresentationMode() {
     }, 3000);
   }, []);
 
+  // ---- Manual camera actions -------------------------------------------------
+  const focusCurrentFrame = useCallback(() => {
+    const frameId = presentationPath[currentFrameIndex];
+    if (!frameId) return;
+    zoomToFrame(frameId, presentationSettings.transitionDuration, presentationSettings.smoothness);
+  }, [presentationPath, currentFrameIndex, zoomToFrame, presentationSettings]);
+
+  const manualZoomBy = useCallback((factor: number) => {
+    const cam = getCamera();
+    zoomTo(clampZoom(cam.zoom * factor));
+  }, [zoomTo]);
+
+  const handleZoomIn = useCallback(() => manualZoomBy(1.25), [manualZoomBy]);
+  const handleZoomOut = useCallback(() => manualZoomBy(1 / 1.25), [manualZoomBy]);
+
+  // ---- Keyboard --------------------------------------------------------------
   useEffect(() => {
     if (!isPresenting) return;
 
@@ -44,25 +65,66 @@ export default function PresentationMode() {
       } else if (e.key === 'Escape') {
         e.preventDefault();
         stopPresentation();
+      } else if (e.key === '+' || e.key === '=') {
+        e.preventDefault();
+        handleZoomIn();
+      } else if (e.key === '-' || e.key === '_') {
+        e.preventDefault();
+        handleZoomOut();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        fitToScreen();
+      } else if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        focusCurrentFrame();
+      } else if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        resetZoom();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPresenting, nextFrame, prevFrame, stopPresentation]);
+  }, [isPresenting, nextFrame, prevFrame, stopPresentation, handleZoomIn, handleZoomOut, fitToScreen, resetZoom, focusCurrentFrame]);
 
+  // ---- Wheel zoom (non-passive so pinch/ctrl-wheel never zooms the page) ------
+  const settingsRef = useRef(presentationSettings);
+  settingsRef.current = presentationSettings;
+
+  useEffect(() => {
+    if (!isPresenting) return;
+    const el = rootRef.current;
+    if (!el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      if (!settingsRef.current.manualZoom) return;
+      const rect = el.getBoundingClientRect();
+      const px = e.clientX - rect.left;
+      const py = e.clientY - rect.top;
+      const dy = normalizedDelta(e);
+      // Ctrl + wheel = precise (finer) zoom
+      const intensity = 0.0015 * settingsRef.current.zoomSpeed * (e.ctrlKey ? 0.3 : 1);
+      const cam = getCamera();
+      applyCamera(zoomAtPoint(cam.zoom * Math.exp(-dy * intensity), px, py, cam));
+    };
+
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [isPresenting]);
+
+  // ---- Frame navigation ------------------------------------------------------
   useEffect(() => {
     if (isPresenting && presentationPath[currentFrameIndex]) {
       const frameId = presentationPath[currentFrameIndex];
       const frame = objects.find(o => o.id === frameId);
-      
-      // Use frame-specific duration and easing if available, otherwise fallback to global
+
       const duration = frame?.settings?.duration ?? presentationSettings.transitionDuration;
-      const easing = frame?.settings?.easing ?? 'smooth';
-      
+      const easing = frame?.settings?.easing ?? presentationSettings.smoothness ?? 'smooth';
+
       zoomToFrame(frameId, duration, easing);
     }
-  }, [currentFrameIndex, isPresenting, presentationPath, zoomToFrame, presentationSettings.transitionDuration, objects]);
+  }, [currentFrameIndex, isPresenting, presentationPath, zoomToFrame, presentationSettings.transitionDuration, presentationSettings.smoothness, objects]);
 
   if (!isPresenting) {
     return null;
@@ -71,16 +133,66 @@ export default function PresentationMode() {
   const currentFrameId = presentationPath[currentFrameIndex];
   const currentFrame = objects.find(o => o.id === currentFrameId);
 
+  // ---- Pan (drag) ------------------------------------------------------------
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (!presentationSettings.manualPan) return;
+    if (e.button !== 0 && e.button !== 1) return;
+    const cam = getCamera();
+    panRef.current = { startX: e.clientX, startY: e.clientY, camX: cam.x, camY: cam.y, moved: false };
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    handleMouseMove();
+    const pan = panRef.current;
+    if (!pan) return;
+    const dx = e.clientX - pan.startX;
+    const dy = e.clientY - pan.startY;
+    if (!pan.moved && Math.hypot(dx, dy) < 3) return;
+    pan.moved = true;
+    const cam = getCamera();
+    applyCamera({ ...cam, x: pan.camX + dx, y: pan.camY + dy }, false);
+  };
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    const pan = panRef.current;
+    panRef.current = null;
+    if (pan?.moved) {
+      const cam = getCamera();
+      const dx = e.clientX - pan.startX;
+      const dy = e.clientY - pan.startY;
+      applyCamera({ ...cam, x: pan.camX + dx, y: pan.camY + dy });
+      return;
+    }
+    // Simple click to advance when clicking empty stage
+    if (e.target === e.currentTarget) nextFrame();
+  };
+
+  // Double click focuses the frame under the cursor
+  const onDoubleClick = (e: React.MouseEvent) => {
+    const cam = getCamera();
+    const worldX = (e.clientX - cam.x) / cam.zoom;
+    const worldY = (e.clientY - cam.y) / cam.zoom;
+    const frames = objects.filter(o => o.type === 'frame');
+    const hit = [...frames].reverse().find(
+      f => worldX >= f.x && worldX <= f.x + f.width && worldY >= f.y && worldY <= f.y + f.height
+    );
+    if (hit) {
+      const idx = presentationPath.indexOf(hit.id);
+      if (idx >= 0) goToFrame(idx);
+      else zoomToFrame(hit.id, presentationSettings.transitionDuration, presentationSettings.smoothness);
+    } else if (presentationSettings.manualZoom) {
+      applyCamera(zoomAtPoint(cam.zoom * 1.6, e.clientX, e.clientY, cam));
+    }
+  };
+
   return (
-    <div 
-      className={`fixed inset-0 z-[100] flex flex-col overflow-hidden select-none transition-colors duration-500 ${presentationSettings.darkBackground ? 'bg-neutral-950' : 'bg-white'}`}
-      onMouseMove={handleMouseMove}
-      onClick={(e) => {
-        // Simple click to advance (if not clicking controls)
-        if (e.target === e.currentTarget) {
-          nextFrame();
-        }
-      }}
+    <div
+      ref={rootRef}
+      className={`fixed inset-0 z-[100] flex flex-col overflow-hidden select-none transition-colors duration-500 ${presentationSettings.darkBackground ? 'bg-neutral-950' : 'bg-white'} ${presentationSettings.manualPan ? 'cursor-grab active:cursor-grabbing' : ''}`}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onDoubleClick={onDoubleClick}
     >
       <div className="flex-1 relative overflow-hidden pointer-events-none">
         {/* Camera Stage (GPU Accelerated Container) */}
@@ -88,7 +200,7 @@ export default function PresentationMode() {
           id="presentation-camera-container"
           className="absolute inset-0 will-change-transform"
           style={{
-            transformOrigin: '50% 50%',
+            transformOrigin: '0 0',
             willChange: 'transform',
           }}
         >
@@ -134,7 +246,7 @@ export default function PresentationMode() {
         </div>
 
         <LaserPointer />
-        
+
         {presentationSettings.showFrameTitles && currentFrame && (
           <div className={`absolute top-8 left-1/2 -translate-x-1/2 px-6 py-2 rounded-full backdrop-blur-md border animate-in fade-in slide-in-from-top-4 duration-500 pointer-events-auto ${presentationSettings.darkBackground ? 'bg-white/10 border-white/20 text-white' : 'bg-black/5 border-black/10 text-black'}`}>
             <h2 className="text-lg font-medium">{currentFrame.text || `Frame ${currentFrameIndex + 1}`}</h2>
@@ -143,28 +255,46 @@ export default function PresentationMode() {
       </div>
 
       {presentationSettings.showProgressBar && (
-        <ProgressBar 
-          current={currentFrameIndex + 1} 
-          total={presentationPath.length} 
+        <ProgressBar
+          current={currentFrameIndex + 1}
+          total={presentationPath.length}
           dark={presentationSettings.darkBackground}
         />
       )}
 
+      {presentationSettings.showMiniMap && (
+        <div className={`fixed bottom-24 right-6 transition-all duration-300 pointer-events-auto ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <PresentationMiniMap
+            dark={presentationSettings.darkBackground}
+            onJumpToFrame={(id) => {
+              const idx = presentationPath.indexOf(id);
+              if (idx >= 0) goToFrame(idx);
+              else zoomToFrame(id, presentationSettings.transitionDuration, presentationSettings.smoothness);
+            }}
+          />
+        </div>
+      )}
+
       <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 transition-all duration-300 transform pointer-events-auto ${showControls ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
-        <PresentationControls 
+        <PresentationControls
           onToggleNotes={() => setShowPresenterNotes(!showPresenterNotes)}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          onFitCanvas={fitToScreen}
+          onFocusFrame={focusCurrentFrame}
+          onResetCamera={resetZoom}
           dark={presentationSettings.darkBackground}
         />
       </div>
 
       {showPresenterNotes && (
-        <PresenterView 
+        <PresenterView
           onClose={() => setShowPresenterNotes(false)}
           dark={presentationSettings.darkBackground}
         />
       )}
 
-      <button 
+      <button
         onClick={stopPresentation}
         className={`fixed top-4 right-4 p-2 rounded-full transition-all duration-300 transform pointer-events-auto ${showControls ? 'opacity-100 scale-100' : 'opacity-0 scale-75'} hover:bg-black/10 ${presentationSettings.darkBackground ? 'text-white hover:bg-white/10' : 'text-black'}`}
       >
