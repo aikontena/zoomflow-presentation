@@ -16,7 +16,7 @@ import {
   FileText
 } from 'lucide-react';
 import { IconRenderer } from './IconRenderer';
-import { ICONS } from '@/lib/icons';
+import { IconProperties } from './icons/IconProperties';
 import { toast } from 'sonner';
 
 export default function RightSidebar() {
