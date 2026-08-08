@@ -156,7 +156,7 @@ export class SlideImporter {
 
   private static async importPPT(file: File, mode: 'preserve' | 'convert' | 'ai'): Promise<any> {
     const arrayBuffer = await file.arrayBuffer();
-    const zip = await jszip.loadAsync(arrayBuffer);
+    const zip = await JSZip.loadAsync(arrayBuffer);
     
     // 1. Find all slide files
     const slideFiles = Object.keys(zip.files).filter(name => name.startsWith('ppt/slides/slide') && name.endsWith('.xml'));
