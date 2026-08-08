@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useCanvasStore } from '@/lib/canvas-store';
 import { useViewportController } from './ViewportController';
+import { IconRenderer } from './IconRenderer';
 import PresentationControls from './PresentationControls';
 import LaserPointer from './LaserPointer';
 import ProgressBar from './ProgressBar';
@@ -14,6 +15,7 @@ export default function PresentationMode() {
     currentFrameIndex, 
     presentationPath, 
     objects,
+    viewport,
     nextFrame,
     prevFrame,
     goToFrame,
@@ -71,7 +73,56 @@ export default function PresentationMode() {
       className={`fixed inset-0 z-[100] flex flex-col overflow-hidden select-none transition-colors duration-500 ${presentationSettings.darkBackground ? 'bg-neutral-950' : 'bg-white'}`}
       onMouseMove={handleMouseMove}
     >
-      <div className="flex-1 relative overflow-hidden">
+      <div className="flex-1 relative overflow-hidden flex items-center justify-center">
+        {/* Render the full canvas context during presentation */}
+        <div 
+          className="absolute inset-0 transition-transform duration-700 ease-in-out"
+          style={{
+            transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom || 1})`,
+            transformOrigin: '0 0'
+          }}
+        >
+          {objects.map(obj => (
+            <div 
+              key={obj.id}
+              style={{
+                position: 'absolute',
+                left: obj.x,
+                top: obj.y,
+                width: obj.width,
+                height: obj.height,
+                transform: `rotate(${obj.rotation || 0}deg)`,
+                backgroundColor: (obj.type !== 'text' && obj.type !== 'frame' && obj.type !== 'icon') ? obj.fill : 'transparent',
+                background: obj.type === 'frame' ? obj.fill : undefined,
+                border: obj.type === 'frame' ? '1px solid rgba(0,0,0,0.1)' : 'none',
+                borderRadius: obj.type === 'circle' ? '50%' : '0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: obj.fill || 'black',
+                fontSize: obj.fontSize || (obj.type === 'frame' ? 12 : 16),
+                pointerEvents: 'none',
+                userSelect: 'none',
+                filter: obj.shadow ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.25))' : undefined,
+                zIndex: obj.type === 'frame' ? -1 : 1,
+                opacity: obj.opacity ?? 1,
+              }}
+            >
+              {obj.type === 'text' && obj.text}
+              {obj.type === 'icon' && obj.iconName && (
+                <div className="w-full h-full p-[10%]">
+                  <IconRenderer 
+                    name={obj.iconName} 
+                    size="100%" 
+                    color={obj.fill} 
+                    strokeWidth={obj.strokeWidth || 2}
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
         <LaserPointer />
         
         {presentationSettings.showFrameTitles && currentFrame && (

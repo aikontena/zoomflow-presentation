@@ -4,9 +4,9 @@ import { Sparkles, Send } from 'lucide-react';
 export const AIPanel: React.FC = () => {
   const [prompt, setPrompt] = useState(`'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
                                             
-                                            the selection slide in file should same showed in navigation panel. want to know which actully the position of the slide in the canvas
+                                            why in presentation view, its not show the same like the slide shoud be
 
-Analyze the file at this link: https://aiframework.cloud/storage/v1/object/public/prompt-images/uploads/1786182918739-57c52d41-3682-4bcc-8fc5-362ee7beb819.png`);
+Analyze the file at this link: https://aiframework.cloud/storage/v1/object/public/prompt-images/uploads/1786183156074-81ae8524-d236-4ada-be71-3d7f1043c2ef.png`);
 
   return (
     <div className="flex flex-col h-full bg-white">
