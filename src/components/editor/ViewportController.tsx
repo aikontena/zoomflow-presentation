@@ -12,7 +12,7 @@ export function useViewportController() {
   const { viewport, setViewport, objects, selection } = useCanvasStore();
   const animationFrameRef = useRef<number | null>(null);
 
-  const animateViewport = useCallback((target: Viewport, duration: number = 300, easing: string = 'smooth') => {
+  const animateViewport = useCallback((target: Viewport, duration: number = 300, easing: string = 'smooth', pathType: string = 'linear') => {
     const start = { ...useCanvasStore.getState().viewport };
     const startTime = performance.now();
     const targetRotation = target.rotation ?? 0;
