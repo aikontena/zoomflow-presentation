@@ -121,7 +121,7 @@ export default function LeftSidebar() {
                         
                         // Calculate next frame for path preview
                         const nextFrameId = presentationPath[index + 1];
-                        const nextFrame = nextFrameId ? objects.find(o => o.id === nextFrameId) : null;
+                        const nextFrame = nextFrameId ? objects.find(o => o.id === nextFrameId) : undefined;
                         
                         return (
                           <div key={frameId} className="group relative flex flex-col gap-2">
