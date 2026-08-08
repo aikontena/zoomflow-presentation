@@ -1,35 +1,36 @@
 import React from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { AlertTriangle, Check } from 'lucide-react';
+import { AlertTriangle, Check, Layout } from 'lucide-react';
 import { useCanvasStore } from '@/lib/canvas-store';
 
-type Choice = 'keep' | 'new' | 'duplicate';
+type Choice = 'keep' | 'new' | 'duplicate' | 'replace';
 
-const OPTIONS: { value: Choice; label: string; description: string }[] = [
-  {
-    value: 'keep',
-    label: 'Keep current presentation (Recommended)',
-    description: 'Nothing changes. The selected canvas template is discarded.',
-  },
+const OPTIONS: { value: Choice; label: string; description: string; danger?: boolean }[] = [
   {
     value: 'new',
-    label: 'Create a NEW presentation using the selected Canvas Template',
-    description: 'Replaces the workspace with a fresh presentation built from the template.',
+    label: 'Create New Presentation (Recommended)',
+    description: 'Your current presentation is kept as a saved copy, and a fresh one is built from this template.',
   },
   {
     value: 'duplicate',
-    label: 'Duplicate current presentation, then apply the Canvas Template',
-    description: 'Saves a copy of the current presentation first, then applies the template.',
+    label: 'Duplicate Current Presentation and Apply Template',
+    description: 'Saves a duplicate of the current presentation first, then applies the template.',
+  },
+  {
+    value: 'replace',
+    label: 'Replace Current Presentation',
+    description: 'This will remove the current presentation.',
+    danger: true,
   },
 ];
 
 export const TemplateConflictDialog: React.FC = () => {
   const pendingTemplate = useCanvasStore((s) => s.pendingTemplate);
   const resolveTemplateConflict = useCanvasStore((s) => s.resolveTemplateConflict);
-  const [choice, setChoice] = React.useState<Choice>('keep');
+  const [choice, setChoice] = React.useState<Choice>('new');
 
   React.useEffect(() => {
-    if (pendingTemplate) setChoice('keep');
+    if (pendingTemplate) setChoice('new');
   }, [pendingTemplate]);
 
   return (
@@ -41,11 +42,11 @@ export const TemplateConflictDialog: React.FC = () => {
         <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1000] animate-in fade-in duration-200" />
         <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-xl shadow-2xl p-6 z-[1001] border border-neutral-200 animate-in zoom-in-95 duration-200">
           <Dialog.Title className="text-lg font-bold text-neutral-900 flex items-center gap-2 mb-2">
-            <AlertTriangle className="text-amber-500" size={20} />
-            This presentation already contains content
+            <Layout className="text-primary" size={20} />
+            Choose how to use this template
           </Dialog.Title>
           <Dialog.Description className="text-sm text-neutral-500 mb-5">
-            What would you like to do?
+            Your existing presentation will not be changed unless you choose to replace it.
           </Dialog.Description>
 
           <div className="space-y-3">
@@ -68,7 +69,10 @@ export const TemplateConflictDialog: React.FC = () => {
                 </span>
                 <span className="flex-1">
                   <span className="block text-sm font-bold text-neutral-900">{opt.label}</span>
-                  <span className="block text-xs text-neutral-500 mt-0.5">{opt.description}</span>
+                  <span className={`flex items-start gap-1.5 text-xs mt-0.5 ${opt.danger ? 'text-amber-600 font-medium' : 'text-neutral-500'}`}>
+                    {opt.danger && <AlertTriangle className="shrink-0 mt-[1px]" size={12} />}
+                    {opt.description}
+                  </span>
                 </span>
                 {choice === opt.value && <Check className="text-primary shrink-0" size={16} />}
               </button>
@@ -84,7 +88,7 @@ export const TemplateConflictDialog: React.FC = () => {
             </button>
             <button
               onClick={() => resolveTemplateConflict(choice)}
-              className="h-10 px-5 rounded-lg bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+              className={`h-10 px-5 rounded-lg text-white ${choice === 'replace' ? 'bg-amber-600 hover:bg-amber-600/90 shadow-amber-600/20' : 'bg-primary hover:bg-primary/90 shadow-primary/20'}`.concat("  text-sm font-bold transition-colors shadow-lg")}
             >
               Continue
             </button>

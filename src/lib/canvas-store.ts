@@ -123,7 +123,7 @@ interface CanvasStore {
   loadTemplate: (template: any) => void;
   pendingTemplate: any | null;
   requestTemplate: (template: any) => void;
-  resolveTemplateConflict: (choice: 'keep' | 'new' | 'duplicate') => void;
+  resolveTemplateConflict: (choice: 'keep' | 'new' | 'duplicate' | 'replace') => void;
   randomizeTransitions: () => void;
 }
 
@@ -449,7 +449,7 @@ export const useCanvasStore = create<CanvasStore>()(
         set({ pendingTemplate: null });
         if (!template || choice === 'keep') return;
 
-        if (choice === 'duplicate') {
+        if (choice === 'duplicate' || choice === 'new') {
           try {
             const snapshot = {
               savedAt: Date.now(),
@@ -462,7 +462,11 @@ export const useCanvasStore = create<CanvasStore>()(
             const existing = JSON.parse(localStorage.getItem(key) || '[]');
             existing.push(snapshot);
             localStorage.setItem(key, JSON.stringify(existing.slice(-10)));
-            toast.success("Current presentation duplicated and saved");
+            toast.success(
+              choice === 'duplicate'
+                ? "Current presentation duplicated and saved"
+                : "Current presentation saved as a copy"
+            );
           } catch (e) {
             console.error('[Store] Duplicate failed', e);
             toast.error("Could not duplicate current presentation");
@@ -472,6 +476,7 @@ export const useCanvasStore = create<CanvasStore>()(
 
         get().loadTemplate(template);
       },
+
 
 
       randomizeTransitions: () => {
