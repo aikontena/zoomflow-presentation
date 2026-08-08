@@ -73,7 +73,7 @@ export default function PresentationMode() {
       className={`fixed inset-0 z-[100] flex flex-col overflow-hidden select-none transition-colors duration-500 ${presentationSettings.darkBackground ? 'bg-neutral-950' : 'bg-white'}`}
       onMouseMove={handleMouseMove}
     >
-      <div className="flex-1 relative overflow-hidden">
+      <div className="flex-1 relative overflow-hidden flex items-center justify-center">
         {/* Render the full canvas context during presentation */}
         <div 
           className="absolute inset-0 transition-transform duration-700 ease-in-out"
