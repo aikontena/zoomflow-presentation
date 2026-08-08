@@ -77,37 +77,36 @@ export function useViewportController() {
         case 'morph':
           ease = progress < 0.5 ? 8 * progress * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 4) / 2;
           break;
-        case 'vortex':
-          // Fast spin at the start
-          ease = 1 - Math.pow(1 - progress, 3);
-          currentRotation += Math.sin(progress * Math.PI) * 45;
-          break;
-        case 'origami':
-          // Back and forth movement
-          ease = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-          currentZoom *= (1 + Math.sin(progress * Math.PI) * 0.2);
-          break;
         case 'pan':
-          ease = progress; // Linear
-          break;
-        case 'orbit':
-          ease = 1 - Math.pow(1 - progress, 3);
-          const orbitOffset = Math.sin(progress * Math.PI) * 200;
-          currentX += orbitOffset;
+          ease = progress;
           break;
         default: // 'smooth'
           ease = 1 - Math.pow(1 - progress, 3);
       }
 
+      // Default interpolation using the ease
+      currentX = start.x + (target.x - start.x) * ease;
+      currentY = start.y + (target.y - start.y) * ease;
+      currentZoom = start.zoom + (target.zoom - start.zoom) * ease;
+      currentRotation = startRotation + (targetRotation - startRotation) * ease;
+
+      // Specialized visual overrides
+      if (easing === 'vortex') {
+        currentRotation += Math.sin(progress * Math.PI) * 45;
+      } else if (easing === 'origami') {
+        currentZoom *= (1 + Math.sin(progress * Math.PI) * 0.2);
+      } else if (easing === 'orbit') {
+        const orbitOffset = Math.sin(progress * Math.PI) * 200;
+        currentX += orbitOffset;
+      }
+
       if (pathType === 'curved' || pathType === 'spiral') {
-        // Add an arc to the movement to avoid linear "sliding"
         const angle = progress * Math.PI;
         const curveIntensity = pathType === 'spiral' ? 200 : 100;
         const offset = Math.sin(angle) * curveIntensity * (1 - ease);
         currentX += offset;
         currentY += offset;
       } else if (pathType === 'zoom-out') {
-        // Dramatic zoom out then in (Spatial content style)
         const zoomDip = Math.sin(progress * Math.PI) * (start.zoom * 0.5);
         currentZoom -= zoomDip * (1 - progress);
       }
