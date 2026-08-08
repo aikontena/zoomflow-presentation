@@ -331,8 +331,12 @@ export default function TemplateLibrary() {
           <div className="p-6 bg-white border-t border-neutral-200 space-y-3">
             <Button 
               onClick={() => {
-                console.log("TemplateLibrary: Use Template clicked for", selectedTemplate.name);
+                console.log("[STEP 1] Template button clicked");
+                console.log(`[STEP 1] Template ID: ${selectedTemplate.id}`);
+                console.log(`[STEP 1] Template Name: ${selectedTemplate.name}`);
+                
                 if (!selectedTemplate.objects || selectedTemplate.objects.length === 0) {
+                  console.error("[STEP 2] Template has no objects");
                   toast.error("Template has no objects");
                   return;
                 }
@@ -340,11 +344,13 @@ export default function TemplateLibrary() {
                 try {
                   // Ensure objects are fresh copies
                   const objectsToLoad = JSON.parse(JSON.stringify(selectedTemplate.objects));
-                  loadTemplate(objectsToLoad);
-                  setActiveOverlay(null); // Close the library after successful load
+                  loadTemplate(objectsToLoad, selectedTemplate.name);
+                  // setActiveOverlay(null) is now called inside loadTemplate, 
+                  // but we ensure it happens here too just in case
+                  setActiveOverlay(null); 
                   toast.success(`Loaded ${selectedTemplate.name}`);
                 } catch (error) {
-                  console.error("TemplateLibrary: Error loading template:", error);
+                  console.error("[ERROR] TemplateLibrary: Error loading template:", error);
                   toast.error("Failed to load template");
                 }
               }}
