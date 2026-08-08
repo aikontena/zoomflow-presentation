@@ -13,6 +13,9 @@ const TemplateLibrary = lazy(() => import("./templates/TemplateLibrary"));
 export default function EditorLayout() {
   const { activeOverlay, setActiveOverlay, isPresenting } = useCanvasStore();
 
+  useEffect(() => {
+    (window as any).useCanvasStore = useCanvasStore;
+  }, []);
 
   return (
     <div className="h-screen w-full overflow-hidden bg-white flex flex-col relative">
