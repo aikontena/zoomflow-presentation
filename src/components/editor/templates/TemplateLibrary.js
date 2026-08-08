@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Grid, List, Filter, Star, Clock, Layers, ArrowRight, TrendingUp, Layout, Sparkles } from 'lucide-react';
+import { Search, Grid, List, Filter, Star, ArrowRight, TrendingUp, Layout, Sparkles, Clock, Layers } from 'lucide-react';
 import { TEMPLATES } from '@/lib/templates';
 import { DynamicTemplateThumbnail } from './DynamicTemplateThumbnail';
 import { Button } from '@/components/ui/button';

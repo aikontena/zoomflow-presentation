@@ -269,7 +269,7 @@ const createProfessionalFrame = (templateId, frameIndex, title, content, type, c
     return objects;
 };
 export const generateTemplate = (id, name, category, colorKey) => {
-    const colors = COLORS[colorKey];
+    const colors = COLORS[colorKey] || COLORS['business'];
     const objects = [];
     const spacing = 1200;
     const sections = [
