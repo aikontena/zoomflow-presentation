@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, Send, Bot, User, Check, X, RefreshCcw, Layout, Image as ImageIcon, Type, Camera, Info, Trash2 } from 'lucide-react';
+import { Sparkles, Send, Bot, User, Check, X, RefreshCcw, Layout, Image as ImageIcon, Type, Camera, Info, Trash2, FileText } from 'lucide-react';
 import { useCanvasStore, AiMessage, AiProposal } from '@/lib/canvas-store';
 import { askAiAssistant } from '@/lib/ai/assistant.functions';
 import { useServerFn } from '@tanstack/react-start';
