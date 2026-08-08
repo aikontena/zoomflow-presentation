@@ -10,6 +10,7 @@ export default function LaserPointer() {
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setPosition({ x: e.clientX, y: e.clientY });
+      // Always keep active while moving to show the pointer
       setIsActive(true);
     };
 

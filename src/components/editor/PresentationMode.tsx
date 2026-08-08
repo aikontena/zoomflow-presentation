@@ -144,10 +144,20 @@ export default function PresentationMode() {
   const currentFrameId = presentationPath[currentFrameIndex];
   const currentFrame = objects.find(o => o.id === currentFrameId);
 
-  // ---- Pan (drag) ------------------------------------------------------------
+  // ---- Pan (drag) & Navigation ------------------------------------------------------------
   const onPointerDown = (e: React.PointerEvent) => {
-    if (!presentationSettings.manualPan) return;
+    // Left mouse click (0) or Middle mouse click (1)
     if (e.button !== 0 && e.button !== 1) return;
+    
+    // If it's the right mouse button (2), we explicitly do nothing to respect the user's request
+    if (e.button === 2) return;
+
+    if (!presentationSettings.manualPan) {
+      // If manual pan is disabled, still track to detect clicks
+      panRef.current = { startX: e.clientX, startY: e.clientY, camX: 0, camY: 0, moved: false };
+      return;
+    }
+
     const cam = getCamera();
     panRef.current = { startX: e.clientX, startY: e.clientY, camX: cam.x, camY: cam.y, moved: false };
   };
@@ -156,10 +166,16 @@ export default function PresentationMode() {
     handleMouseMove();
     const pan = panRef.current;
     if (!pan) return;
+    
     const dx = e.clientX - pan.startX;
     const dy = e.clientY - pan.startY;
-    if (!pan.moved && Math.hypot(dx, dy) < 3) return;
+    
+    // Threshold to distinguish click from drag
+    if (!pan.moved && Math.hypot(dx, dy) < 5) return;
     pan.moved = true;
+
+    if (!presentationSettings.manualPan) return;
+
     const cam = getCamera();
     applyCamera({ ...cam, x: pan.camX + dx, y: pan.camY + dy }, false);
   };
@@ -167,15 +183,21 @@ export default function PresentationMode() {
   const onPointerUp = (e: React.PointerEvent) => {
     const pan = panRef.current;
     panRef.current = null;
+    
     if (pan?.moved) {
-      const cam = getCamera();
-      const dx = e.clientX - pan.startX;
-      const dy = e.clientY - pan.startY;
-      applyCamera({ ...cam, x: pan.camX + dx, y: pan.camY + dy });
+      if (presentationSettings.manualPan) {
+        const cam = getCamera();
+        const dx = e.clientX - pan.startX;
+        const dy = e.clientY - pan.startY;
+        applyCamera({ ...cam, x: pan.camX + dx, y: pan.camY + dy });
+      }
       return;
     }
-    // Simple click to advance when clicking empty stage
-    if (e.target === e.currentTarget) nextFrame();
+
+    // Left click only to advance
+    if (e.button === 0) {
+      nextFrame();
+    }
   };
 
   // Double click focuses the frame under the cursor
@@ -199,7 +221,7 @@ export default function PresentationMode() {
   return (
     <div
       ref={rootRef}
-      className={`fixed inset-0 z-[100] flex flex-col overflow-hidden select-none transition-colors duration-500 ${presentationSettings.darkBackground ? 'bg-neutral-950' : 'bg-white'} ${presentationSettings.manualPan ? 'cursor-grab active:cursor-grabbing' : ''}`}
+      className={`fixed inset-0 z-[100] flex flex-col overflow-hidden select-none transition-colors duration-500 ${presentationSettings.darkBackground ? 'bg-neutral-950' : 'bg-white'} ${presentationSettings.manualPan ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
       style={{
         backgroundColor: presentationSettings.backgroundColor || (presentationSettings.darkBackground ? '#0a0a0a' : '#ffffff'),
         backgroundImage: presentationSettings.backgroundImage ? `url(${presentationSettings.backgroundImage})` : 'none',
@@ -212,7 +234,7 @@ export default function PresentationMode() {
       onPointerUp={onPointerUp}
       onDoubleClick={onDoubleClick}
     >
-      <div className="flex-1 relative overflow-hidden pointer-events-none">
+      <div className="flex-1 relative overflow-hidden">
         {/* Transition Overlay (Fade) */}
         <div 
           className="fixed inset-0 z-[110] bg-black pointer-events-none transition-opacity duration-300" 
