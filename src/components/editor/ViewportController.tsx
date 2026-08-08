@@ -1,5 +1,5 @@
 import { useCanvasStore } from "@/lib/canvas-store";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 
 export interface Viewport {
   x: number;
@@ -10,12 +10,17 @@ export interface Viewport {
 
 export function useViewportController() {
   const { viewport, setViewport, objects, selection } = useCanvasStore();
+  const animationFrameRef = useRef<number | null>(null);
 
   const animateViewport = useCallback((target: Viewport, duration: number = 300, easing: string = 'smooth') => {
-    const start = { ...viewport };
+    const start = { ...useCanvasStore.getState().viewport };
     const startTime = performance.now();
     const targetRotation = target.rotation ?? 0;
     const startRotation = start.rotation ?? 0;
+
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
 
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
@@ -52,17 +57,30 @@ export function useViewportController() {
         rotation: startRotation + (targetRotation - startRotation) * ease,
       };
 
-      setViewport(current);
+      // 1. Direct DOM manipulation for maximum performance during presentation
+      const editorStage = document.getElementById('editor-stage');
+      const presStage = document.getElementById('presentation-camera-container');
+      
+      const transform = `translate3d(${current.x}px, ${current.y}px, 0) scale(${current.zoom}) rotate(${current.rotation}deg)`;
+      
+      if (editorStage) editorStage.style.transform = transform;
+      if (presStage) presStage.style.transform = transform;
 
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        animationFrameRef.current = requestAnimationFrame(animate);
+      } else {
+        // Only update the store at the very end of the animation to sync state
+        // This avoids N React renders during the animation
+        setViewport(current);
+        animationFrameRef.current = null;
       }
     };
 
-    requestAnimationFrame(animate);
-  }, [viewport, setViewport]);
+    animationFrameRef.current = requestAnimationFrame(animate);
+  }, [setViewport]);
 
   const zoomTo = useCallback((newZoom: number, center?: { x: number, y: number }) => {
+    const currentViewport = useCanvasStore.getState().viewport;
     const clampedZoom = Math.min(Math.max(newZoom, 0.05), 10);
     
     const viewportWidth = window.innerWidth;
@@ -71,29 +89,30 @@ export function useViewportController() {
     const cx = center?.x ?? viewportWidth / 2;
     const cy = center?.y ?? viewportHeight / 2;
 
-    const worldX = (cx - viewport.x) / viewport.zoom;
-    const worldY = (cy - viewport.y) / viewport.zoom;
+    const worldX = (cx - currentViewport.x) / currentViewport.zoom;
+    const worldY = (cy - currentViewport.y) / currentViewport.zoom;
 
     const target = {
       zoom: clampedZoom,
       x: cx - worldX * clampedZoom,
       y: cy - worldY * clampedZoom,
-      rotation: viewport.rotation || 0
+      rotation: currentViewport.rotation || 0
     };
 
     animateViewport(target);
-  }, [viewport, animateViewport]);
+  }, [animateViewport]);
 
   const fitToScreen = useCallback(() => {
-    if (objects.length === 0) {
+    const currentObjects = useCanvasStore.getState().objects;
+    if (currentObjects.length === 0) {
       animateViewport({ x: 0, y: 0, zoom: 1, rotation: 0 });
       return;
     }
 
-    const minX = Math.min(...objects.map(o => o.x));
-    const minY = Math.min(...objects.map(o => o.y));
-    const maxX = Math.max(...objects.map(o => o.x + o.width));
-    const maxY = Math.max(...objects.map(o => o.y + o.height));
+    const minX = Math.min(...currentObjects.map(o => o.x));
+    const minY = Math.min(...currentObjects.map(o => o.y));
+    const maxX = Math.max(...currentObjects.map(o => o.x + o.width));
+    const maxY = Math.max(...currentObjects.map(o => o.y + o.height));
 
     const width = maxX - minX;
     const height = maxY - minY;
@@ -117,12 +136,16 @@ export function useViewportController() {
     };
 
     animateViewport(target);
-  }, [objects, animateViewport]);
+  }, [animateViewport]);
 
   const zoomToSelection = useCallback(() => {
-    if (selection.length === 0) return;
+    const state = useCanvasStore.getState();
+    const currentSelection = state.selection;
+    const currentObjects = state.objects;
+    
+    if (currentSelection.length === 0) return;
 
-    const selectedObjects = objects.filter(o => selection.includes(o.id));
+    const selectedObjects = currentObjects.filter(o => currentSelection.includes(o.id));
     if (selectedObjects.length === 0) return;
 
     const minX = Math.min(...selectedObjects.map(o => o.x));
@@ -152,10 +175,11 @@ export function useViewportController() {
     };
 
     animateViewport(target);
-  }, [objects, selection, animateViewport]);
+  }, [animateViewport]);
 
   const zoomToFrame = useCallback((frameId: string, duration?: number, easingOverride?: string) => {
-    const frame = objects.find(o => o.id === frameId);
+    const currentObjects = useCanvasStore.getState().objects;
+    const frame = currentObjects.find(o => o.id === frameId);
     if (!frame) return;
 
     const availableWidth = window.innerWidth;
@@ -179,7 +203,7 @@ export function useViewportController() {
     const finalEasing = easingOverride ?? frame.settings?.easing ?? 'smooth';
 
     animateViewport(target, finalDuration, finalEasing);
-  }, [objects, animateViewport]);
+  }, [animateViewport]);
 
   const resetZoom = useCallback(() => {
     animateViewport({ x: 0, y: 0, zoom: 1, rotation: 0 });
