@@ -5,7 +5,6 @@ import { IconRenderer } from './IconRenderer';
 import PresentationControls from './PresentationControls';
 import PresentationMiniMap from './PresentationMiniMap';
 import LaserPointer from './LaserPointer';
-import ProgressBar from './ProgressBar';
 import PresenterView from './PresenterView';
 import { applyCamera, clampZoom, getCamera, normalizedDelta, zoomAtPoint } from '@/lib/camera-utils';
 import { X } from 'lucide-react';
@@ -254,13 +253,6 @@ export default function PresentationMode() {
         )}
       </div>
 
-      {presentationSettings.showProgressBar && (
-        <ProgressBar
-          current={currentFrameIndex + 1}
-          total={presentationPath.length}
-          dark={presentationSettings.darkBackground}
-        />
-      )}
 
       {presentationSettings.showMiniMap && (
         <div className={`fixed bottom-24 right-6 transition-all duration-300 pointer-events-auto ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
