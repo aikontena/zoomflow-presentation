@@ -115,7 +115,8 @@ export class TemplateLoader {
     return {
       objects: finalObjects,
       viewport,
-      presentationPath
+      presentationPath,
+      bookmarks: templateData.bookmarks || []
     };
   }
 }

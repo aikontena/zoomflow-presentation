@@ -15,10 +15,12 @@ import {
   History,
   Plus,
   MonitorPlay,
-  Bookmark as BookmarkIcon
+  Bookmark as BookmarkIcon,
+  Layout
 } from 'lucide-react';
 import { PresentationPathPanel } from './PresentationPathPanel';
 import { IconLibrary } from './IconLibrary';
+import { CanvasTemplateLibrary } from './CanvasTemplateLibrary';
 import { AIPanel } from './AIPanel';
 import { FramePreview } from './FramePreview';
 import { DynamicTemplateThumbnail } from './templates/DynamicTemplateThumbnail';
@@ -33,7 +35,8 @@ const TABS = [
   { id: 'pages', label: 'Pages', icon: FileText },
   { id: 'layers', label: 'Layers', icon: Layers },
   { id: 'assets', label: 'Assets', icon: Image },
-  { id: 'templates', label: 'Templates', icon: LayoutTemplate },
+  { id: 'templates', label: 'Slides', icon: LayoutTemplate },
+  { id: 'canvas-templates', label: 'Canvas', icon: Layout },
   { id: 'uploads', label: 'Uploads', icon: Upload },
   { id: 'ai', label: 'AI', icon: Sparkles },
   { id: 'icons', label: 'Icons', icon: Box },
@@ -349,6 +352,7 @@ export default function LeftSidebar() {
               </div>
             )}
             {activeTab === 'assets' && <p>Browse your media assets here.</p>}
+            {activeTab === 'canvas-templates' && <CanvasTemplateLibrary />}
             {activeTab === 'templates' && (
               <div className="space-y-4">
                 <p className="text-xs text-neutral-400">Choose a professional template to start your presentation.</p>
