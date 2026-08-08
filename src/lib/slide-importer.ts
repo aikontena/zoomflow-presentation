@@ -1,7 +1,7 @@
 import { CanvasObject, Bookmark } from './canvas-store';
 import * as pdfjs from 'pdfjs-dist';
 // @ts-ignore
-import jszip from 'jszip';
+import JSZip from 'jszip';
 
 // Set worker source for pdfjs-dist using a version-matched CDN
 const PDFJS_VERSION = '4.0.379';
