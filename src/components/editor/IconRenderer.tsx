@@ -1,5 +1,5 @@
 import React from 'react';
-import * as LucideIcons from 'lucide-react';
+import { getIconComponent } from '@/lib/icon-registry';
 
 interface IconRendererProps {
   name: string;
@@ -7,22 +7,28 @@ interface IconRendererProps {
   color?: string;
   className?: string;
   strokeWidth?: number;
+  absoluteStrokeWidth?: boolean;
 }
 
-export const IconRenderer: React.FC<IconRendererProps> = ({ 
-  name, 
-  size = 24, 
-  color = 'currentColor', 
+export const IconRenderer: React.FC<IconRendererProps> = ({
+  name,
+  size = 24,
+  color = 'currentColor',
   className,
-  strokeWidth = 2
+  strokeWidth = 2,
+  absoluteStrokeWidth = true,
 }) => {
-  // Convert kebab-case to PascalCase for Lucide icons
-  const pascalName = name
-    .split('-')
-    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('');
+  const IconComponent = getIconComponent(name);
 
-  const IconComponent = (LucideIcons as any)[pascalName] || (LucideIcons as any)[name] || LucideIcons.HelpCircle;
-
-  return <IconComponent size={size} color={color} className={className} strokeWidth={strokeWidth} />;
+  return (
+    <IconComponent
+      size={size}
+      color={color}
+      className={className}
+      strokeWidth={strokeWidth}
+      absoluteStrokeWidth={absoluteStrokeWidth}
+    />
+  );
 };
+
+export default IconRenderer;
