@@ -50,6 +50,7 @@ export interface PresentationSettings {
   showFrameTitles: boolean;
   darkBackground: boolean;
   type: 'linear' | 'spatial' | 'spiral' | 'grid';
+  zoomPadding: number; // 0 to 1, where 0 is tight fit and 1 is lots of space
   zoomOutBeforeStart?: boolean;
   autoFit?: boolean;
   backgroundColor?: string;
@@ -154,6 +155,7 @@ export const useCanvasStore = create<CanvasStore>()(
         showFrameTitles: true,
         darkBackground: false,
         type: 'spatial',
+        zoomPadding: 0.1,
       },
       setSnapEnabled: (snapEnabled) => set({ snapEnabled }),
       history: { past: [], future: [] },
