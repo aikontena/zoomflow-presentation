@@ -12,13 +12,14 @@ export interface Template {
   objects: any[];
 }
 
-const COLORS = {
+const COLORS: Record<string, any> = {
   business: { primary: '#1E293B', secondary: '#3B82F6', accent: '#60A5FA', bg: '#F8FAFC', text: '#1E293B', shapes: ['#E2E8F0', '#CBD5E1'] },
   startup: { primary: '#10B981', secondary: '#059669', accent: '#34D399', bg: '#F0FDF4', text: '#064E3B', shapes: ['#DCFCE7', '#BBF7D0'] },
   marketing: { primary: '#EC4899', secondary: '#DB2777', accent: '#F472B6', bg: '#FDF2F8', text: '#831843', shapes: ['#FCE7F3', '#FBCFE8'] },
   minimal: { primary: '#18181B', secondary: '#3F3F46', accent: '#A1A1AA', bg: '#FFFFFF', text: '#18181B', shapes: ['#F4F4F5', '#E4E4E7'] },
   dark: { primary: '#FFFFFF', secondary: '#94A3B8', accent: '#3B82F6', bg: '#0F172A', text: '#F8FAFC', shapes: ['#1E293B', '#334155'] },
-  academic: { primary: '#4338CA', secondary: '#6366F1', accent: '#818CF8', bg: '#EEF2FF', text: '#312E81', shapes: ['#E0E7FF', '#C7D2FE'] }
+  academic: { primary: '#4338CA', secondary: '#6366F1', accent: '#818CF8', bg: '#EEF2FF', text: '#312E81', shapes: ['#E0E7FF', '#C7D2FE'] },
+  creative: { primary: '#F97316', secondary: '#FB923C', accent: '#FDBA74', bg: '#FFF7ED', text: '#7C2D12', shapes: ['#FFEDD5', '#FED7AA'] }
 };
 
 const ICONS = ['Briefcase', 'TrendingUp', 'Target', 'Users', 'Zap', 'Shield', 'Globe', 'Cpu', 'Layers', 'PieChart'];
