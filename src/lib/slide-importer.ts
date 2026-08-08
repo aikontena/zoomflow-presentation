@@ -1,6 +1,4 @@
 import { CanvasObject, Bookmark } from './canvas-store';
-// @ts-ignore
-import pptx2json from 'pptx2json';
 import * as pdfjs from 'pdfjs-dist';
 // @ts-ignore
 import jszip from 'jszip';
