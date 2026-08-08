@@ -11,6 +11,37 @@ import { useViewportController } from './ViewportController';
 // Memoized individual object renderer
 export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObject, selection: string[] }) => {
   const isSelected = selection.includes(obj.id);
+  
+  const getFilter = () => {
+    if (obj.type !== 'image' && obj.type !== 'video') return undefined;
+    const brightness = obj.brightness ?? 1;
+    const contrast = obj.contrast ?? 1;
+    const saturation = obj.saturation ?? 1;
+    const blur = obj.blur ?? 0;
+    return `brightness(${brightness}) contrast(${contrast}) saturate(${saturation}) blur(${blur}px)`;
+  };
+
+  const getTextStyle = (): React.CSSProperties => {
+    if (obj.type !== 'text') return {};
+    return {
+      fontFamily: obj.fontFamily || 'Inter',
+      fontWeight: obj.fontWeight || 'normal',
+      fontStyle: obj.fontStyle || 'normal',
+      textDecoration: obj.textDecoration || 'none',
+      textAlign: obj.textAlign || 'left',
+      letterSpacing: `${obj.letterSpacing || 0}px`,
+      lineHeight: obj.lineHeight || 1.2,
+      backgroundColor: obj.highlight || 'transparent',
+      whiteSpace: 'pre-wrap',
+      wordBreak: 'break-word',
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      alignItems: obj.textAlign === 'center' ? 'center' : 'flex-start',
+      justifyContent: obj.textAlign === 'center' ? 'center' : (obj.textAlign === 'right' ? 'flex-end' : 'flex-start'),
+    };
+  };
+
   return (
     <div
       style={{
@@ -20,10 +51,10 @@ export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObj
         width: obj.width,
         height: obj.height,
         transform: `translate3d(0, 0, 0) rotate(${obj.rotation || 0}deg)`,
-        backgroundColor: (obj.type !== 'text' && obj.type !== 'frame' && obj.type !== 'icon') ? obj.fill : 'transparent',
+        backgroundColor: (obj.type !== 'text' && obj.type !== 'frame' && obj.type !== 'icon' && obj.type !== 'video') ? obj.fill : 'transparent',
         background: obj.type === 'frame' ? obj.fill : undefined,
-        border: obj.type === 'frame' ? '1px solid rgba(0,0,0,0.1)' : 'none',
-        borderRadius: obj.type === 'circle' ? '50%' : '0',
+        border: obj.type === 'frame' ? '1px solid rgba(0,0,0,0.1)' : (obj.strokeWidth ? `${obj.strokeWidth}px solid ${obj.stroke || 'black'}` : 'none'),
+        borderRadius: obj.type === 'circle' ? '50%' : `${obj.borderRadius || 0}px`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -31,10 +62,11 @@ export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObj
         fontSize: obj.fontSize || (obj.type === 'frame' ? 12 : 16),
         pointerEvents: obj.locked ? 'none' : 'auto',
         userSelect: 'none',
-        filter: obj.shadow ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.25))' : undefined,
+        filter: obj.shadow ? `drop-shadow(${obj.shadowOffsetX || 0}px ${obj.shadowOffsetY || 4}px ${obj.shadowBlur || 6}px ${obj.shadowColor || 'rgba(0,0,0,0.25)'})` : undefined,
         boxShadow: isSelected ? '0 0 0 2px #3b82f6' : (obj.type === 'frame' ? '0 4px 6px -1px rgb(0 0 0 / 0.1)' : 'none'),
         zIndex: obj.type === 'frame' ? 0 : 1,
         opacity: obj.opacity ?? 1,
+        overflow: 'hidden',
       }}>
 
       {obj.type === 'frame' && (
@@ -42,19 +74,47 @@ export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObj
           {obj.text || 'Frame Title'}
         </div>
       )}
-      {obj.type === 'text' && obj.text}
+      {obj.type === 'text' && (
+        <div style={getTextStyle()}>
+          {obj.text}
+        </div>
+      )}
       {obj.type === 'image' && obj.src && (
         <img 
           src={obj.src} 
           style={{ 
             width: '100%', 
             height: '100%', 
-            objectFit: 'contain',
+            objectFit: obj.objectFit || 'contain',
             pointerEvents: 'none',
-            userSelect: 'none'
+            userSelect: 'none',
+            filter: getFilter()
           }} 
           draggable={false}
         />
+      )}
+      {obj.type === 'video' && obj.src && (
+        <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+          {obj.videoType === 'youtube' || obj.src.includes('youtube.com') || obj.src.includes('youtu.be') ? (
+            <iframe
+              width="100%"
+              height="100%"
+              src={`https://www.youtube.com/embed/${obj.src.split('v=')[1]?.split('&')[0] || obj.src.split('/').pop()}?autoplay=${obj.autoplay ? 1 : 0}&loop=${obj.loop ? 1 : 0}&mute=${obj.muted ? 1 : 0}`}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          ) : (
+            <video
+              src={obj.src}
+              poster={obj.poster}
+              autoPlay={obj.autoplay}
+              loop={obj.loop}
+              muted={obj.muted}
+              style={{ width: '100%', height: '100%', objectFit: obj.objectFit || 'contain', filter: getFilter() }}
+            />
+          )}
+        </div>
       )}
       {obj.type === 'icon' && obj.iconName && (
         <IconRenderer
@@ -65,13 +125,27 @@ export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObj
         />
       )}
 
+      {(obj.type === 'audio' || obj.type === 'pdf' || obj.type === 'qr' || obj.type === 'chart' || obj.type === 'table' || obj.type === 'equation') && (
+        <div className="flex flex-col items-center justify-center gap-2 p-4 text-center">
+          <div className="text-4xl">
+            {obj.type === 'audio' ? '🎵' : obj.type === 'pdf' ? '📄' : obj.type === 'qr' ? '📱' : obj.type === 'chart' ? '📊' : obj.type === 'table' ? '📋' : 'Σ'}
+          </div>
+          <div className="text-[10px] font-bold uppercase truncate max-w-full">
+            {obj.text || obj.type}
+          </div>
+          {obj.type === 'audio' && obj.src && (
+            <audio src={obj.src} controls className="h-6 w-full max-w-[200px]" />
+          )}
+        </div>
+      )}
+
       {isSelected && (
         <>
           <div className="absolute -top-1 -left-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
           <div className="absolute -top-1 -right-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
           <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
           <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
-          <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border border-blue-500 rounded-full flex items-center justify-center">
+          <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border border-blue-500 rounded-full flex items-center justify-center cursor-ns-resize">
             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
           </div>
         </>
@@ -79,7 +153,6 @@ export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObj
     </div>
   );
 }, (prev, next) => {
-  // Only re-render if object data changed or its selection status changed
   return prev.obj === next.obj && 
          (prev.selection.includes(prev.obj.id) === next.selection.includes(next.obj.id));
 });
@@ -284,10 +357,42 @@ export default function Canvas() {
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    
+    // Check for files first
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const files = Array.from(e.dataTransfer.files);
+      const pos = getPointerPos(e as any);
+      
+      files.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const src = event.target?.result as string;
+          const type = file.type.startsWith('video/') ? 'video' : 
+                       file.type.startsWith('audio/') ? 'audio' :
+                       file.type === 'application/pdf' ? 'pdf' : 'image';
+          
+          const id = addObject({
+            type: type as any,
+            x: Math.round(pos.x - 100 + (index * 20)),
+            y: Math.round(pos.y - 100 + (index * 20)),
+            width: type === 'image' ? 300 : type === 'video' ? 480 : 200,
+            height: type === 'image' ? 200 : type === 'video' ? 270 : 50,
+            rotation: 0,
+            fill: type === 'image' || type === 'video' ? 'transparent' : '#3b82f6',
+            src,
+            text: type === 'audio' ? file.name : undefined
+          });
+          if (typeof id === 'string') setSelection([id]);
+        };
+        reader.readAsDataURL(file);
+      });
+      return;
+    }
+
     const iconName = e.dataTransfer.getData('iconName') || e.dataTransfer.getData('text/plain');
     if (!iconName) return;
     if (!getIconMeta(iconName)) {
-      toast.error('Unknown icon');
+      // It might be just text if not an icon name
       return;
     }
     const pos = getPointerPos(e as any);

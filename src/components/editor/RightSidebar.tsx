@@ -1,5 +1,5 @@
 import React from 'react';
-import { useCanvasStore } from '@/lib/canvas-store';
+import { useCanvasStore, CanvasObject, FrameSettings } from '@/lib/canvas-store';
 import { 
   Move, 
   Maximize, 
@@ -18,6 +18,7 @@ import {
 import { IconRenderer } from './IconRenderer';
 import { IconProperties } from './icons/IconProperties';
 import { toast } from 'sonner';
+import { TextProperties, MediaProperties, ShapeProperties } from './properties/ObjectProperties';
 
 export default function RightSidebar() {
   const { objects, selection, updateObject, presentationSettings, updatePresentationSettings } = useCanvasStore();
@@ -28,6 +29,13 @@ export default function RightSidebar() {
       updateObject(selectedObject.id, { [key]: value });
     }
   };
+
+  const ensureFrameSettings = (settings: Partial<FrameSettings> = {}): FrameSettings => ({
+    duration: settings.duration ?? 1200,
+    easing: settings.easing ?? 'smooth',
+    camera: settings.camera ?? { x: 0, y: 0, zoom: 1, rotation: 0 },
+    ...settings
+  });
 
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="py-4 border-b border-neutral-100 last:border-0">
@@ -64,7 +72,7 @@ export default function RightSidebar() {
                 <div className="flex items-center gap-2">
                   <input 
                     type="range" 
-                    min="100" max="2000" step="100"
+                    min="100" max="2500" step="100"
                     value={presentationSettings.transitionDuration}
                     onChange={(e) => updatePresentationSettings({ transitionDuration: parseInt(e.target.value) })}
                     className="flex-1 accent-primary" 
@@ -263,89 +271,71 @@ export default function RightSidebar() {
           </InputRow>
         </Section>
 
-        <Section title="Style">
-          <InputRow label="Fill">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-neutral-400 uppercase font-mono">{selectedObject.fill}</span>
-              <input 
-                type="color" 
-                value={selectedObject.fill}
-                onChange={(e) => handleChange('fill', e.target.value)}
-                className="w-6 h-6 rounded border-none cursor-pointer"
-              />
-            </div>
-          </InputRow>
-          <InputRow label="Opacity">
-            <input 
-              type="range" 
-              min="0" max="1" step="0.1"
-              value={selectedObject.opacity ?? 1}
-              onChange={(e) => handleChange('opacity', parseFloat(e.target.value))}
-              className="w-24 accent-primary"
-            />
-          </InputRow>
-        </Section>
-
         {selectedObject.type === 'frame' && (
           <>
-            <Section title="Camera & Transition">
+            <Section title="Camera Settings">
+              <button 
+                onClick={() => {
+                  const { viewport } = useCanvasStore.getState();
+                  const settings = ensureFrameSettings({ 
+                    ...(selectedObject.settings || {}), 
+                    camera: { x: viewport.x, y: viewport.y, zoom: viewport.zoom, rotation: viewport.rotation } 
+                  });
+                  updateObject(selectedObject.id, { settings });
+                  toast.success('Camera position captured');
+                }}
+                className="w-full py-2 bg-neutral-900 text-white rounded text-[11px] font-bold hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
+              >
+                <Maximize size={12} /> Capture Viewport
+              </button>
+            </Section>
+
+            <Section title="Transition Step">
               <div className="space-y-3">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-medium text-neutral-500 uppercase">Transition Duration (ms)</label>
-                  <div className="flex items-center gap-2">
-                    <input 
-                      type="number" 
-                      value={selectedObject.settings?.duration || 1200}
-                      onChange={(e) => {
-                        const settings = { ...(selectedObject.settings || {}), duration: parseInt(e.target.value) };
-                        handleChange('settings', settings);
-                      }}
-                      className="w-full bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary"
-                    />
-                  </div>
+                  <label className="text-[10px] font-medium text-neutral-500 uppercase">Duration (ms)</label>
+                  <input 
+                    type="number" 
+                    value={selectedObject.settings?.duration || 1200}
+                    onChange={(e) => {
+                      const settings = ensureFrameSettings({ 
+                        ...(selectedObject.settings || {}), 
+                        duration: parseInt(e.target.value) 
+                      });
+                      updateObject(selectedObject.id, { settings });
+                    }}
+                    className="w-full bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary"
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-medium text-neutral-500 uppercase">Easing Style</label>
+                  <label className="text-[10px] font-medium text-neutral-500 uppercase">Transition Effect</label>
                   <select 
                     value={selectedObject.settings?.easing || 'smooth'}
                     onChange={(e) => {
-                      const settings = { ...(selectedObject.settings || {}), easing: e.target.value };
-                      handleChange('settings', settings);
+                      const settings = ensureFrameSettings({ 
+                        ...(selectedObject.settings || {}), 
+                        easing: e.target.value as any 
+                      });
+                      updateObject(selectedObject.id, { settings });
                     }}
                     className="w-full bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary"
                   >
-                    <option value="smooth">Smooth</option>
-                    <option value="ease-in">Ease In</option>
-                    <option value="ease-out">Ease Out</option>
-                    <option value="ease-in-out">Ease In Out</option>
-                    <option value="cinematic">Cinematic</option>
-                    <option value="fast">Fast</option>
-                    <option value="slow">Slow</option>
+                    <option value="smooth">Smooth Morph</option>
+                    <option value="cinematic">Cinematic Zoom</option>
+                    <option value="vortex">Vortex Spin</option>
+                    <option value="origami">Origami Fold</option>
+                    <option value="fade">Cross Fade</option>
+                    <option value="bounce">Spring Bounce</option>
                   </select>
                 </div>
-
-                <button 
-                  onClick={() => {
-                    const { viewport } = useCanvasStore.getState();
-                    const settings = { 
-                      ...(selectedObject.settings || {}), 
-                      camera: { x: viewport.x, y: viewport.y, zoom: viewport.zoom, rotation: viewport.rotation } 
-                    };
-                    handleChange('settings', settings);
-                    toast.success('Camera position captured');
-                  }}
-                  className="w-full py-2 bg-neutral-100 hover:bg-neutral-200 rounded text-[11px] font-bold text-neutral-600 transition-colors"
-                >
-                  Capture Current Camera
-                </button>
               </div>
             </Section>
 
             <Section title="Speaker Notes">
               <textarea 
                 value={selectedObject.speakerNotes || ''}
-                onChange={(e) => handleChange('speakerNotes', e.target.value)}
+                onChange={(e) => updateObject(selectedObject.id, { speakerNotes: e.target.value })}
                 placeholder="Add notes for this frame..."
                 className="w-full h-32 bg-neutral-50 border border-neutral-200 rounded px-2 py-2 text-xs outline-none focus:border-primary resize-none font-medium leading-relaxed"
               />
@@ -356,18 +346,9 @@ export default function RightSidebar() {
           </>
         )}
 
-        {selectedObject.type === 'text' && (
-          <Section title="Typography">
-            <InputRow label="Font Size">
-              <input 
-                type="number" 
-                value={selectedObject.fontSize || 16}
-                onChange={(e) => handleChange('fontSize', parseInt(e.target.value))}
-                className="w-12 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary text-right"
-              />
-            </InputRow>
-          </Section>
-        )}
+        {selectedObject.type === 'text' && <TextProperties object={selectedObject} />}
+        {(selectedObject.type === 'image' || selectedObject.type === 'video') && <MediaProperties object={selectedObject} />}
+        {(selectedObject.type === 'rectangle' || selectedObject.type === 'circle') && <ShapeProperties object={selectedObject} />}
 
         {selectedObject.type === 'icon' && (
           <Section title="Icon Settings">
