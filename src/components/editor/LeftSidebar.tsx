@@ -119,13 +119,11 @@ export default function LeftSidebar() {
                         <div key={frameId} className="group relative flex flex-col gap-2">
                           <div 
                             onClick={() => setSelection([frameId])}
-                            className={`aspect-video bg-neutral-100 rounded-lg border-2 overflow-hidden relative transition-all cursor-pointer shadow-sm ${
+                            className={`aspect-video rounded-lg border-2 overflow-hidden relative transition-all cursor-pointer shadow-sm ${
                               selection.includes(frameId) ? 'border-primary' : 'border-neutral-200 hover:border-neutral-300'
                             }`}
                           >
-                            <div className="absolute inset-0 flex items-center justify-center text-neutral-300">
-                              <span className="text-2xl font-thin">□</span>
-                            </div>
+                            <FramePreview frame={frame} allObjects={objects} />
                             <div className="absolute bottom-0 inset-x-0 bg-white/90 backdrop-blur-sm p-2 text-[10px] font-medium border-t border-neutral-100 flex justify-between items-center">
                               <span className="truncate max-w-[180px]">{frame.text || `Frame ${index + 1}`}</span>
                               <span className="text-neutral-400 font-mono">#{index + 1}</span>
