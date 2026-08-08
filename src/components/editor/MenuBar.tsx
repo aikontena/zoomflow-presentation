@@ -39,7 +39,8 @@ export default function MenuBar() {
     bringForward,
     sendBackward,
     setViewport,
-    viewport
+    viewport,
+    updateObject
   } = useCanvasStore();
 
   useEffect(() => {
