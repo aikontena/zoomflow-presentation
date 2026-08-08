@@ -52,6 +52,7 @@ export const CanvasObjectItem = React.memo(({
       letterSpacing: `${obj.letterSpacing || 0}px`,
       lineHeight: obj.lineHeight || 1.2,
       backgroundColor: obj.highlight || 'transparent',
+      textTransform: (obj as any).textTransform || 'none',
       whiteSpace: 'pre-wrap',
       wordBreak: 'break-word',
       width: '100%',
