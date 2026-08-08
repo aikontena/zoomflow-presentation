@@ -20,7 +20,7 @@ export interface FrameSettings {
 
 export interface CanvasObject {
   id: string;
-  type: "rectangle" | "circle" | "text" | "image" | "frame" | "icon";
+  type: "rectangle" | "circle" | "text" | "image" | "frame" | "icon" | "video" | "audio" | "chart" | "table" | "pdf" | "qr" | "equation";
   x: number;
   y: number;
   width: number;
@@ -30,16 +30,61 @@ export interface CanvasObject {
   stroke?: string;
   strokeWidth?: number;
   text?: string;
+  
+  // Typography
+  fontFamily?: string;
   fontSize?: number;
+  fontWeight?: "normal" | "bold";
+  fontStyle?: "normal" | "italic";
+  textDecoration?: "none" | "underline" | "line-through";
+  textAlign?: "left" | "center" | "right" | "justify";
+  letterSpacing?: number;
+  lineHeight?: number;
+  highlight?: string;
+  
+  // Image & Video
   src?: string;
+  objectFit?: "contain" | "cover" | "fill";
+  borderRadius?: number;
+  
+  // Filters
+  brightness?: number;
+  contrast?: number;
+  saturation?: number;
+  blur?: number;
+  
+  // Video specific
+  videoType?: "upload" | "youtube" | "vimeo";
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  poster?: string;
+  startTime?: number;
+  endTime?: number;
+  
+  // Common
   iconName?: string;
   opacity?: number;
   locked?: boolean;
   shadow?: boolean;
   parentId?: string;
   speakerNotes?: string;
+  
   // Frame-specific settings
   settings?: FrameSettings;
+  
+  // Charts & Tables
+  data?: any;
+  columns?: any;
+  
+  // Effects
+  shadowColor?: string;
+  shadowBlur?: number;
+  shadowOffsetX?: number;
+  shadowOffsetY?: number;
+  
+  // Animation
+  animation?: "none" | "fade" | "slide" | "zoom" | "spin";
 }
 
 export interface PresentationSettings {
