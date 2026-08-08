@@ -52,8 +52,29 @@ export default function LeftSidebar() {
     setSelection,
     addObject,
     loadTemplate,
-    setViewport
+    setViewport,
+    viewport
   } = useCanvasStore();
+
+  const { zoomToFrame } = useViewportController();
+
+  const handleAddStep = () => {
+    addObject({
+      type: 'frame',
+      x: (window.innerWidth / 2 - viewport.x) / viewport.zoom - 400,
+      y: (window.innerHeight / 2 - viewport.y) / viewport.zoom - 225,
+      width: 800,
+      height: 450,
+      rotation: viewport.rotation || 0,
+      fill: '#ffffff',
+      text: `Step ${presentationPath.length + 1}`,
+      settings: {
+        duration: 1200,
+        easing: 'smooth',
+        camera: { ...viewport }
+      }
+    });
+  };
 
 
   const [activeTab, setActiveTab] = useState<string | null>(null);
@@ -192,11 +213,41 @@ export default function LeftSidebar() {
                   )}
                 </div>
                 <button 
+                  onClick={handleAddStep}
+                  className="w-full py-2 border-2 border-dashed border-neutral-200 rounded-lg hover:border-neutral-300 hover:bg-neutral-50 transition-colors text-neutral-400 font-medium"
+                >
+                  + Add New Step
+                </button>
+              </div>
+            )}
+            {activeTab === 'pages' && (
+              <div className="space-y-4">
+                <p className="text-xs text-neutral-400">Manage your frames as static pages.</p>
+                <div className="flex flex-col gap-4">
+                  {objects.filter(o => o.type === 'frame').map((frame, index) => (
+                    <div 
+                      key={frame.id}
+                      onClick={() => {
+                        setSelection([frame.id]);
+                        zoomToFrame(frame.id);
+                      }}
+                      className={`aspect-video rounded-lg border-2 overflow-hidden relative transition-all cursor-pointer shadow-sm ${
+                        selection.includes(frame.id) ? 'border-primary ring-2 ring-primary/20' : 'border-neutral-200 hover:border-neutral-300'
+                      }`}
+                    >
+                      <FramePreview frame={frame} allObjects={objects} />
+                      <div className="absolute bottom-0 inset-x-0 bg-white/90 backdrop-blur-sm p-2 text-[10px] font-medium border-t border-neutral-100">
+                        {frame.text || `Frame ${index + 1}`}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button 
                   onClick={() => {
                     addObject({
                       type: 'frame',
-                      x: 100,
-                      y: 100,
+                      x: (window.innerWidth / 2 - useCanvasStore.getState().viewport.x) / useCanvasStore.getState().viewport.zoom - 400,
+                      y: (window.innerHeight / 2 - useCanvasStore.getState().viewport.y) / useCanvasStore.getState().viewport.zoom - 225,
                       width: 800,
                       height: 450,
                       rotation: 0,

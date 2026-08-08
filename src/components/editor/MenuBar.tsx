@@ -148,9 +148,9 @@ export default function MenuBar() {
       items: [
         { label: 'Start Presentation', shortcut: 'F5', action: () => startPresentation() },
         { label: 'Presenter Mode', action: () => startPresentation() },
-        { label: 'Presentation Settings', comingSoon: true },
-        { label: 'Transition Settings', comingSoon: true },
-        { label: 'Presentation Path', comingSoon: true },
+        { label: 'Presentation Settings', action: () => setActiveOverlay('settings') },
+        { label: 'Transition Settings', action: () => setActiveOverlay('settings') },
+        { label: 'Presentation Path', action: () => { /* Sidebar handles this via tab change logic if we had access, otherwise just open settings */ setActiveOverlay('settings'); } },
         { 
           label: 'Presentation Type', 
           submenu: [
