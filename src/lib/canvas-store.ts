@@ -339,7 +339,7 @@ export const useCanvasStore = create<CanvasStore>()(
           selection: [],
           viewport: { x: 100, y: 100, zoom: 0.8 },
           history: { 
-            past: [...state.history.past, state.objects].slice(-50), 
+            past: [state.objects, ...state.history.past].slice(0, 50), 
             future: [] 
           },
           activeOverlay: null,
@@ -353,9 +353,9 @@ export const useCanvasStore = create<CanvasStore>()(
         objects: state.objects, 
         viewport: state.viewport,
         presentationPath: state.presentationPath,
-        presentationSettings: state.presentationSettings
+        presentationSettings: state.presentationSettings,
+        lastSaved: state.lastSaved
       }),
-
     }
   )
 );
