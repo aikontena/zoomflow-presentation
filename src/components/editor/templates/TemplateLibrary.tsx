@@ -1,4 +1,7 @@
 import React, { useState, useMemo } from 'react';
+import type { Template } from '@/lib/templates';
+import { TEMPLATES } from '@/lib/templates';
+import type { CanvasObject } from '@/lib/canvas-store';
 import { 
   Search, 
   Grid, 
