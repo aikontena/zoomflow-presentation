@@ -83,18 +83,36 @@ export function PresentationPathPanel() {
         </h3>
         <div className="flex items-center gap-1">
           <button 
+            onClick={() => randomizeTransitions()}
+            className="p-1.5 hover:bg-neutral-100 text-neutral-600 rounded-md transition-colors"
+            title="Randomize All Transitions"
+          >
+            <Dices size={16} />
+          </button>
+          <button 
+            onClick={() => {
+              const { objects, presentationPath, updateObject } = useCanvasStore.getState();
+              presentationPath.forEach(id => {
+                const obj = objects.find(o => o.id === id);
+                if (obj && obj.type === 'frame') {
+                  updateObject(id, { 
+                    settings: { ...obj.settings!, easing: 'morph' } 
+                  });
+                }
+              });
+              import('sonner').then(({ toast }) => toast.success("Applied Morph to all steps! ✨"));
+            }}
+            className="p-1.5 hover:bg-neutral-100 text-neutral-600 rounded-md transition-colors"
+            title="Apply Morph to All"
+          >
+            <MonitorPlay size={16} className="rotate-90" />
+          </button>
+          <button 
             onClick={() => startPresentation()}
             className="p-1.5 hover:bg-primary/10 text-primary rounded-md transition-colors"
             title="Present All"
           >
             <Play size={16} fill="currentColor" />
-          </button>
-          <button 
-            onClick={() => randomizeTransitions()}
-            className="p-1.5 hover:bg-neutral-100 text-neutral-600 rounded-md transition-colors"
-            title="Randomize Transitions"
-          >
-            <Dices size={16} />
           </button>
           <button 
             onClick={handleAddStep}
