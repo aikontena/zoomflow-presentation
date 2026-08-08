@@ -290,57 +290,56 @@ export default function RightSidebar() {
 
         {selectedObject.type === 'frame' && (
           <>
-            <Section title="Camera & Transition">
+            <Section title="Camera Settings">
+              <button 
+                onClick={() => {
+                  const { viewport } = useCanvasStore.getState();
+                  const settings = { 
+                    ...(selectedObject.settings || {}), 
+                    camera: { x: viewport.x, y: viewport.y, zoom: viewport.zoom, rotation: viewport.rotation } 
+                  };
+                  updateObject(selectedObject.id, { settings });
+                  toast.success('Camera position captured');
+                }}
+                className="w-full py-2 bg-neutral-900 text-white rounded text-[11px] font-bold hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
+              >
+                <Maximize size={12} /> Capture Viewport
+              </button>
+            </Section>
+
+            <Section title="Transition Step">
               <div className="space-y-3">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-medium text-neutral-500 uppercase">Transition Duration (ms)</label>
-                  <div className="flex items-center gap-2">
-                    <input 
-                      type="number" 
-                      value={selectedObject.settings?.duration || 1200}
-                      onChange={(e) => {
-                        const settings = { ...(selectedObject.settings || {}), duration: parseInt(e.target.value) };
-                        handleChange('settings', settings);
-                      }}
-                      className="w-full bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary"
-                    />
-                  </div>
+                  <label className="text-[10px] font-medium text-neutral-500 uppercase">Duration (ms)</label>
+                  <input 
+                    type="number" 
+                    value={selectedObject.settings?.duration || 1200}
+                    onChange={(e) => {
+                      const settings = { ...(selectedObject.settings || {}), duration: parseInt(e.target.value) };
+                      updateObject(selectedObject.id, { settings });
+                    }}
+                    className="w-full bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary"
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-medium text-neutral-500 uppercase">Easing Style</label>
+                  <label className="text-[10px] font-medium text-neutral-500 uppercase">Transition Effect</label>
                   <select 
                     value={selectedObject.settings?.easing || 'smooth'}
                     onChange={(e) => {
-                      const settings = { ...(selectedObject.settings || {}), easing: e.target.value };
-                      handleChange('settings', settings);
+                      const settings = { ...(selectedObject.settings || {}), easing: e.target.value as any };
+                      updateObject(selectedObject.id, { settings });
                     }}
                     className="w-full bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary"
                   >
-                    <option value="smooth">Smooth</option>
-                    <option value="ease-in">Ease In</option>
-                    <option value="ease-out">Ease Out</option>
-                    <option value="ease-in-out">Ease In Out</option>
-                    <option value="cinematic">Cinematic</option>
-                    <option value="fast">Fast</option>
-                    <option value="slow">Slow</option>
+                    <option value="smooth">Smooth Morph</option>
+                    <option value="cinematic">Cinematic Zoom</option>
+                    <option value="vortex">Vortex Spin</option>
+                    <option value="origami">Origami Fold</option>
+                    <option value="fade">Cross Fade</option>
+                    <option value="bounce">Spring Bounce</option>
                   </select>
                 </div>
-
-                <button 
-                  onClick={() => {
-                    const { viewport } = useCanvasStore.getState();
-                    const settings = { 
-                      ...(selectedObject.settings || {}), 
-                      camera: { x: viewport.x, y: viewport.y, zoom: viewport.zoom, rotation: viewport.rotation } 
-                    };
-                    handleChange('settings', settings);
-                    toast.success('Camera position captured');
-                  }}
-                  className="w-full py-2 bg-neutral-100 hover:bg-neutral-200 rounded text-[11px] font-bold text-neutral-600 transition-colors"
-                >
-                  Capture Current Camera
-                </button>
               </div>
             </Section>
 
