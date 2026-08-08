@@ -311,7 +311,7 @@ export default function Canvas() {
   return (
     <div className={`relative h-full w-full overflow-hidden outline-none flex flex-col`} 
          style={{ 
-           backgroundColor: useCanvasStore.getState().presentationSettings.backgroundColor || '#f8f9fa',
+           backgroundColor: viewport.zoom < 0.2 ? (useCanvasStore.getState().presentationSettings.backgroundColor || '#f8f9fa') : (useCanvasStore.getState().presentationSettings.backgroundColor || '#f8f9fa'),
            backgroundImage: useCanvasStore.getState().presentationSettings.backgroundImage ? `url(${useCanvasStore.getState().presentationSettings.backgroundImage})` : 'none',
            backgroundSize: 'cover',
            backgroundPosition: 'center',
