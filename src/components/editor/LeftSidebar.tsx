@@ -175,9 +175,19 @@ export default function LeftSidebar() {
               <div className="space-y-4">
                 <p className="text-xs text-neutral-400">Choose a professional template to start your presentation.</p>
                 <div className="grid grid-cols-2 gap-2">
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="aspect-video bg-neutral-100 rounded-md border border-neutral-200 hover:border-primary cursor-pointer transition-colors overflow-hidden">
-                      <img src={`https://picsum.photos/seed/${i + 50}/200/120`} className="w-full h-full object-cover" />
+                  {TEMPLATES.slice(0, 4).map((t, i) => (
+                    <div 
+                      key={t.id} 
+                      onClick={() => {
+                        loadTemplate(JSON.parse(JSON.stringify(t.objects)));
+                        toast.success(`Loaded ${t.name}`);
+                      }}
+                      className="aspect-video bg-neutral-100 rounded-md border border-neutral-200 hover:border-primary cursor-pointer transition-colors overflow-hidden group relative"
+                    >
+                      <img src={t.thumbnail} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                        <Plus size={20} className="text-white" />
+                      </div>
                     </div>
                   ))}
                 </div>
