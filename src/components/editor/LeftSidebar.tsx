@@ -12,10 +12,14 @@ import {
   Redo2,
   Settings,
   Clock,
-  History
+  History,
+  Plus
 } from 'lucide-react';
 import { IconLibrary } from './IconLibrary';
 import { useCanvasStore } from '@/lib/canvas-store';
+import { TEMPLATES } from '@/lib/templates';
+import { toast } from 'sonner';
+
 
 const TABS = [
   { id: 'pages', label: 'Pages', icon: FileText },
@@ -40,8 +44,10 @@ export default function LeftSidebar() {
     objects,
     selection,
     setSelection,
-    addObject
+    addObject,
+    loadTemplate
   } = useCanvasStore();
+
 
   const [activeTab, setActiveTab] = useState<string | null>(null);
   
