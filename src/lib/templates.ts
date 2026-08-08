@@ -215,7 +215,7 @@ const createProfessionalFrame = (
   return objects;
 };
 
-const generateTemplate = (id: string, name: string, category: string, colorKey: keyof typeof COLORS): Template => {
+export const generateTemplate = (id: string, name: string, category: string, colorKey: keyof typeof COLORS): Template => {
   const colors = COLORS[colorKey];
   const objects: any[] = [];
   const spacing = 1200;
@@ -230,7 +230,7 @@ const generateTemplate = (id: string, name: string, category: string, colorKey: 
   ];
 
   sections.forEach((sec, i) => {
-    // Spiral or grid layout for zoom-out effects
+    // Spiral layout for spatial effect
     const x = Math.cos(i * 0.8) * i * spacing;
     const y = Math.sin(i * 0.8) * i * spacing;
     objects.push(...createProfessionalFrame(id, i, sec.title, sec.content, sec.type, colors, x, y));
@@ -246,7 +246,7 @@ const generateTemplate = (id: string, name: string, category: string, colorKey: 
     difficulty: 'Intermediate',
     popularity: 900 + Math.floor(Math.random() * 100),
     tags: [category.toLowerCase(), 'professional', 'high-quality', 'presentation-ready'],
-    thumbnail: `https://picsum.photos/seed/${id}/800/450`,
+    thumbnail: '', // Thumbnail is now generated dynamically in the UI
     objects
   };
 };

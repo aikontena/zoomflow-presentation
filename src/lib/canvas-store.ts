@@ -322,9 +322,15 @@ export const useCanvasStore = create<CanvasStore>()(
       },
 
       loadTemplate: (template) => {
+        console.log("[Store] loadTemplate triggered for:", template.id);
         import('./template-loader').then(({ TemplateLoader }) => {
+          // Pass the specific template object directly
           TemplateLoader.load(template).then(doc => {
+            console.log("[Store] Template processed, loading doc with", doc.objects.length, "objects");
             get().loadDocument(doc);
+          }).catch(err => {
+            console.error("[Store] Template loading failed:", err);
+            toast.error("Failed to load template");
           });
         });
       },
