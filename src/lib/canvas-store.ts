@@ -304,12 +304,24 @@ export const useCanvasStore = create<CanvasStore>()(
       clear: () => set({ objects: [], selection: [], history: { past: [], future: [] }, lastSaved: null }),
       save: () => set({ lastSaved: Date.now() }),
       setActiveOverlay: (activeOverlay) => set({ activeOverlay }),
-      loadTemplate: (objects) => set((state) => ({
-        objects,
-        selection: [],
-        history: { past: [...state.history.past, state.objects].slice(-50), future: [] },
-        activeOverlay: null
-      })),
+      loadTemplate: (objects) => {
+        const objectsWithIds = objects.map(obj => ({
+          ...obj,
+          id: obj.id || Math.random().toString(36).substring(7)
+        }));
+        
+        const presentationPath = objectsWithIds
+          .filter(o => o.type === 'frame')
+          .map(o => o.id);
+
+        set((state) => ({
+          objects: objectsWithIds,
+          presentationPath,
+          selection: [],
+          history: { past: [...state.history.past, state.objects].slice(-50), future: [] },
+          activeOverlay: null
+        }));
+      },
     }),
     {
       name: "zoomcanvas-v4-storage",

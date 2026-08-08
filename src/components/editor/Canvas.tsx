@@ -260,10 +260,10 @@ export default function Canvas() {
                   justifyContent: 'center',
                   color: obj.fill || 'black',
                   fontSize: obj.fontSize || (obj.type === 'frame' ? 12 : 16),
-                  pointerEvents: 'none',
+                  pointerEvents: 'auto',
                   userSelect: 'none',
                   boxShadow: isSelected ? '0 0 0 2px #3b82f6' : (obj.type === 'frame' ? '0 4px 6px -1px rgb(0 0 0 / 0.1)' : 'none'),
-                  zIndex: obj.type === 'frame' ? -1 : 0,
+                  zIndex: obj.type === 'frame' ? -1 : 1,
                   opacity: obj.opacity ?? 1,
                 }}>
                 {obj.type === 'frame' && (
