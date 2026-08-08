@@ -101,7 +101,7 @@ function categorize(id: string): IconCategory {
   for (const [category, keywords] of CATEGORY_RULES) {
     if (keywords.some((k) => id.includes(k))) {
       // "Transport" is not part of the requested list -> fold into Travel
-      return (category as string) === "Transport" ? "Travel" : category;
+      return category === "Transport" ? "Travel" : (category as IconCategory);
     }
   }
   return "General";
