@@ -1,25 +1,19 @@
 import React, { useState, useMemo } from 'react';
-import type { Template } from '@/lib/templates';
-import { TEMPLATES } from '@/lib/templates';
-import type { CanvasObject } from '@/lib/canvas-store';
 import { 
   Search, 
   Grid, 
   List, 
   Filter, 
   Star, 
-  ExternalLink, 
-  Plus, 
-  MoreVertical,
-  Clock,
-  Layers,
   ArrowRight,
   TrendingUp,
   Layout,
   Sparkles,
-  X
+  Clock,
+  Layers
 } from 'lucide-react';
-import { TEMPLATES, Template } from '@/lib/templates';
+import { TEMPLATES } from '@/lib/templates';
+import type { Template } from '@/lib/templates';
 import { DynamicTemplateThumbnail } from './DynamicTemplateThumbnail';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,6 +27,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import { useCanvasStore } from '@/lib/canvas-store';
+import { toast } from 'sonner';
 import { toast } from 'sonner';
 
 interface TemplateCardProps {
