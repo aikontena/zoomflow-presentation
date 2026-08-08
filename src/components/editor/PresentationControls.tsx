@@ -67,9 +67,11 @@ export default function PresentationControls({
   return (
     <div className={`rounded-2xl border backdrop-blur-xl shadow-2xl ${bgClass} ${borderClass}`}>
       {/* Progress */}
-      <div className={`h-1 rounded-t-2xl overflow-hidden ${dark ? 'bg-white/10' : 'bg-black/5'}`}>
-        <div className="h-full bg-primary transition-all duration-500 ease-out" style={{ width: `${progress}%` }} />
-      </div>
+      {presentationSettings.showProgressBar && (
+        <div className={`h-1 rounded-t-2xl overflow-hidden ${dark ? 'bg-white/10' : 'bg-black/5'}`}>
+          <div className="h-full bg-primary transition-all duration-500 ease-out" style={{ width: `${progress}%` }} />
+        </div>
+      )}
 
       <div className="flex items-center gap-1 p-1.5">
         <div className="flex items-center px-2 mr-1">
