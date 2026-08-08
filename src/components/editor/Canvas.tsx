@@ -43,6 +43,19 @@ export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObj
         </div>
       )}
       {obj.type === 'text' && obj.text}
+      {obj.type === 'image' && obj.src && (
+        <img 
+          src={obj.src} 
+          style={{ 
+            width: '100%', 
+            height: '100%', 
+            objectFit: 'contain',
+            pointerEvents: 'none',
+            userSelect: 'none'
+          }} 
+          draggable={false}
+        />
+      )}
       {obj.type === 'icon' && obj.iconName && (
         <IconRenderer
           name={obj.iconName}
