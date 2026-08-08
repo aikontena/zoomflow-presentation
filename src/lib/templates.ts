@@ -46,29 +46,40 @@ export const TEMPLATES: Template[] = Array.from({ length: 40 }).map((_, i) => {
     thumbnail: `https://picsum.photos/seed/${i + 100}/800/450`,
     objects: [
       {
-        id: Math.random().toString(36).substring(7),
+        id: `f-${i}-1`,
+        type: 'frame',
+        x: 0,
+        y: 0,
+        width: 800,
+        height: 450,
+        rotation: 0,
+        fill: '#ffffff',
+        text: 'Title Slide'
+      },
+      {
+        id: `t-${i}-1`,
         type: 'text',
-        x: 400,
-        y: 250,
+        x: 200,
+        y: 150,
         width: 400,
-        height: 60,
+        height: 80,
         rotation: 0,
         fill: '#1E293B',
         text: i === 0 ? "BUSINESS PROPOSAL" : "TEMPLATE TITLE",
         fontSize: 48,
-        parentId: 'f1'
+        parentId: `f-${i}-1`
       },
       {
-        id: Math.random().toString(36).substring(7),
+        id: `r-${i}-1`,
         type: 'rectangle',
         x: 100,
         y: 100,
         width: 600,
-        height: 400,
+        height: 250,
         rotation: 0,
         fill: '#3B82F6',
         opacity: 0.1,
-        parentId: 'f1'
+        parentId: `f-${i}-1`
       }
     ]
   };
