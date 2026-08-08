@@ -259,8 +259,13 @@ export const useCanvasStore = create<CanvasStore>()(
 
       setViewport: (viewport) => {
         const current = get().viewport;
-        if (current.x === viewport.x && current.y === viewport.y && current.zoom === viewport.zoom && current.rotation === (viewport.rotation || 0)) return;
-        set({ viewport: { ...current, ...viewport } });
+        const nextX = viewport.x ?? current.x;
+        const nextY = viewport.y ?? current.y;
+        const nextZoom = viewport.zoom ?? current.zoom;
+        const nextRotation = viewport.rotation ?? current.rotation ?? 0;
+        
+        if (current.x === nextX && current.y === nextY && current.zoom === nextZoom && current.rotation === nextRotation) return;
+        set({ viewport: { x: nextX, y: nextY, zoom: nextZoom, rotation: nextRotation } });
       },
 
       undo: () => {
