@@ -71,6 +71,9 @@ interface CanvasStore {
   duplicateObjects: (ids: string[]) => void;
   groupObjects: (ids: string[]) => void;
   ungroupObjects: (ids: string[]) => void;
+  bringForward: (ids: string[]) => void;
+  sendBackward: (ids: string[]) => void;
+
 
   lastSaved: number | null;
   clear: () => void;
