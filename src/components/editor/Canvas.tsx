@@ -296,7 +296,14 @@ export default function Canvas() {
 
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-[#f8f9fa] outline-none flex flex-col" 
+    <div className={`relative h-full w-full overflow-hidden outline-none flex flex-col`} 
+         style={{ 
+           backgroundColor: useCanvasStore.getState().presentationSettings.backgroundColor || '#f8f9fa',
+           backgroundImage: useCanvasStore.getState().presentationSettings.backgroundImage ? `url(${useCanvasStore.getState().presentationSettings.backgroundImage})` : 'none',
+           backgroundSize: 'cover',
+           backgroundPosition: 'center',
+           backgroundAttachment: 'fixed'
+         }}
          tabIndex={0}
          onKeyDown={handleKeyDown}
          onKeyUp={handleKeyUp}

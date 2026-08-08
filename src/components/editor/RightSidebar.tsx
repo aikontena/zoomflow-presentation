@@ -119,6 +119,63 @@ export default function RightSidebar() {
             </div>
           </Section>
           
+          <Section title="Project Canvas">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-medium text-neutral-500 uppercase">Canvas Background Color</label>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="color" 
+                    value={presentationSettings.backgroundColor || '#f8f9fa'}
+                    onChange={(e) => updatePresentationSettings({ backgroundColor: e.target.value })}
+                    className="w-8 h-8 rounded border-none cursor-pointer" 
+                  />
+                  <input 
+                    type="text"
+                    value={presentationSettings.backgroundColor || '#f8f9fa'}
+                    onChange={(e) => updatePresentationSettings({ backgroundColor: e.target.value })}
+                    className="flex-1 bg-neutral-50 border border-neutral-200 rounded px-2 py-1.5 text-[10px] font-mono outline-none focus:border-primary"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-medium text-neutral-500 uppercase">Background Image</label>
+                <button 
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.onchange = (e) => {
+                      const file = (e.target as HTMLInputElement).files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          const dataUrl = event.target?.result as string;
+                          updatePresentationSettings({ backgroundImage: dataUrl });
+                          toast.success('Background image updated');
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    };
+                    input.click();
+                  }}
+                  className="w-full py-2 bg-neutral-900 text-white rounded text-[11px] font-bold hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
+                >
+                  <RefreshCw size={12} /> Upload Photo
+                </button>
+                {presentationSettings.backgroundImage && (
+                  <button 
+                    onClick={() => updatePresentationSettings({ backgroundImage: undefined })}
+                    className="w-full py-2 text-red-500 hover:bg-red-50 rounded text-[10px] font-bold transition-colors"
+                  >
+                    Remove Background Photo
+                  </button>
+                )}
+              </div>
+            </div>
+          </Section>
+
           <Section title="Canvas Navigation">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
