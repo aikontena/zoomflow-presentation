@@ -576,6 +576,21 @@ export const useCanvasStore = create<CanvasStore>()(
         toast.success("AI changes applied successfully");
       },
 
+      // --- Template Logic ---
+      requestTemplate: (template) => {
+        const hasContent = get().objects.some(o => !(o.locked && (o.type === 'rectangle' || o.type === 'image') && o.width > 5000));
+        if (!hasContent) {
+          get().loadTemplate(template);
+          return;
+        }
+        set({ pendingTemplate: template });
+      },
+
+      resolveTemplateConflict: (choice) => {
+        const template = get().pendingTemplate;
+        set({ pendingTemplate: null });
+        if (!template || choice === 'keep') return;
+
         if (choice === 'duplicate' || choice === 'new') {
           try {
             const snapshot = {
