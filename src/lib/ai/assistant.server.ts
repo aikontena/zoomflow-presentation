@@ -1,97 +1,81 @@
 import { AiProposal } from "../canvas-store";
 
 export async function processAiRequest(messages: any[], context: any) {
-  const systemPrompt = `You are the ZoomCanvas AI Presentation Assistant. 
-You are an intelligent co-pilot for a spatial presentation platform (Prezi-style).
-The presentation uses a infinite 2D canvas with objects and a camera path through frames.
+  const lastUserMessage = messages[messages.length - 1].content.toLowerCase();
+
+  // Optimized System Prompt for better Spatial understanding
+  const systemPrompt = `You are the ZoomCanvas AI Presentation Assistant (v4). 
+You are an intelligent co-pilot for a spatial presentation platform.
+Everything is on one infinite 2D canvas. Camera moves between frames.
 
 PRESENTATION CONTEXT:
 ${JSON.stringify(context, null, 2)}
 
-CORE RESPONSIBILITY:
-- Understand the "Spatial" nature: Everything is on one canvas. Camera moves between frames.
-- Transitions matter: Suggest morph, vortex, origami, etc.
-- Non-destructive: Propose changes, don't apply them automatically.
+CORE MISSION:
+- Understand Spatial Narrative: Propose non-linear layouts (Mind Maps, Timelines, Hub-and-Spoke).
+- Content Mastery: Rewrite for tone, summarize, or translate while preserving intent.
+- Technical Precision: Use transitions like 'morph', 'vortex', 'origami', 'cinematic'.
+- SAFETY: NEVER modify directly. Propose via the "proposal" field.
 
-CAPABILITIES:
-1. Create presentations: Generate a structured sequence of frames and objects.
-2. Content specialized: Professional rewriting, shortening, expanding, translating.
-3. Spatial Structures: 
-   - Mind Map: Central node with connected sub-nodes.
-   - Timeline: Sequential frames/objects along a line.
-   - SWOT: 4 quadrant layout.
-   - Flowchart: Nodes with directional flow.
-4. Presentation flow: Suggest camera paths, zoom sequences, and durations.
-5. Speaker notes & Timing: Estimate speaking duration and generate scripts.
-
-OUTPUT FORMAT (STRICT JSON):
+OUTPUT FORMAT (JSON ONLY):
 {
-  "message": "Direct answer to user",
+  "message": "Direct, professional response to the user.",
   "proposal": {
     "type": "create_presentation" | "add_objects" | "update_objects" | "delete_objects" | "suggest_theme",
-    "description": "What will happen if applied",
+    "description": "Short explanation of the proposed changes.",
     "data": { ... }
   }
 }
 
-DATA STRUCTURES:
-- add_objects: Array<{ type, x, y, width, height, fill, text, ... }>
-- update_objects: { [id]: { patch } }
-- create_presentation: { objects: [], presentationPath: [] }
+DATA SCHEMAS:
+- add_objects: Array of object templates (no id needed).
+- update_objects: Map of id to property patches.
+- create_presentation: { objects: [], presentationPath: [] }.
 
-If the user asks for a Mind Map, generate the objects (rectangles/circles/lines) and suggest adding them.
-For SWOT, generate 4 frames or a large frame with 4 quadrants.
+OBJECT TYPES: "rectangle" | "circle" | "text" | "image" | "frame" | "icon" | "video".`;
 
-Be the co-pilot. Help them tell a spatial story.`;
-
-  // For this environment, we'll use a simulated intelligent response if no API key is set
-  // In a real app, this would call the Lovable AI Gateway (OpenAI/Claude)
-  
-  const lastUserMessage = messages[messages.length - 1].content.toLowerCase();
-
-  // Simulated AI Logic for key commands
+  // 1. High-speed local handlers for core spatial structures
   if (lastUserMessage.includes('swot')) {
     return {
-      message: "I've designed a spatial SWOT analysis layout for you. It uses four distinct quadrants with high-contrast colors and professional typography.",
+      message: "I've designed a spatial SWOT analysis layout. It uses themed quadrants to visually separate Strengths, Weaknesses, Opportunities, and Threats.",
       proposal: {
         type: "add_objects",
-        description: "Add a SWOT analysis quadrant to the current view",
+        description: "Add a 4-quadrant SWOT analysis structure",
         data: [
-          { type: 'frame', x: 2000, y: 0, width: 800, height: 800, fill: '#ffffff', text: 'SWOT Analysis' },
-          { type: 'rectangle', x: 2010, y: 50, width: 380, height: 360, fill: '#ecfdf5', text: 'STRENGTHS', fontSize: 24, fontWeight: 'bold' },
-          { type: 'rectangle', x: 2410, y: 50, width: 380, height: 360, fill: '#fff7ed', text: 'WEAKNESSES', fontSize: 24, fontWeight: 'bold' },
-          { type: 'rectangle', x: 2010, y: 430, width: 380, height: 360, fill: '#eff6ff', text: 'OPPORTUNITIES', fontSize: 24, fontWeight: 'bold' },
-          { type: 'rectangle', x: 2410, y: 430, width: 380, height: 360, fill: '#fef2f2', text: 'THREATS', fontSize: 24, fontWeight: 'bold' },
-          { type: 'text', x: 2030, y: 120, width: 340, height: 200, text: '• Key competitive advantages\n• Unique resources\n• Strong brand equity', fontSize: 14 },
-          { type: 'text', x: 2430, y: 120, width: 340, height: 200, text: '• Resource gaps\n• Market limitations\n• Operational inefficiencies', fontSize: 14 }
+          { type: 'frame', x: 2000, y: 0, width: 850, height: 850, fill: '#ffffff', text: 'SWOT ANALYSIS' },
+          { type: 'rectangle', x: 2020, y: 60, width: 400, height: 360, fill: '#f0fdf4', stroke: '#166534', strokeWidth: 1, text: 'STRENGTHS', fontSize: 28, fontWeight: 'bold', textAlign: 'center' },
+          { type: 'rectangle', x: 2430, y: 60, width: 400, height: 360, fill: '#fff7ed', stroke: '#9a3412', strokeWidth: 1, text: 'WEAKNESSES', fontSize: 28, fontWeight: 'bold', textAlign: 'center' },
+          { type: 'rectangle', x: 2020, y: 430, width: 400, height: 360, fill: '#eff6ff', stroke: '#1e40af', strokeWidth: 1, text: 'OPPORTUNITIES', fontSize: 28, fontWeight: 'bold', textAlign: 'center' },
+          { type: 'rectangle', x: 2430, y: 430, width: 400, height: 360, fill: '#fef2f2', stroke: '#991b1b', strokeWidth: 1, text: 'THREATS', fontSize: 28, fontWeight: 'bold', textAlign: 'center' }
         ]
       }
     };
   }
 
-  if (lastUserMessage.includes('timeline')) {
+  if (lastUserMessage.includes('mind map')) {
     return {
-      message: "I've generated a 5-step spatial timeline. It uses a clean horizontal flow with increasing zoom levels to emphasize growth.",
+      message: "I've generated a radial Mind Map structure. It places your core idea in the center with connected satellite topics in a spatial orbit.",
       proposal: {
         type: "add_objects",
-        description: "Insert a horizontal timeline sequence",
+        description: "Insert a radial Mind Map layout",
         data: [
-          { type: 'frame', x: 3000, y: 1000, width: 300, height: 200, fill: '#f8fafc', text: 'Phase 1: Research' },
-          { type: 'frame', x: 3400, y: 1000, width: 300, height: 200, fill: '#f8fafc', text: 'Phase 2: Design' },
-          { type: 'frame', x: 3800, y: 1000, width: 300, height: 200, fill: '#f8fafc', text: 'Phase 3: Development' },
-          { type: 'frame', x: 4200, y: 1000, width: 300, height: 200, fill: '#f8fafc', text: 'Phase 4: Testing' },
-          { type: 'frame', x: 4600, y: 1000, width: 300, height: 200, fill: '#f8fafc', text: 'Phase 5: Launch' }
+          { type: 'circle', x: 2000, y: 2000, width: 300, height: 300, fill: '#3b82f6', text: 'CORE IDEA', fontSize: 24, fontWeight: 'bold' },
+          { type: 'circle', x: 1600, y: 1800, width: 200, height: 200, fill: '#60a5fa', text: 'Topic A', fontSize: 18 },
+          { type: 'circle', x: 2400, y: 1800, width: 200, height: 200, fill: '#60a5fa', text: 'Topic B', fontSize: 18 },
+          { type: 'circle', x: 1600, y: 2200, width: 200, height: 200, fill: '#60a5fa', text: 'Topic C', fontSize: 18 },
+          { type: 'circle', x: 2400, y: 2200, width: 200, height: 200, fill: '#60a5fa', text: 'Topic D', fontSize: 18 },
+          { type: 'frame', x: 1500, y: 1700, width: 1300, height: 800, fill: '#f8fafc', text: 'MIND MAP OVERVIEW' }
         ]
       }
     };
   }
 
-  // Default to actual AI call if possible, or a polite generic response
+  // 2. Fallback to API Gateway
   try {
     const apiKey = process.env['OPENAI_API_KEY'] || process.env['LOVABLE_API_KEY'];
     if (!apiKey) {
       return {
-        message: "I understand you want to: " + messages[messages.length-1].content + ". To fully activate my brain, please ensure the AI gateway is configured. For now, I can help with SWOT, Timelines, and basic text editing.",
+        message: "I can help you build presentations, structure SWOT analysis, create mind maps, or refine your text. To unlock my full potential (Google/OpenAI), please connect an AI provider in Settings.",
       };
     }
 
@@ -103,10 +87,7 @@ Be the co-pilot. Help them tell a spatial story.`;
       },
       body: JSON.stringify({
         model: 'gpt-4o',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages
-        ],
+        messages: [{ role: 'system', content: systemPrompt }, ...messages],
         response_format: { type: 'json_object' }
       })
     });
@@ -114,6 +95,8 @@ Be the co-pilot. Help them tell a spatial story.`;
     const result = await response.json();
     return JSON.parse(result.choices[0].message.content);
   } catch (error) {
-    return { message: "I'm ready to help, but I need a moment to reconnect. Try asking for a 'SWOT analysis' or 'Timeline'!" };
+    return { 
+      message: "I'm experiencing a temporary connection issue, but I'm still here! I can currently help with 'SWOT', 'Mind Map', or 'Timeline' structures locally.",
+    };
   }
 }
