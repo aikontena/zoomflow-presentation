@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import { SlideImporter } from '@/lib/slide-importer';
 import { toast } from 'sonner';
+import { ImportModal } from './ImportModal';
+
 
 
 interface MenuItem {
@@ -319,6 +321,15 @@ export default function MenuBar() {
           <span>Shortcuts Active</span>
         </div>
       </div>
+
+      <ImportModal 
+        isOpen={!!pendingFile}
+        onClose={() => setPendingFile(null)}
+        onConfirm={confirmImport}
+        fileName={pendingFile?.name || ''}
+        fileType={pendingFile?.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'pptx'}
+      />
     </div>
+
   );
 }
