@@ -12,7 +12,7 @@ import PresentationMode from "./PresentationMode";
 const TemplateLibrary = lazy(() => import("./templates/TemplateLibrary"));
 
 export default function EditorLayout() {
-  const { activeOverlay, setActiveOverlay, isPresenting } = useCanvasStore();
+  const { activeOverlay, setActiveOverlay, isPresenting, isRightSidebarVisible } = useCanvasStore();
 
   useEffect(() => {
     (window as any).useCanvasStore = useCanvasStore;
