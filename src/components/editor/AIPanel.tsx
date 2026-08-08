@@ -4,7 +4,7 @@ import { Sparkles, Send } from 'lucide-react';
 export const AIPanel: React.FC = () => {
   const [prompt, setPrompt] = useState(`'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
                                             
-                                            any menu to choose the type of presentation we want? the way etc`);
+                                            slide di fail untuk digunakan yang dipilih di template library tidak keluar seperti template yang dipiilih.. yang keluar hanya kosong`);
 
   return (
     <div className="flex flex-col h-full bg-white">

@@ -86,8 +86,8 @@ export class TemplateLoader {
       const contentHeight = bounds.maxY - bounds.minY;
       
       // Target viewport size (approximate editor area)
-      const targetWidth = 1200; 
-      const targetHeight = 800;
+      const targetWidth = window?.innerWidth || 1200; 
+      const targetHeight = window?.innerHeight || 800;
 
       const zoomX = targetWidth / (contentWidth + padding * 2);
       const zoomY = targetHeight / (contentHeight + padding * 2);

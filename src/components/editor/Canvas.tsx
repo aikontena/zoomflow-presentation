@@ -252,7 +252,7 @@ export default function Canvas() {
         onMouseLeave={handleMouseUp}
       >
         <div style={{
-          transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom || 1})`,
+          transform: `translate(${viewport.x || 0}px, ${viewport.y || 0}px) scale(${viewport.zoom || 1})`,
           transformOrigin: '0 0'
         }}>
           {/* Grid Background */}
