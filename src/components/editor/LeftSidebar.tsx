@@ -16,6 +16,7 @@ import {
   Plus
 } from 'lucide-react';
 import { IconLibrary } from './IconLibrary';
+import { AIPanel } from './AIPanel';
 import { useCanvasStore } from '@/lib/canvas-store';
 import { TEMPLATES } from '@/lib/templates';
 import { toast } from 'sonner';
