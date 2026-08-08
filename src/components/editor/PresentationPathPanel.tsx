@@ -13,8 +13,8 @@ import {
   MonitorPlay,
   PlayCircle
 } from 'lucide-react';
-import { FramePreview } from '../FramePreview';
-import { useViewportController } from '../ViewportController';
+import { FramePreview } from './FramePreview';
+import { useViewportController } from './ViewportController';
 
 export function PresentationPathPanel() {
   const { 
@@ -56,9 +56,8 @@ export function PresentationPathPanel() {
     if (!frame) return;
     
     addObject({
-      ...frame,
-      id: undefined as any,
-      text: `${frame.text} (Copy)`,
+      type: 'frame',
+      x: (window.innerWidth / 2 - viewport.x) / viewport.zoom - 400,
       x: frame.x + 50,
       y: frame.y + 50
     });
