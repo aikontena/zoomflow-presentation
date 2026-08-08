@@ -120,8 +120,9 @@ export default function PresentationMode() {
 
       const duration = frame?.settings?.duration ?? presentationSettings.transitionDuration;
       const easing = frame?.settings?.easing ?? presentationSettings.smoothness ?? 'smooth';
+      const pathType = frame?.settings?.pathType ?? 'linear';
 
-      zoomToFrame(frameId, duration, easing);
+      zoomToFrame(frameId, duration, easing, pathType);
     }
   }, [currentFrameIndex, isPresenting, presentationPath, zoomToFrame, presentationSettings.transitionDuration, presentationSettings.smoothness, objects]);
 
