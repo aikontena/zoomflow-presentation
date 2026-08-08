@@ -125,6 +125,20 @@ export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObj
         />
       )}
 
+      {(obj.type === 'audio' || obj.type === 'pdf' || obj.type === 'qr' || obj.type === 'chart' || obj.type === 'table' || obj.type === 'equation') && (
+        <div className="flex flex-col items-center justify-center gap-2 p-4 text-center">
+          <div className="text-4xl">
+            {obj.type === 'audio' ? '🎵' : obj.type === 'pdf' ? '📄' : obj.type === 'qr' ? '📱' : obj.type === 'chart' ? '📊' : obj.type === 'table' ? '📋' : 'Σ'}
+          </div>
+          <div className="text-[10px] font-bold uppercase truncate max-w-full">
+            {obj.text || obj.type}
+          </div>
+          {obj.type === 'audio' && obj.src && (
+            <audio src={obj.src} controls className="h-6 w-full max-w-[200px]" />
+          )}
+        </div>
+      )}
+
       {isSelected && (
         <>
           <div className="absolute -top-1 -left-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
