@@ -11,7 +11,8 @@ import {
   ChevronRight,
   ChevronDown,
   MonitorPlay,
-  PlayCircle
+  PlayCircle,
+  Dices
 } from 'lucide-react';
 import { FramePreview } from './FramePreview';
 import { useViewportController } from './ViewportController';
@@ -27,7 +28,8 @@ export function PresentationPathPanel() {
     updateObject,
     deleteObjects,
     startPresentation,
-    viewport
+    viewport,
+    randomizeTransitions
   } = useCanvasStore();
   
   const { zoomToFrame } = useViewportController();
@@ -86,6 +88,13 @@ export function PresentationPathPanel() {
             title="Present All"
           >
             <Play size={16} fill="currentColor" />
+          </button>
+          <button 
+            onClick={() => randomizeTransitions()}
+            className="p-1.5 hover:bg-neutral-100 text-neutral-600 rounded-md transition-colors"
+            title="Randomize Transitions"
+          >
+            <Dices size={16} />
           </button>
           <button 
             onClick={handleAddStep}

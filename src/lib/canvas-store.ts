@@ -121,6 +121,7 @@ interface CanvasStore {
   setActiveOverlay: (overlay: 'templates' | 'export' | 'settings' | 'presentation' | null) => void;
   loadDocument: (doc: { objects: CanvasObject[]; viewport: { x: number; y: number; zoom: number; rotation?: number }; presentationPath: string[]; bookmarks?: Bookmark[] }) => void;
   loadTemplate: (template: any) => void;
+  randomizeTransitions: () => void;
 }
 
 export const useCanvasStore = create<CanvasStore>()(
@@ -426,6 +427,53 @@ export const useCanvasStore = create<CanvasStore>()(
             toast.error("Failed to load template");
           });
         });
+      },
+
+      randomizeTransitions: () => {
+        const { objects, presentationPath } = get();
+        if (presentationPath.length === 0) {
+          toast.error("Add presentation steps first!");
+          return;
+        }
+
+        const easings: FrameSettings['easing'][] = [
+          'morph', 'smooth', 'cinematic', 'pan', 'orbit', 'spring', 
+          'elastic', 'bounce', 'fade', 'push', 'reveal', 'fall', 
+          'wind', 'origami', 'vortex'
+        ];
+        
+        const pathTypes: FrameSettings['pathType'][] = [
+          'linear', 'curved', 'spiral', 'zoom-out'
+        ];
+
+        const durations = [800, 1200, 2000, 2500];
+
+        set((state) => ({
+          history: {
+            past: [...state.history.past, state.objects].slice(-50),
+            future: [],
+          },
+          objects: state.objects.map((obj) => {
+            if (obj.type === 'frame' && presentationPath.includes(obj.id)) {
+              const randomEasing = easings[Math.floor(Math.random() * easings.length)]!;
+              const randomPath = pathTypes[Math.floor(Math.random() * pathTypes.length)]!;
+              const randomDuration = durations[Math.floor(Math.random() * durations.length)]!;
+              
+              return {
+                ...obj,
+                settings: {
+                  ...obj.settings!,
+                  easing: randomEasing,
+                  pathType: randomPath,
+                  duration: randomDuration
+                }
+              };
+            }
+            return obj;
+          }),
+        }));
+        
+        toast.success("Randomized all transitions! 🎲");
       },
     }),
     {
