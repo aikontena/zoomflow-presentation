@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useCanvasStore, CanvasObject } from '@/lib/canvas-store';
 import { IconRenderer } from './IconRenderer';
 import { getIconMeta } from '@/lib/icon-registry';
@@ -7,6 +7,69 @@ import ZoomControls from './ZoomControls';
 import MiniMap from './MiniMap';
 import StatusBar from './StatusBar';
 import { useViewportController } from './ViewportController';
+
+// Memoized individual object renderer
+export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObject, selection: string[] }) => {
+  const isSelected = selection.includes(obj.id);
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: obj.x,
+        top: obj.y,
+        width: obj.width,
+        height: obj.height,
+        transform: `translate3d(0, 0, 0) rotate(${obj.rotation || 0}deg)`,
+        backgroundColor: (obj.type !== 'text' && obj.type !== 'frame' && obj.type !== 'icon') ? obj.fill : 'transparent',
+        background: obj.type === 'frame' ? obj.fill : undefined,
+        border: obj.type === 'frame' ? '1px solid rgba(0,0,0,0.1)' : 'none',
+        borderRadius: obj.type === 'circle' ? '50%' : '0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: obj.fill || 'black',
+        fontSize: obj.fontSize || (obj.type === 'frame' ? 12 : 16),
+        pointerEvents: obj.locked ? 'none' : 'auto',
+        userSelect: 'none',
+        filter: obj.shadow ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.25))' : undefined,
+        boxShadow: isSelected ? '0 0 0 2px #3b82f6' : (obj.type === 'frame' ? '0 4px 6px -1px rgb(0 0 0 / 0.1)' : 'none'),
+        zIndex: obj.type === 'frame' ? 0 : 1,
+        opacity: obj.opacity ?? 1,
+      }}>
+
+      {obj.type === 'frame' && (
+        <div className="absolute -top-6 left-0 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+          {obj.text || 'Frame Title'}
+        </div>
+      )}
+      {obj.type === 'text' && obj.text}
+      {obj.type === 'icon' && obj.iconName && (
+        <IconRenderer
+          name={obj.iconName}
+          size="100%"
+          color={obj.fill}
+          strokeWidth={obj.strokeWidth || 2}
+        />
+      )}
+
+      {isSelected && (
+        <>
+          <div className="absolute -top-1 -left-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
+          <div className="absolute -top-1 -right-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
+          <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
+          <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
+          <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border border-blue-500 rounded-full flex items-center justify-center">
+            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}, (prev, next) => {
+  // Only re-render if object data changed or its selection status changed
+  return prev.obj === next.obj && 
+         (prev.selection.includes(prev.obj.id) === next.selection.includes(next.obj.id));
+});
 
 export default function Canvas() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -270,66 +333,6 @@ export default function Canvas() {
           {objects.map(obj => (
             <CanvasObjectItem key={obj.id} obj={obj} selection={selection} />
           ))}
-            return (
-export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObject, selection: string[] }) => {
-  const isSelected = selection.includes(obj.id);
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        left: obj.x,
-        top: obj.y,
-        width: obj.width,
-        height: obj.height,
-        transform: `translate3d(0, 0, 0) rotate(${obj.rotation || 0}deg)`,
-        backgroundColor: (obj.type !== 'text' && obj.type !== 'frame' && obj.type !== 'icon') ? obj.fill : 'transparent',
-        background: obj.type === 'frame' ? obj.fill : undefined,
-        border: obj.type === 'frame' ? '1px solid rgba(0,0,0,0.1)' : 'none',
-        borderRadius: obj.type === 'circle' ? '50%' : '0',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: obj.fill || 'black',
-        fontSize: obj.fontSize || (obj.type === 'frame' ? 12 : 16),
-        pointerEvents: obj.locked ? 'none' : 'auto',
-        userSelect: 'none',
-        filter: obj.shadow ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.25))' : undefined,
-        boxShadow: isSelected ? '0 0 0 2px #3b82f6' : (obj.type === 'frame' ? '0 4px 6px -1px rgb(0 0 0 / 0.1)' : 'none'),
-        zIndex: obj.type === 'frame' ? 0 : 1,
-        opacity: obj.opacity ?? 1,
-      }}>
-
-      {obj.type === 'frame' && (
-        <div className="absolute -top-6 left-0 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
-          {obj.text || 'Frame Title'}
-        </div>
-      )}
-      {obj.type === 'text' && obj.text}
-      {obj.type === 'icon' && obj.iconName && (
-        <IconRenderer
-          name={obj.iconName}
-          size="100%"
-          color={obj.fill}
-          strokeWidth={obj.strokeWidth || 2}
-        />
-      )}
-
-      {isSelected && (
-        <>
-          <div className="absolute -top-1 -left-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
-          <div className="absolute -top-1 -right-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
-          <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
-          <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
-          <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border border-blue-500 rounded-full flex items-center justify-center">
-            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-          </div>
-        </>
-      )}
-    </div>
-  );
-}, (prev, next) => {
-  return prev.obj === next.obj && prev.selection.includes(prev.obj.id) === next.selection.includes(next.obj.id);
-});
         </div>
 
         {/* Floating Overlays inside Canvas Area */}
