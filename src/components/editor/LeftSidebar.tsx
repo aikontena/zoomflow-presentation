@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { IconLibrary } from './IconLibrary';
 import { AIPanel } from './AIPanel';
+import { FramePreview } from './FramePreview';
 import { useCanvasStore } from '@/lib/canvas-store';
 import { TEMPLATES } from '@/lib/templates';
 import { toast } from 'sonner';
