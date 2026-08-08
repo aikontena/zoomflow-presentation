@@ -32,20 +32,18 @@ export interface PresentationSettings {
   darkBackground: boolean;
 }
 
-
 interface CanvasStore {
   objects: CanvasObject[];
-  frames: { id: string; name: string; order: number }[]; // Keeping legacy frames for now if needed
+  frames: { id: string; name: string; order: number }[];
   selection: string[];
   viewport: { x: number; y: number; zoom: number };
   activeOverlay: 'templates' | 'export' | 'settings' | 'presentation' | null;
   snapEnabled: boolean;
   setSnapEnabled: (enabled: boolean) => void;
   
-  // Presentation State
   isPresenting: boolean;
   currentFrameIndex: number;
-  presentationPath: string[]; // List of object IDs that are frames, in order
+  presentationPath: string[];
   presentationSettings: PresentationSettings;
   startPresentation: (startFromFrameId?: string) => void;
   stopPresentation: () => void;
@@ -55,19 +53,12 @@ interface CanvasStore {
   setPresentationPath: (path: string[]) => void;
   updatePresentationSettings: (settings: Partial<PresentationSettings>) => void;
 
-  
-  // Basic Actions
   addObject: (obj: Omit<CanvasObject, "id">) => string;
   updateObject: (id: string, patch: Partial<CanvasObject>) => void;
   deleteObjects: (ids: string[]) => void;
-  
-  // Selection
   setSelection: (ids: string[]) => void;
-  
-  // Viewport
   setViewport: (v: { x: number; y: number; zoom: number }) => void;
   
-  // History is handled by a separate mechanism or simplified here
   history: {
     past: CanvasObject[][];
     future: CanvasObject[][];
@@ -75,18 +66,15 @@ interface CanvasStore {
   undo: () => void;
   redo: () => void;
   
-  // Advanced Actions
   duplicateObjects: (ids: string[]) => void;
   groupObjects: (ids: string[]) => void;
   ungroupObjects: (ids: string[]) => void;
 
-  // System
   lastSaved: number | null;
   clear: () => void;
   save: () => void;
-  setActiveOverlay: (overlay: 'templates' | 'export' | 'settings' | null) => void;
+  setActiveOverlay: (overlay: 'templates' | 'export' | 'settings' | 'presentation' | null) => void;
   loadDocument: (doc: { objects: CanvasObject[]; viewport: { x: number; y: number; zoom: number }; presentationPath: string[] }) => void;
-  // Legacy alias for compatibility during migration, to be removed later
   loadTemplate: (objects: CanvasObject[], templateName?: string) => void;
 }
 
@@ -94,12 +82,7 @@ export const useCanvasStore = create<CanvasStore>()(
   persist(
     (set, get) => ({
       objects: [],
-      frames: [
-        { id: 'f1', name: 'Frame 1', order: 0 },
-        { id: 'f2', name: 'Frame 2', order: 1 },
-        { id: 'f3', name: 'Frame 3', order: 2 },
-        { id: 'f4', name: 'Frame 4', order: 3 },
-      ],
+      frames: [],
       selection: [],
       viewport: { x: 0, y: 0, zoom: 1 },
       activeOverlay: null,
@@ -123,23 +106,14 @@ export const useCanvasStore = create<CanvasStore>()(
       startPresentation: (startFromFrameId) => {
         const { objects, presentationPath } = get();
         let path = presentationPath;
-        
-        // If path is empty, auto-generate from frames sorted by x/y
         if (path.length === 0) {
           path = objects
             .filter(o => o.type === 'frame')
             .sort((a, b) => (a.y - b.y) || (a.x - b.x))
             .map(o => o.id);
         }
-
-        if (path.length === 0) {
-          return;
-        }
-
-        const startIndex = startFromFrameId 
-          ? path.indexOf(startFromFrameId) 
-          : 0;
-
+        if (path.length === 0) return;
+        const startIndex = startFromFrameId ? path.indexOf(startFromFrameId) : 0;
         set({ 
           isPresenting: true, 
           currentFrameIndex: startIndex === -1 ? 0 : startIndex,
@@ -179,15 +153,11 @@ export const useCanvasStore = create<CanvasStore>()(
         presentationSettings: { ...state.presentationSettings, ...settings }
       })),
 
-
       addObject: (obj) => {
         const id = Math.random().toString(36).substring(7);
         const newObj = { ...obj, id };
         set((state) => {
-          const nextPath = obj.type === 'frame' 
-            ? [...state.presentationPath, id] 
-            : state.presentationPath;
-            
+          const nextPath = obj.type === 'frame' ? [...state.presentationPath, id] : state.presentationPath;
           return {
             lastSaved: Date.now(),
             history: {
@@ -201,12 +171,9 @@ export const useCanvasStore = create<CanvasStore>()(
         return id;
       },
 
-
       updateObject: (id, patch) => {
         const currentObjects = get().objects;
         const target = currentObjects.find(o => o.id === id);
-        
-        // Skip if no changes
         if (!target) return;
         const hasChanges = Object.keys(patch).some(key => (patch as any)[key] !== (target as any)[key]);
         if (!hasChanges) return;
@@ -233,7 +200,6 @@ export const useCanvasStore = create<CanvasStore>()(
         }));
       },
 
-
       setSelection: (selection) => {
         const current = get().selection;
         if (current.length === selection.length && current.every((id, i) => id === selection[i])) return;
@@ -249,12 +215,10 @@ export const useCanvasStore = create<CanvasStore>()(
       undo: () => {
         const { past, future } = get().history;
         if (past.length === 0) return;
-
         const previous = past[past.length - 1];
         const newPast = past.slice(0, past.length - 1);
-
         set((state) => ({
-          objects: previous,
+          objects: previous!,
           history: {
             past: newPast,
             future: [state.objects, ...future].slice(0, 50),
@@ -265,12 +229,10 @@ export const useCanvasStore = create<CanvasStore>()(
       redo: () => {
         const { past, future } = get().history;
         if (future.length === 0) return;
-
         const next = future[0];
         const newFuture = future.slice(1);
-
         set((state) => ({
-          objects: next,
+          objects: next!,
           history: {
             past: [...past, state.objects].slice(-50),
             future: newFuture,
@@ -288,7 +250,6 @@ export const useCanvasStore = create<CanvasStore>()(
           x: o.x + 20,
           y: o.y + 20
         }));
-        
         set((state) => ({
           history: { past: [...state.history.past, state.objects].slice(-50), future: [] },
           objects: [...state.objects, ...newObjects],
@@ -296,43 +257,29 @@ export const useCanvasStore = create<CanvasStore>()(
         }));
       },
 
-      groupObjects: (ids) => {
-        console.log("Grouping", ids);
-      },
-
-      ungroupObjects: (ids) => {
-        console.log("Ungrouping", ids);
-      },
-
+      groupObjects: (ids) => console.log("Grouping", ids),
+      ungroupObjects: (ids) => console.log("Ungrouping", ids),
       clear: () => set({ objects: [], selection: [], history: { past: [], future: [] }, lastSaved: null }),
       save: () => set({ lastSaved: Date.now() }),
-      setActiveOverlay: (activeOverlay) => {
-        console.log("CanvasStore: Setting active overlay to:", activeOverlay);
-        set({ activeOverlay });
-      },
+      setActiveOverlay: (activeOverlay) => set({ activeOverlay }),
+
       loadDocument: (doc) => {
-        console.log("[CanvasStore] Loading new document...");
-        
-        console.log("[CanvasStore] Document loaded. Objects:", doc.objects.length, "Frames:", doc.presentationPath.length, "Selection:", 0);
-        set((state) => ({
-          objects: doc.objects,
-          presentationPath: doc.presentationPath,
+        const objects = [...doc.objects];
+        const presentationPath = [...doc.presentationPath];
+        const viewport = { ...doc.viewport };
+        set({
+          objects,
+          presentationPath,
+          viewport,
           selection: [],
-          viewport: doc.viewport,
-          history: { 
-            past: [state.objects, ...state.history.past].slice(0, 50), 
-            future: [] 
-          },
+          history: { past: [], future: [] },
           activeOverlay: null,
           lastSaved: Date.now()
-        }));
-        
-        toast.success("Document loaded successfully");
+        });
+        toast.success("Template applied successfully");
       },
 
-      // Legacy support - delegates to loadDocument
       loadTemplate: (templateObjects, templateName) => {
-        console.warn("loadTemplate is deprecated, use TemplateLoader + loadDocument");
         import('./template-loader').then(({ TemplateLoader }) => {
           TemplateLoader.load({ objects: templateObjects }).then(doc => {
             get().loadDocument(doc);
