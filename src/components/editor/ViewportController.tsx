@@ -202,31 +202,30 @@ export function useViewportController() {
     const availableHeight = window.innerHeight;
 
     // Apply zoom padding from settings
-    // A padding of 0 means tight fit, 0.5 means frame takes 50% of the screen.
-    // However, if the user says "still no improve", they likely want MORE space or the calculation is inverted/too subtle.
-    // The previous code: paddingMultiplier = 1 - (0.1) = 0.9. Frame takes 90% of screen.
-    // If they set 0.5, multiplier is 0.5. Frame takes 50%.
-    // Let's ensure the padding is applied to both axes correctly and potentially increase the influence.
+    // A padding of 0 means the frame takes 100% of the screen.
+    // A padding of 0.8 means the frame takes only 20% of the screen (zoomed out more).
     const paddingMultiplier = 1 - (presentationSettings.zoomPadding ?? 0.1);
     
-    // Calculate zoom needed to fit the frame into the viewport with padding
-    const zoomX = (availableWidth * paddingMultiplier) / frame.width;
-    const zoomY = (availableHeight * paddingMultiplier) / frame.height;
+    // Use the effective viewport area for the calculation
+    const effectiveWidth = availableWidth * paddingMultiplier;
+    const effectiveHeight = availableHeight * paddingMultiplier;
+
+    const zoomX = effectiveWidth / frame.width;
+    const zoomY = effectiveHeight / frame.height;
     
-    // We take the minimum to ensure the whole frame fits
+    // We take the minimum to ensure the whole frame fits within the effective area
     let zoom = Math.min(zoomX, zoomY);
 
-    // Add a safety cap: don't zoom in beyond a reasonable level for small frames
-    // unless explicitly zoomed to that level.
-    zoom = Math.min(zoom, 5); 
+    // Limit extreme zoom-in for very small frames
+    zoom = Math.min(zoom, 10); 
 
     const centerX = frame.x + frame.width / 2;
     const centerY = frame.y + frame.height / 2;
 
     const target = {
       zoom,
-      x: window.innerWidth / 2 - centerX * zoom,
-      y: window.innerHeight / 2 - centerY * zoom,
+      x: availableWidth / 2 - centerX * zoom,
+      y: availableHeight / 2 - centerY * zoom,
       rotation: frame.rotation || 0
     };
 
