@@ -39,8 +39,11 @@ export class TemplateLoader {
 
     // Pass 1: Register all existing IDs and generate new ones
     clonedObjects.forEach((obj: any) => {
-      const oldId = obj.id || `temp-${Math.random().toString(36).substring(7)}`;
-      const newId = Math.random().toString(36).substring(7);
+      const oldId = obj.id;
+      // We only generate a NEW ID if we're not loading into an empty canvas
+      // But for templates, we ALWAYS want fresh IDs to avoid collisions if merging
+      // However, for the first frame selection to work, we need a consistent way to reference them
+      const newId = `obj-${Math.random().toString(36).substring(7)}`;
       idMap.set(oldId, newId);
     });
 
