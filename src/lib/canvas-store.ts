@@ -121,6 +121,9 @@ interface CanvasStore {
   setActiveOverlay: (overlay: 'templates' | 'export' | 'settings' | 'presentation' | null) => void;
   loadDocument: (doc: { objects: CanvasObject[]; viewport: { x: number; y: number; zoom: number; rotation?: number }; presentationPath: string[]; bookmarks?: Bookmark[] }) => void;
   loadTemplate: (template: any) => void;
+  pendingTemplate: any | null;
+  requestTemplate: (template: any) => void;
+  resolveTemplateConflict: (choice: 'keep' | 'new' | 'duplicate') => void;
   randomizeTransitions: () => void;
 }
 
@@ -428,6 +431,48 @@ export const useCanvasStore = create<CanvasStore>()(
           });
         });
       },
+
+      pendingTemplate: null,
+
+      // Never apply a template on top of an existing presentation without consent.
+      requestTemplate: (template) => {
+        const hasContent = get().objects.some(o => !(o.locked && (o.type === 'rectangle' || o.type === 'image') && o.width > 5000));
+        if (!hasContent) {
+          get().loadTemplate(template);
+          return;
+        }
+        set({ pendingTemplate: template });
+      },
+
+      resolveTemplateConflict: (choice) => {
+        const template = get().pendingTemplate;
+        set({ pendingTemplate: null });
+        if (!template || choice === 'keep') return;
+
+        if (choice === 'duplicate') {
+          try {
+            const snapshot = {
+              savedAt: Date.now(),
+              objects: get().objects,
+              viewport: get().viewport,
+              presentationPath: get().presentationPath,
+              bookmarks: get().bookmarks,
+            };
+            const key = 'zoomcanvas-duplicates';
+            const existing = JSON.parse(localStorage.getItem(key) || '[]');
+            existing.push(snapshot);
+            localStorage.setItem(key, JSON.stringify(existing.slice(-10)));
+            toast.success("Current presentation duplicated and saved");
+          } catch (e) {
+            console.error('[Store] Duplicate failed', e);
+            toast.error("Could not duplicate current presentation");
+            return;
+          }
+        }
+
+        get().loadTemplate(template);
+      },
+
 
       randomizeTransitions: () => {
         const { objects, presentationPath } = get();

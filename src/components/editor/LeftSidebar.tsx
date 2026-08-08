@@ -57,7 +57,7 @@ export default function LeftSidebar() {
     selection,
     setSelection,
     addObject,
-    loadTemplate,
+    requestTemplate,
     setViewport,
     viewport
   } = useCanvasStore();
@@ -308,8 +308,7 @@ export default function LeftSidebar() {
                     <div 
                       key={t.id} 
                       onClick={() => {
-                        loadTemplate(t);
-                        toast.success(`Loaded ${t.name}`);
+                        requestTemplate(t);
                       }}
                       className="aspect-video bg-neutral-100 rounded-md border border-neutral-200 hover:border-primary cursor-pointer transition-colors overflow-hidden group relative"
                     >

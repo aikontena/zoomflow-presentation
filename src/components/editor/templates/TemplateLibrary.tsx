@@ -107,7 +107,7 @@ function TemplateCard({ template, viewMode, isSelected, isFavorite, onClick, onF
 }
 
 export default function TemplateLibrary() {
-  const { setActiveOverlay, loadTemplate } = useCanvasStore();
+  const { setActiveOverlay, requestTemplate } = useCanvasStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -333,7 +333,7 @@ export default function TemplateLibrary() {
             <Button 
               onClick={() => {
                 console.log("[UI] Template button clicked:", selectedTemplate.name);
-                loadTemplate(selectedTemplate);
+                requestTemplate(selectedTemplate);
                 setActiveOverlay(null);
               }}
               className="w-full bg-primary hover:bg-primary/90 text-white h-11 text-lg font-medium shadow-lg shadow-primary/20 group"
@@ -345,8 +345,7 @@ export default function TemplateLibrary() {
               variant="outline" 
               className="w-full h-11 font-medium"
               onClick={() => {
-                loadTemplate(selectedTemplate);
-                toast.info(`Duplicated ${selectedTemplate.name} as draft`);
+                requestTemplate(selectedTemplate);
                 setActiveOverlay(null);
               }}
             >
