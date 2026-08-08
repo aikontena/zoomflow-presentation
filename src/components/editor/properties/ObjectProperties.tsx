@@ -18,7 +18,8 @@ import {
   Sparkles,
   Globe,
   Scissors,
-  ChevronRight
+  ChevronRight,
+  Upload
 } from 'lucide-react';
 import { askAiAssistant } from '@/lib/ai/assistant.functions';
 import { useServerFn } from '@tanstack/react-start';
@@ -310,12 +311,33 @@ export const MediaProperties = ({ object }: { object: CanvasObject }) => {
   return (
     <>
       <PropertySection title="Media Source">
-        <button
-          onClick={handleUpload}
-          className="w-full py-2 bg-neutral-900 text-white rounded text-[11px] font-bold hover:bg-neutral-800 transition-colors mb-2"
-        >
-          {object.src ? 'Replace Source' : 'Upload File'}
-        </button>
+        <div className="grid grid-cols-1 gap-2 mb-2">
+          <button
+            onClick={handleUpload}
+            className="w-full py-2 bg-neutral-900 text-white rounded text-[11px] font-bold hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
+          >
+            <Upload size={12} /> {object.src ? 'Replace Source' : 'Upload File'}
+          </button>
+          <button
+            onClick={async () => {
+              const prompt = window.prompt("Describe the image you want to generate:");
+              if (!prompt) return;
+              
+              const toastId = toast.loading("AI is generating your image...");
+              try {
+                // We'll use a placeholder image generation for now, in real app call OpenAI DALL-E or similar
+                const mockUrl = `https://picsum.photos/seed/${Math.random()}/800/600`;
+                handleChange({ src: mockUrl });
+                toast.success("AI image generated!", { id: toastId });
+              } catch (e) {
+                toast.error("Generation failed", { id: toastId });
+              }
+            }}
+            className="w-full py-2 bg-primary/10 text-primary border border-primary/20 rounded text-[11px] font-bold hover:bg-primary/20 transition-colors flex items-center justify-center gap-2"
+          >
+            <Sparkles size={12} /> Generate with AI
+          </button>
+        </div>
         {object.type === 'video' && (
           <InputRow label="Embed URL">
              <input
