@@ -312,10 +312,20 @@ export const useCanvasStore = create<CanvasStore>()(
           return;
         }
 
-        const objectsWithIds = templateObjects.map(obj => ({
-          ...obj,
-          id: obj.id || Math.random().toString(36).substring(7)
-        }));
+        // Generate a unique ID mapping to ensure parents and children stay connected but have new IDs
+        const idMap = new Map<string, string>();
+        templateObjects.forEach(obj => {
+          if (obj.id) idMap.set(obj.id, Math.random().toString(36).substring(7));
+        });
+
+        const objectsWithIds = templateObjects.map(obj => {
+          const newId = obj.id ? idMap.get(obj.id) || Math.random().toString(36).substring(7) : Math.random().toString(36).substring(7);
+          return {
+            ...obj,
+            id: newId,
+            parentId: obj.parentId ? idMap.get(obj.parentId) || obj.parentId : undefined
+          };
+        });
         
         const presentationPath = objectsWithIds
           .filter(o => o.type === 'frame')
