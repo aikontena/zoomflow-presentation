@@ -11,7 +11,8 @@ export interface CameraState {
 
 export interface FrameSettings {
   duration: number;
-  easing: 'smooth' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'cinematic' | 'fast' | 'slow' | 'bounce';
+  easing: 'smooth' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'cinematic' | 'fast' | 'slow' | 'bounce' | 'morph' | 'fade' | 'push' | 'reveal' | 'cut' | 'fall' | 'wind' | 'zoom' | 'pan' | 'orbit' | 'elastic' | 'spring' | 'drape' | 'vortex' | 'origami';
+  pathType?: 'linear' | 'curved' | 'spiral' | 'bounce' | 'zoom-out';
   camera: CameraState;
   delay?: number;
   autoNext?: boolean;
