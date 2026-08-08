@@ -264,6 +264,37 @@ export const useCanvasStore = create<CanvasStore>()(
 
       groupObjects: (ids) => console.log("Grouping", ids),
       ungroupObjects: (ids) => console.log("Ungrouping", ids),
+
+      bringForward: (ids) => {
+        if (ids.length === 0) return;
+        set((state) => {
+          const objects = [...state.objects];
+          for (let i = objects.length - 2; i >= 0; i--) {
+            if (ids.includes(objects[i]!.id) && !ids.includes(objects[i + 1]!.id)) {
+              const tmp = objects[i]!;
+              objects[i] = objects[i + 1]!;
+              objects[i + 1] = tmp;
+            }
+          }
+          return { objects };
+        });
+      },
+
+      sendBackward: (ids) => {
+        if (ids.length === 0) return;
+        set((state) => {
+          const objects = [...state.objects];
+          for (let i = 1; i < objects.length; i++) {
+            if (ids.includes(objects[i]!.id) && !ids.includes(objects[i - 1]!.id)) {
+              const tmp = objects[i]!;
+              objects[i] = objects[i - 1]!;
+              objects[i - 1] = tmp;
+            }
+          }
+          return { objects };
+        });
+      },
+
       clear: () => set({ objects: [], selection: [], history: { past: [], future: [] }, lastSaved: null }),
       save: () => set({ lastSaved: Date.now() }),
       setActiveOverlay: (activeOverlay) => set({ activeOverlay }),
