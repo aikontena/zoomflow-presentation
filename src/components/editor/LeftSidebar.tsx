@@ -31,8 +31,8 @@ import { useViewportController } from './ViewportController';
 
 
 const TABS = [
-  { id: 'path', label: 'Path', icon: MonitorPlay },
   { id: 'pages', label: 'Pages', icon: FileText },
+  { id: 'path', label: 'Path', icon: MonitorPlay },
   { id: 'layers', label: 'Layers', icon: Layers },
   { id: 'assets', label: 'Assets', icon: Image },
   { id: 'templates', label: 'Slides', icon: LayoutTemplate },
@@ -213,128 +213,75 @@ export default function LeftSidebar() {
             )}
             {activeTab === 'pages' && (
               <div className="space-y-4">
-                <div className="flex flex-col gap-4">
-                  {presentationPath.length > 0 ? (
-                    <div className="space-y-4">
-                      {presentationPath.map((frameId, index) => {
-                        const frame = objects.find(o => o.id === frameId);
-                        if (!frame) return null;
-                        
-                        const nextFrameId = presentationPath[index + 1];
-                        const nextFrame = nextFrameId ? objects.find(o => o.id === nextFrameId) : undefined;
-                        
-                        return (
-                          <div key={frameId} className="group relative flex flex-col gap-2">
-                            <div 
-                              draggable
-                              onDragStart={(e) => {
-                                e.dataTransfer.setData('frameIndex', index.toString());
-                              }}
-                              onDragOver={(e) => e.preventDefault()}
-                              onDrop={(e) => {
-                                e.preventDefault();
-                                const fromIndexRaw = e.dataTransfer.getData('frameIndex');
-                                if (!fromIndexRaw) return;
-                                const fromIndex = parseInt(fromIndexRaw);
-                                const newPath = [...presentationPath];
-                                const [removed] = newPath.splice(fromIndex, 1);
-                                if (!removed) return;
-                                newPath.splice(index, 0, removed);
-                                useCanvasStore.getState().setPresentationPath(newPath);
-                              }}
-                              onClick={() => {
-                                setSelection([frameId]);
-                                const currentZoom = useCanvasStore.getState().viewport.zoom;
-                                const rect = document.getElementById('canvas-container')?.getBoundingClientRect();
-                                if (rect && frame) {
-                                  setViewport({
-                                    x: (rect.width / 2) - (frame.x + frame.width / 2) * currentZoom,
-                                    y: (rect.height / 2) - (frame.y + frame.height / 2) * currentZoom,
-                                    zoom: currentZoom
-                                  });
-                                }
-                              }}
-                              className={`aspect-video rounded-lg border-2 overflow-hidden relative transition-all cursor-grab active:cursor-grabbing shadow-sm ${
-                                selection.includes(frameId) ? 'border-primary ring-2 ring-primary/20' : 'border-neutral-200 hover:border-neutral-300'
-                              }`}
-                            >
-                              <FramePreview frame={frame} allObjects={objects} />
-                              <div className="absolute bottom-0 inset-x-0 bg-white/90 backdrop-blur-sm p-2 text-[10px] font-medium border-t border-neutral-100 flex justify-between items-center">
-                                <span className="truncate max-w-[180px]">{frame.text || `Frame ${index + 1}`}</span>
-                                <div className="flex items-center gap-1.5">
-                                  {frame.settings?.camera?.rotation !== 0 && (
-                                    <div className="w-1 h-1 bg-amber-400 rounded-full" title="Camera Rotation Active" />
-                                  )}
-                                  <span className="text-neutral-400 font-mono">#{index + 1}</span>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            {nextFrame && (
-                              <div className="flex flex-col items-center py-1 opacity-40 group-hover:opacity-100 transition-opacity">
-                                <div className="w-px h-6 bg-gradient-to-b from-primary to-primary/20" />
-                                <div className="text-[9px] font-bold text-primary/60 uppercase tracking-tighter">
-                                  {frame.settings?.duration || 1200}ms · {frame.settings?.easing || 'smooth'}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 px-4 border-2 border-dashed border-neutral-100 rounded-xl">
-                      <p className="text-xs text-neutral-400">Add frames to your canvas to create a presentation path.</p>
-                    </div>
-                  )}
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-neutral-400">Total Frames: {objects.filter(o => o.type === 'frame').length}</p>
+                  <button 
+                    onClick={() => {
+                      addObject({
+                        type: 'frame',
+                        x: (window.innerWidth / 2 - useCanvasStore.getState().viewport.x) / useCanvasStore.getState().viewport.zoom - 400,
+                        y: (window.innerHeight / 2 - useCanvasStore.getState().viewport.y) / useCanvasStore.getState().viewport.zoom - 225,
+                        width: 800,
+                        height: 450,
+                        rotation: 0,
+                        fill: '#ffffff',
+                        text: `Frame ${objects.filter(o => o.type === 'frame').length + 1}`
+                      });
+                    }}
+                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold bg-primary text-white rounded hover:bg-primary/90 transition-colors"
+                  >
+                    <Plus size={12} /> NEW FRAME
+                  </button>
                 </div>
-                <button 
-                  onClick={handleAddStep}
-                  className="w-full py-2 border-2 border-dashed border-neutral-200 rounded-lg hover:border-neutral-300 hover:bg-neutral-50 transition-colors text-neutral-400 font-medium"
-                >
-                  + Add New Step
-                </button>
-              </div>
-            )}
-            {activeTab === 'pages' && (
-              <div className="space-y-4">
-                <p className="text-xs text-neutral-400">Manage your frames as static pages.</p>
-                <div className="flex flex-col gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   {objects.filter(o => o.type === 'frame').map((frame, index) => (
-                    <div 
-                      key={frame.id}
-                      onClick={() => {
-                        setSelection([frame.id]);
-                        zoomToFrame(frame.id);
-                      }}
-                      className={`aspect-video rounded-lg border-2 overflow-hidden relative transition-all cursor-pointer shadow-sm ${
-                        selection.includes(frame.id) ? 'border-primary ring-2 ring-primary/20' : 'border-neutral-200 hover:border-neutral-300'
-                      }`}
-                    >
-                      <FramePreview frame={frame} allObjects={objects} />
-                      <div className="absolute bottom-0 inset-x-0 bg-white/90 backdrop-blur-sm p-2 text-[10px] font-medium border-t border-neutral-100">
-                        {frame.text || `Frame ${index + 1}`}
+                    <div key={frame.id} className="group relative flex flex-col gap-2">
+                      <div 
+                        onClick={() => {
+                          setSelection([frame.id]);
+                          zoomToFrame(frame.id);
+                        }}
+                        className={`aspect-video rounded-lg border-2 overflow-hidden relative transition-all cursor-pointer shadow-sm ${
+                          selection.includes(frame.id) ? 'border-primary ring-2 ring-primary/20' : 'border-neutral-200 hover:border-neutral-300'
+                        }`}
+                      >
+                        <FramePreview frame={frame} allObjects={objects} />
+                        <div className="absolute bottom-0 inset-x-0 bg-white/95 backdrop-blur-sm px-2.5 py-1.5 text-[10px] font-bold border-t border-neutral-100 flex justify-between items-center">
+                          <span className="truncate max-w-[150px] uppercase tracking-tight text-neutral-700">{frame.text || `Frame ${index + 1}`}</span>
+                          <span className="text-neutral-400 font-mono text-[9px]">#{index + 1}</span>
+                        </div>
+                        
+                        {/* Frame Actions Overlay */}
+                        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const newX = frame.x + 50;
+                              const newY = frame.y + 50;
+                              addObject({ ...frame, id: undefined, x: newX, y: newY } as any);
+                            }}
+                            className="p-1.5 bg-white/90 shadow-sm border border-neutral-100 rounded text-neutral-500 hover:text-primary hover:bg-white"
+                            title="Duplicate"
+                          >
+                            <History size={12} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
+                  {objects.filter(o => o.type === 'frame').length === 0 && (
+                    <div className="text-center py-12 px-6 border-2 border-dashed border-neutral-100 rounded-xl bg-neutral-50/50">
+                      <Layout className="mx-auto mb-3 text-neutral-300" size={32} strokeWidth={1.5} />
+                      <p className="text-xs text-neutral-400 font-medium">No frames on canvas yet.</p>
+                      <button 
+                        onClick={() => addObject({ type: 'frame', x: 0, y: 0, width: 800, height: 450, rotation: 0, fill: '#ffffff', text: 'Frame 1' })}
+                        className="mt-4 text-xs font-bold text-primary hover:underline"
+                      >
+                        Add your first frame
+                      </button>
+                    </div>
+                  )}
                 </div>
-                <button 
-                  onClick={() => {
-                    addObject({
-                      type: 'frame',
-                      x: (window.innerWidth / 2 - useCanvasStore.getState().viewport.x) / useCanvasStore.getState().viewport.zoom - 400,
-                      y: (window.innerHeight / 2 - useCanvasStore.getState().viewport.y) / useCanvasStore.getState().viewport.zoom - 225,
-                      width: 800,
-                      height: 450,
-                      rotation: 0,
-                      fill: '#ffffff',
-                      text: `New Frame`
-                    });
-                  }}
-                  className="w-full py-2 border-2 border-dashed border-neutral-200 rounded-lg hover:border-neutral-300 hover:bg-neutral-50 transition-colors text-neutral-400 font-medium"
-                >
-                  + Add New Frame
-                </button>
               </div>
             )}
             {activeTab === 'layers' && (
