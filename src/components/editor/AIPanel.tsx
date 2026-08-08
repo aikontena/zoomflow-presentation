@@ -105,7 +105,30 @@ export const AIPanel: React.FC = () => {
         >
           <Trash2 size={14} />
         </button>
-      </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h5 className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest px-1">Visuals</h5>
+                  <div className="grid grid-cols-1 gap-2">
+                    <button 
+                      onClick={() => {
+                        const query = window.prompt("What images are you looking for?");
+                        if (query) setInput(`Search royalty-free images for "${query}"`);
+                      }}
+                      className="flex items-center gap-3 w-full p-2.5 text-[10px] bg-white border border-neutral-100 rounded-xl hover:border-primary/30 hover:bg-primary/5 transition-all text-neutral-700 font-bold shadow-sm"
+                    >
+                      <ImageIcon size={14} className="text-primary" />
+                      Search Royalty-Free Images
+                    </button>
+                    <button 
+                      onClick={() => setInput("Suggest better icons for my presentation content")}
+                      className="flex items-center gap-3 w-full p-2.5 text-[10px] bg-white border border-neutral-100 rounded-xl hover:border-primary/30 hover:bg-primary/5 transition-all text-neutral-700 font-bold shadow-sm"
+                    >
+                      <Sparkles size={14} className="text-primary" />
+                      Suggest Better Icons
+                    </button>
+                  </div>
+                </div>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
         {aiMessages.length === 0 && (
