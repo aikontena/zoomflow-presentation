@@ -383,8 +383,33 @@ export default function Canvas() {
       e.preventDefault();
       resetZoom();
     } else if (e.key === 'z' && (e.metaKey || e.ctrlKey)) {
+      if (editingId) return; // Don't trigger undo while typing
       if (e.shiftKey) redo();
       else undo();
+    } else if (e.key === 'b' && (e.metaKey || e.ctrlKey)) {
+      if (selection.length > 0) {
+        const obj = objects.find(o => o.id === selection[0]);
+        if (obj?.type === 'text') {
+          e.preventDefault();
+          updateObject(obj.id, { fontWeight: obj.fontWeight === 'bold' ? 'normal' : 'bold' });
+        }
+      }
+    } else if (e.key === 'i' && (e.metaKey || e.ctrlKey)) {
+      if (selection.length > 0) {
+        const obj = objects.find(o => o.id === selection[0]);
+        if (obj?.type === 'text') {
+          e.preventDefault();
+          updateObject(obj.id, { fontStyle: obj.fontStyle === 'italic' ? 'normal' : 'italic' });
+        }
+      }
+    } else if (e.key === 'u' && (e.metaKey || e.ctrlKey)) {
+      if (selection.length > 0) {
+        const obj = objects.find(o => o.id === selection[0]);
+        if (obj?.type === 'text') {
+          e.preventDefault();
+          updateObject(obj.id, { textDecoration: obj.textDecoration === 'underline' ? 'none' : 'underline' });
+        }
+      }
     } else if (e.key === 'c' && (e.metaKey || e.ctrlKey)) {
       setClipboard(selection);
     } else if (e.key === 'v' && (e.metaKey || e.ctrlKey)) {
