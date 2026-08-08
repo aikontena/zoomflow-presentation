@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 
 export const CanvasTemplateLibrary: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const { loadTemplate } = useCanvasStore();
+  const { requestTemplate } = useCanvasStore();
 
   const filteredLayouts = CANVAS_LAYOUTS.filter(layout => 
     layout.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -40,7 +40,7 @@ export const CanvasTemplateLibrary: React.FC = () => {
             <button
               key={layout.id}
               onClick={() => {
-                loadTemplate(layout);
+                requestTemplate(layout);
                 toast.success(`Applied ${layout.name} layout`);
               }}
               className="group flex flex-col gap-2 p-2 rounded-xl border border-neutral-100 hover:border-primary hover:bg-neutral-50 transition-all text-left"
