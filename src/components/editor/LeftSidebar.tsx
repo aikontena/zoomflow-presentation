@@ -47,7 +47,8 @@ export default function LeftSidebar() {
     selection,
     setSelection,
     addObject,
-    loadTemplate
+    loadTemplate,
+    setViewport
   } = useCanvasStore();
 
 
