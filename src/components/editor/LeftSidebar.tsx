@@ -114,43 +114,67 @@ export default function LeftSidebar() {
               <div className="space-y-4">
                 <div className="flex flex-col gap-4">
                   {presentationPath.length > 0 ? (
-                    presentationPath.map((frameId, index) => {
-                      const frame = objects.find(o => o.id === frameId);
-                      if (!frame) return null;
-                      return (
-                        <div key={frameId} className="group relative flex flex-col gap-2">
-                          <div 
-                            onClick={() => {
-                              setSelection([frameId]);
-                              // Pan viewport to the frame
-                              const currentZoom = useCanvasStore.getState().viewport.zoom;
-                              const rect = document.getElementById('canvas-container')?.getBoundingClientRect();
-                              if (rect && frame) {
-                                setViewport({
-                                  x: (rect.width / 2) - (frame.x + frame.width / 2) * currentZoom,
-                                  y: (rect.height / 2) - (frame.y + frame.height / 2) * currentZoom,
-                                  zoom: currentZoom
-                                });
-                              }
-                            }}
-                            className={`aspect-video rounded-lg border-2 overflow-hidden relative transition-all cursor-pointer shadow-sm ${
-                              selection.includes(frameId) ? 'border-primary ring-2 ring-primary/20' : 'border-neutral-200 hover:border-neutral-300'
-                            }`}
-                          >
-                            <FramePreview frame={frame} allObjects={objects} />
-                            <div className="absolute bottom-0 inset-x-0 bg-white/90 backdrop-blur-sm p-2 text-[10px] font-medium border-t border-neutral-100 flex justify-between items-center">
-                              <span className="truncate max-w-[180px]">{frame.text || `Frame ${index + 1}`}</span>
-                              <span className="text-neutral-400 font-mono">#{index + 1}</span>
+                    <div className="space-y-4">
+                      {presentationPath.map((frameId, index) => {
+                        const frame = objects.find(o => o.id === frameId);
+                        if (!frame) return null;
+                        
+                        // Calculate next frame for path preview
+                        const nextFrameId = presentationPath[index + 1];
+                        const nextFrame = nextFrameId ? objects.find(o => o.id === nextFrameId) : null;
+                        
+                        return (
+                          <div key={frameId} className="group relative flex flex-col gap-2">
+                            <div 
+                              draggable
+                              onDragStart={(e) => {
+                                e.dataTransfer.setData('frameIndex', index.toString());
+                              }}
+                              onDragOver={(e) => e.preventDefault()}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                const fromIndex = parseInt(e.dataTransfer.getData('frameIndex'));
+                                const newPath = [...presentationPath];
+                                const [removed] = newPath.splice(fromIndex, 1);
+                                newPath.splice(index, 0, removed);
+                                useCanvasStore.getState().setPresentationPath(newPath);
+                              }}
+                              onClick={() => {
+                                setSelection([frameId]);
+                                const currentZoom = useCanvasStore.getState().viewport.zoom;
+                                const rect = document.getElementById('canvas-container')?.getBoundingClientRect();
+                                if (rect && frame) {
+                                  setViewport({
+                                    x: (rect.width / 2) - (frame.x + frame.width / 2) * currentZoom,
+                                    y: (rect.height / 2) - (frame.y + frame.height / 2) * currentZoom,
+                                    zoom: currentZoom
+                                  });
+                                }
+                              }}
+                              className={`aspect-video rounded-lg border-2 overflow-hidden relative transition-all cursor-grab active:cursor-grabbing shadow-sm ${
+                                selection.includes(frameId) ? 'border-primary ring-2 ring-primary/20' : 'border-neutral-200 hover:border-neutral-300'
+                              }`}
+                            >
+                              <FramePreview frame={frame} allObjects={objects} />
+                              <div className="absolute bottom-0 inset-x-0 bg-white/90 backdrop-blur-sm p-2 text-[10px] font-medium border-t border-neutral-100 flex justify-between items-center">
+                                <span className="truncate max-w-[180px]">{frame.text || `Frame ${index + 1}`}</span>
+                                <span className="text-neutral-400 font-mono">#{index + 1}</span>
+                              </div>
                             </div>
+                            
+                            {/* Camera Path Visualizer */}
+                            {nextFrame && (
+                              <div className="flex flex-col items-center py-1 opacity-40 group-hover:opacity-100 transition-opacity">
+                                <div className="w-px h-6 bg-gradient-to-b from-primary to-primary/20" />
+                                <div className="text-[9px] font-bold text-primary/60 uppercase tracking-tighter">
+                                  {frame.settings?.duration || 1200}ms · {frame.settings?.easing || 'smooth'}
+                                </div>
+                              </div>
+                            )}
                           </div>
-                          {index < presentationPath.length - 1 && (
-                            <div className="flex justify-center text-neutral-200">
-                              <div className="w-px h-4 bg-neutral-200" />
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })
+                        );
+                      })}
+                    </div>
                   ) : (
                     <div className="text-center py-8 px-4 border-2 border-dashed border-neutral-100 rounded-xl">
                       <p className="text-xs text-neutral-400">Add frames to your canvas to create a presentation path.</p>
