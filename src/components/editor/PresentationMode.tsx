@@ -86,21 +86,21 @@ export default function PresentationMode() {
         }
       }}
     >
-      <div className="flex-1 relative overflow-hidden flex items-center justify-center pointer-events-none">
-        {/* Camera Stage */}
-        <div 
-          className="absolute inset-0"
+      <div className="flex-1 relative overflow-hidden pointer-events-none">
+        {/* Camera Stage (GPU Accelerated Container) */}
+        <div
+          id="presentation-camera-container"
+          className="absolute inset-0 will-change-transform"
           style={{
-            transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom || 1}) rotate(${viewport.rotation || 0}deg)`,
-            transformOrigin: '50% 50%', // Centered camera rotation
-            transition: 'none', // Handled by ViewportController requestAnimationFrame at 60fps
+            transformOrigin: '50% 50%',
+            willChange: 'transform',
           }}
         >
           {objects.map(obj => (
-            <div 
+            <div
               key={obj.id}
+              className="absolute"
               style={{
-                position: 'absolute',
                 left: obj.x,
                 top: obj.y,
                 width: obj.width,
@@ -125,10 +125,10 @@ export default function PresentationMode() {
               {obj.type === 'text' && obj.text}
               {obj.type === 'icon' && obj.iconName && (
                 <div className="w-full h-full p-[10%]">
-                  <IconRenderer 
-                    name={obj.iconName} 
-                    size="100%" 
-                    color={obj.fill} 
+                  <IconRenderer
+                    name={obj.iconName}
+                    size="100%"
+                    color={obj.fill}
                     strokeWidth={obj.strokeWidth || 2}
                   />
                 </div>
