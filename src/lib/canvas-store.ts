@@ -115,6 +115,18 @@ export interface Bookmark {
   viewport: { x: number; y: number; zoom: number; rotation: number };
 }
 
+export interface AiMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  proposal?: AiProposal;
+}
+
+export interface AiProposal {
+  type: 'update_objects' | 'add_objects' | 'delete_objects' | 'create_presentation' | 'suggest_theme' | 'suggest_path';
+  description: string;
+  data: any;
+}
+
 interface CanvasStore {
   objects: CanvasObject[];
   selection: string[];
@@ -170,6 +182,16 @@ interface CanvasStore {
   requestTemplate: (template: any) => void;
   resolveTemplateConflict: (choice: 'keep' | 'new' | 'duplicate' | 'replace') => void;
   randomizeTransitions: () => void;
+  
+  // AI Assistant
+  aiMessages: AiMessage[];
+  pendingAiProposal: AiProposal | null;
+  isAiThinking: boolean;
+  addAiMessage: (message: AiMessage) => void;
+  setPendingAiProposal: (proposal: AiProposal | null) => void;
+  setAiThinking: (thinking: boolean) => void;
+  applyAiProposal: (proposal: AiProposal) => void;
+  clearAiMessages: () => void;
 }
 
 export const useCanvasStore = create<CanvasStore>()(
@@ -484,7 +506,56 @@ export const useCanvasStore = create<CanvasStore>()(
 
       pendingTemplate: null,
 
-      // Never apply a template on top of an existing presentation without consent.
+      aiMessages: [],
+      pendingAiProposal: null,
+      isAiThinking: false,
+      addAiMessage: (message) => set((state) => ({ aiMessages: [...state.aiMessages, message] })),
+      setPendingAiProposal: (pendingAiProposal) => set({ pendingAiProposal }),
+      setAiThinking: (isAiThinking) => set({ isAiThinking }),
+      clearAiMessages: () => set({ aiMessages: [] }),
+      applyAiProposal: (proposal) => {
+        const { addObject, updateObject, deleteObjects, clear, loadDocument } = get();
+        
+        switch (proposal.type) {
+          case 'create_presentation':
+            if (proposal.data.objects) {
+              loadDocument({
+                objects: proposal.data.objects,
+                viewport: { x: 0, y: 0, zoom: 1, rotation: 0 },
+                presentationPath: proposal.data.presentationPath || []
+              });
+            }
+            break;
+          case 'add_objects':
+            if (Array.isArray(proposal.data)) {
+              proposal.data.forEach((obj: any) => addObject(obj));
+            }
+            break;
+          case 'update_objects':
+            if (typeof proposal.data === 'object') {
+              Object.entries(proposal.data).forEach(([id, patch]: [string, any]) => {
+                updateObject(id, patch);
+              });
+            }
+            break;
+          case 'delete_objects':
+            if (Array.isArray(proposal.data)) {
+              deleteObjects(proposal.data);
+            }
+            break;
+          case 'suggest_theme':
+            // Update presentation settings colors
+            if (proposal.data.backgroundColor) {
+              get().updatePresentationSettings({ backgroundColor: proposal.data.backgroundColor });
+            }
+            break;
+        }
+        
+        set({ pendingAiProposal: null });
+        toast.success("AI changes applied successfully");
+      },
+
+      // --- Template Logic ---
       requestTemplate: (template) => {
         const hasContent = get().objects.some(o => !(o.locked && (o.type === 'rectangle' || o.type === 'image') && o.width > 5000));
         if (!hasContent) {

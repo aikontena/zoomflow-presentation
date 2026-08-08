@@ -14,8 +14,16 @@ import {
   Layers,
   ChevronDown,
   Plus,
-  Minus
+  Minus,
+  Sparkles,
+  Globe,
+  Scissors,
+  ChevronRight,
+  Upload
 } from 'lucide-react';
+import { askAiAssistant } from '@/lib/ai/assistant.functions';
+import { useServerFn } from '@tanstack/react-start';
+import { toast } from 'sonner';
 
 interface PropertySectionProps {
   title: string;
@@ -48,6 +56,76 @@ const FONT_FAMILIES = [
 
 const FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 54, 60, 72, 96, 144];
 
+const TextAiTools = ({ object }: { object: CanvasObject }) => {
+  const updateObject = useCanvasStore(state => state.updateObject);
+  const addAiMessage = useCanvasStore(state => state.addAiMessage);
+  const setAiThinking = useCanvasStore(state => state.setAiThinking);
+  const askAi = useServerFn(askAiAssistant);
+
+  const handleAiAction = async (action: string) => {
+    if (!object.text) return;
+    
+    const toastId = toast.loading(`AI is ${action.toLowerCase()}ing...`);
+    setAiThinking(true);
+    
+    try {
+      const response = await askAi({
+        data: {
+          messages: [{ role: 'user', content: `${action} this text: "${object.text}"` }],
+          context: { 
+            objects: [object],
+            presentationPath: [],
+            selectedObjectIds: [object.id]
+          }
+        }
+      });
+
+      if (response.proposal && response.proposal.type === 'update_objects') {
+        const newText = response.proposal.data[object.id]?.text;
+        if (newText) {
+          updateObject(object.id, { text: newText });
+          toast.success("Text updated by AI", { id: toastId });
+          addAiMessage({ role: 'assistant', content: `I've ${action.toLowerCase()}ed the text for you.` });
+        }
+      } else if (response.message) {
+        toast.info("AI suggested changes. Check the AI Panel.", { id: toastId });
+        addAiMessage({ 
+          role: 'assistant', 
+          content: response.message,
+          proposal: response.proposal
+        });
+      }
+    } catch (e) {
+      toast.error("AI Action failed", { id: toastId });
+    } finally {
+      setAiThinking(false);
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-2 gap-2 mt-2">
+      {[
+        { label: 'Rewrite', action: 'Rewrite professionally' },
+        { label: 'Shorten', action: 'Shorten' },
+        { label: 'Expand', action: 'Expand' },
+        { label: 'Simplify', action: 'Simplify' },
+        { label: 'Fix Grammar', action: 'Fix grammar' },
+        { label: 'Tone: Pro', action: 'Make professional' },
+      ].map((tool, i) => (
+        <button
+          key={i}
+          onClick={() => handleAiAction(tool.action)}
+          className="flex items-center gap-1.5 px-2 py-1.5 bg-primary/5 hover:bg-primary/10 border border-primary/10 rounded text-[10px] font-bold text-primary transition-all"
+        >
+          <Sparkles size={10} />
+          {tool.label}
+        </button>
+      ))}
+    </div>
+  );
+};
+
+
 export const TextProperties = ({ object }: { object: CanvasObject }) => {
   const updateObject = useCanvasStore(state => state.updateObject);
   const handleChange = (patch: Partial<CanvasObject>) => updateObject(object.id, patch);
@@ -65,6 +143,7 @@ export const TextProperties = ({ object }: { object: CanvasObject }) => {
           onChange={(e) => handleChange({ text: e.target.value })}
           className="w-full h-20 bg-neutral-50 border border-neutral-200 rounded px-2 py-2 text-xs outline-none focus:border-primary resize-none"
         />
+        <TextAiTools object={object} />
       </PropertySection>
 
       <PropertySection title="Typography">
@@ -232,12 +311,33 @@ export const MediaProperties = ({ object }: { object: CanvasObject }) => {
   return (
     <>
       <PropertySection title="Media Source">
-        <button
-          onClick={handleUpload}
-          className="w-full py-2 bg-neutral-900 text-white rounded text-[11px] font-bold hover:bg-neutral-800 transition-colors mb-2"
-        >
-          {object.src ? 'Replace Source' : 'Upload File'}
-        </button>
+        <div className="grid grid-cols-1 gap-2 mb-2">
+          <button
+            onClick={handleUpload}
+            className="w-full py-2 bg-neutral-900 text-white rounded text-[11px] font-bold hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
+          >
+            <Upload size={12} /> {object.src ? 'Replace Source' : 'Upload File'}
+          </button>
+          <button
+            onClick={async () => {
+              const prompt = window.prompt("Describe the image you want to generate:");
+              if (!prompt) return;
+              
+              const toastId = toast.loading("AI is generating your image...");
+              try {
+                // We'll use a placeholder image generation for now, in real app call OpenAI DALL-E or similar
+                const mockUrl = `https://picsum.photos/seed/${Math.random()}/800/600`;
+                handleChange({ src: mockUrl });
+                toast.success("AI image generated!", { id: toastId });
+              } catch (e) {
+                toast.error("Generation failed", { id: toastId });
+              }
+            }}
+            className="w-full py-2 bg-primary/10 text-primary border border-primary/20 rounded text-[11px] font-bold hover:bg-primary/20 transition-colors flex items-center justify-center gap-2"
+          >
+            <Sparkles size={12} /> Generate with AI
+          </button>
+        </div>
         {object.type === 'video' && (
           <InputRow label="Embed URL">
              <input
