@@ -508,7 +508,13 @@ export default function Canvas() {
                }} />
 
           {objects.map(obj => (
-            <CanvasObjectItem key={obj.id} obj={obj} selection={selection} />
+            <CanvasObjectItem 
+              key={obj.id} 
+              obj={obj} 
+              selection={selection}
+              editingId={editingId}
+              onStartEditing={(id) => setEditingId(id)}
+            />
           ))}
         </div>
 
