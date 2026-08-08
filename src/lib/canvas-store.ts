@@ -11,8 +11,10 @@ export interface CameraState {
 
 export interface FrameSettings {
   duration: number;
-  easing: 'smooth' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'cinematic' | 'fast' | 'slow';
+  easing: 'smooth' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'cinematic' | 'fast' | 'slow' | 'bounce';
   camera: CameraState;
+  delay?: number;
+  autoNext?: boolean;
 }
 
 export interface CanvasObject {
@@ -48,6 +50,9 @@ export interface PresentationSettings {
   showFrameTitles: boolean;
   darkBackground: boolean;
   type: 'linear' | 'spatial' | 'spiral' | 'grid';
+  zoomOutBeforeStart?: boolean;
+  autoFit?: boolean;
+  backgroundColor?: string;
 }
 
 interface CanvasStore {
