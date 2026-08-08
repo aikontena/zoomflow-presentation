@@ -133,9 +133,12 @@ export default function LeftSidebar() {
                               onDragOver={(e) => e.preventDefault()}
                               onDrop={(e) => {
                                 e.preventDefault();
-                                const fromIndex = parseInt(e.dataTransfer.getData('frameIndex'));
+                                const fromIndexRaw = e.dataTransfer.getData('frameIndex');
+                                if (!fromIndexRaw) return;
+                                const fromIndex = parseInt(fromIndexRaw);
                                 const newPath = [...presentationPath];
                                 const [removed] = newPath.splice(fromIndex, 1);
+                                if (!removed) return;
                                 newPath.splice(index, 0, removed);
                                 useCanvasStore.getState().setPresentationPath(newPath);
                               }}
