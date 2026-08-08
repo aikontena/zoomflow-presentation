@@ -16,8 +16,10 @@ interface MenuItem {
   action?: () => void;
   disabled?: boolean;
   comingSoon?: boolean;
+  icon?: React.ReactNode;
   submenu?: MenuItem[];
 }
+
 
 interface MenuCategory {
   label: string;
@@ -270,8 +272,10 @@ export default function MenuBar() {
                       }`}
                     >
                       <span className="flex items-center gap-2">
+                        {item.icon}
                         {item.label}
                         {item.comingSoon && (
+
                           <span className="text-[9px] px-1 rounded bg-neutral-100 text-neutral-400 group-hover:bg-white/20 group-hover:text-white">
                             Coming Soon
                           </span>
