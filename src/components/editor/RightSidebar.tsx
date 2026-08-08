@@ -72,6 +72,19 @@ export default function RightSidebar() {
                   <span className="text-[10px] w-12">{presentationSettings.transitionDuration}ms</span>
                 </div>
               </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-medium text-neutral-500 uppercase">Zoom Padding</label>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="range" 
+                    min="0" max="0.5" step="0.05"
+                    value={presentationSettings.zoomPadding ?? 0.1}
+                    onChange={(e) => updatePresentationSettings({ zoomPadding: parseFloat(e.target.value) })}
+                    className="flex-1 accent-primary" 
+                  />
+                  <span className="text-[10px] w-12">{Math.round((presentationSettings.zoomPadding ?? 0.1) * 100)}%</span>
+                </div>
+              </div>
               
               <div className="flex items-center justify-between">
                 <label className="text-xs text-neutral-500">Auto-play</label>
