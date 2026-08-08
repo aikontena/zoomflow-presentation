@@ -12,7 +12,9 @@ import {
   AlignJustify,
   Palette,
   Layers,
-  ChevronDown
+  ChevronDown,
+  Plus,
+  Minus
 } from 'lucide-react';
 
 interface PropertySectionProps {
@@ -37,9 +39,23 @@ const InputRow = ({ label, children }: { label: string; children: React.ReactNod
   </div>
 );
 
+const FONT_FAMILIES = [
+  'Arial', 'Calibri', 'Aptos', 'Times New Roman', 'Georgia', 'Verdana', 'Tahoma',
+  'Trebuchet MS', 'Helvetica', 'Roboto', 'Open Sans', 'Lato', 'Montserrat',
+  'Poppins', 'Inter', 'Nunito', 'Playfair Display', 'Merriweather', 'Oswald',
+  'Raleway', 'Source Sans Pro'
+];
+
+const FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 54, 60, 72, 96, 144];
+
 export const TextProperties = ({ object }: { object: CanvasObject }) => {
   const updateObject = useCanvasStore(state => state.updateObject);
   const handleChange = (patch: Partial<CanvasObject>) => updateObject(object.id, patch);
+
+  const adjustFontSize = (delta: number) => {
+    const currentSize = object.fontSize || 16;
+    handleChange({ fontSize: Math.max(1, currentSize + delta) });
+  };
 
   return (
     <>
@@ -58,20 +74,43 @@ export const TextProperties = ({ object }: { object: CanvasObject }) => {
             onChange={(e) => handleChange({ fontFamily: e.target.value })}
             className="w-32 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none"
           >
-            <option value="Inter">Inter</option>
-            <option value="SF Pro Display">SF Pro</option>
-            <option value="Georgia">Serif</option>
-            <option value="JetBrains Mono">Mono</option>
+            {FONT_FAMILIES.map(font => (
+              <option key={font} value={font}>{font}</option>
+            ))}
           </select>
         </InputRow>
 
         <InputRow label="Font Size">
-          <input
-            type="number"
-            value={object.fontSize || 16}
-            onChange={(e) => handleChange({ fontSize: parseInt(e.target.value) })}
-            className="w-16 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none"
-          />
+          <div className="flex items-center gap-1">
+            <button 
+              onClick={() => adjustFontSize(-1)}
+              className="p-1 hover:bg-neutral-100 rounded border border-neutral-200"
+            >
+              <Minus size={12} />
+            </button>
+            <div className="relative">
+              <input
+                type="number"
+                value={object.fontSize || 16}
+                onChange={(e) => handleChange({ fontSize: parseInt(e.target.value) || 16 })}
+                className="w-12 bg-neutral-50 border border-neutral-200 rounded px-1 py-1 text-xs outline-none text-center"
+              />
+              <select
+                className="absolute inset-0 opacity-0 cursor-pointer w-full"
+                onChange={(e) => handleChange({ fontSize: parseInt(e.target.value) })}
+              >
+                {FONT_SIZES.map(size => (
+                  <option key={size} value={size}>{size}</option>
+                ))}
+              </select>
+            </div>
+            <button 
+              onClick={() => adjustFontSize(1)}
+              className="p-1 hover:bg-neutral-100 rounded border border-neutral-200"
+            >
+              <Plus size={12} />
+            </button>
+          </div>
         </InputRow>
 
         <div className="flex gap-1 justify-between">
@@ -80,15 +119,19 @@ export const TextProperties = ({ object }: { object: CanvasObject }) => {
             { icon: Italic, key: 'fontStyle', activeVal: 'italic', defaultVal: 'normal' },
             { icon: Underline, key: 'textDecoration', activeVal: 'underline', defaultVal: 'none' },
             { icon: Strikethrough, key: 'textDecoration', activeVal: 'line-through', defaultVal: 'none' },
+            { label: 'TT', key: 'textTransform', activeVal: 'uppercase', defaultVal: 'none' },
           ].map((btn, i) => (
             <button
               key={i}
-              onClick={() => handleChange({ [btn.key]: (object as any)[btn.key] === btn.activeVal ? btn.defaultVal : btn.activeVal })}
-              className={`p-2 rounded border transition-colors ${
+              onClick={() => {
+                const currentVal = (object as any)[btn.key];
+                handleChange({ [btn.key]: currentVal === btn.activeVal ? btn.defaultVal : btn.activeVal });
+              }}
+              className={`p-2 rounded border transition-colors flex items-center justify-center min-w-[32px] ${
                 (object as any)[btn.key] === btn.activeVal ? 'bg-primary text-white border-primary' : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50'
               }`}
             >
-              <btn.icon size={14} />
+              {btn.icon ? <btn.icon size={14} /> : <span className="text-[10px] font-bold">{btn.label}</span>}
             </button>
           ))}
         </div>
@@ -146,7 +189,7 @@ export const TextProperties = ({ object }: { object: CanvasObject }) => {
         <InputRow label="Highlight">
           <input
             type="color"
-            value={object.highlight || '#ffffff'}
+            value={object.highlight || 'transparent'}
             onChange={(e) => handleChange({ highlight: e.target.value })}
             className="w-8 h-8 rounded border-none cursor-pointer"
           />

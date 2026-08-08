@@ -326,13 +326,18 @@ export const useCanvasStore = create<CanvasStore>()(
         const hasChanges = Object.keys(patch).some(key => (patch as any)[key] !== (target as any)[key]);
         if (!hasChanges) return;
 
-        set((state) => ({
-          history: {
-            past: [...state.history.past, state.objects].slice(-50),
-            future: [],
-          },
-          objects: state.objects.map((o) => (o.id === id ? { ...o, ...patch } : o)),
-        }));
+        set((state) => {
+          // Optimization: If only text is changing and we're just updating the current object's text,
+          // we might want to be careful about history flooding.
+          // For now, let's keep it simple as it's required for undo/redo to work "correctly" after editing.
+          return {
+            history: {
+              past: [...state.history.past, state.objects].slice(-50),
+              future: [],
+            },
+            objects: state.objects.map((o) => (o.id === id ? { ...o, ...patch } : o)),
+          };
+        });
       },
 
       deleteObjects: (ids) => {

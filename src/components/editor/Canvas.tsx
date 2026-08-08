@@ -9,8 +9,28 @@ import StatusBar from './StatusBar';
 import { useViewportController } from './ViewportController';
 
 // Memoized individual object renderer
-export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObject, selection: string[] }) => {
+export const CanvasObjectItem = React.memo(({ 
+  obj, 
+  selection, 
+  editingId, 
+  onStartEditing 
+}: { 
+  obj: CanvasObject, 
+  selection: string[],
+  editingId: string | null,
+  onStartEditing: (id: string) => void
+}) => {
   const isSelected = selection.includes(obj.id);
+  const isEditing = editingId === obj.id;
+  const updateObject = useCanvasStore(state => state.updateObject);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (isEditing && textAreaRef.current) {
+      textAreaRef.current.focus();
+      textAreaRef.current.select();
+    }
+  }, [isEditing]);
   
   const getFilter = () => {
     if (obj.type !== 'image' && obj.type !== 'video') return undefined;
@@ -32,6 +52,7 @@ export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObj
       letterSpacing: `${obj.letterSpacing || 0}px`,
       lineHeight: obj.lineHeight || 1.2,
       backgroundColor: obj.highlight || 'transparent',
+      textTransform: (obj as any).textTransform || 'none',
       whiteSpace: 'pre-wrap',
       wordBreak: 'break-word',
       width: '100%',
@@ -39,11 +60,23 @@ export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObj
       display: 'flex',
       alignItems: obj.textAlign === 'center' ? 'center' : 'flex-start',
       justifyContent: obj.textAlign === 'center' ? 'center' : (obj.textAlign === 'right' ? 'flex-end' : 'flex-start'),
+      color: obj.fill || 'black',
+      fontSize: obj.fontSize || 16,
+      padding: '4px',
+      outline: 'none',
     };
+  };
+
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    if (obj.type === 'text') {
+      e.stopPropagation();
+      onStartEditing(obj.id);
+    }
   };
 
   return (
     <div
+      onDoubleClick={handleDoubleClick}
       style={{
         position: 'absolute',
         left: obj.x,
@@ -61,9 +94,9 @@ export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObj
         color: obj.fill || 'black',
         fontSize: obj.fontSize || (obj.type === 'frame' ? 12 : 16),
         pointerEvents: obj.locked ? 'none' : 'auto',
-        userSelect: 'none',
+        userSelect: isEditing ? 'text' : 'none',
         filter: obj.shadow ? `drop-shadow(${obj.shadowOffsetX || 0}px ${obj.shadowOffsetY || 4}px ${obj.shadowBlur || 6}px ${obj.shadowColor || 'rgba(0,0,0,0.25)'})` : undefined,
-        boxShadow: isSelected ? '0 0 0 2px #3b82f6' : (obj.type === 'frame' ? '0 4px 6px -1px rgb(0 0 0 / 0.1)' : 'none'),
+        boxShadow: isEditing ? '0 0 0 2px #3b82f6' : (isSelected ? '0 0 0 2px #3b82f6' : (obj.type === 'frame' ? '0 4px 6px -1px rgb(0 0 0 / 0.1)' : 'none')),
         zIndex: obj.type === 'frame' ? 0 : 1,
         opacity: obj.opacity ?? 1,
         overflow: 'hidden',
@@ -75,9 +108,26 @@ export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObj
         </div>
       )}
       {obj.type === 'text' && (
-        <div style={getTextStyle()}>
-          {obj.text}
-        </div>
+        isEditing ? (
+          <textarea
+            ref={textAreaRef}
+            value={obj.text}
+            onChange={(e) => updateObject(obj.id, { text: e.target.value })}
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{
+              ...getTextStyle(),
+              background: 'transparent',
+              border: 'none',
+              resize: 'none',
+              overflow: 'hidden',
+              cursor: 'text',
+            }}
+          />
+        ) : (
+          <div style={getTextStyle()}>
+            {obj.text}
+          </div>
+        )
       )}
       {obj.type === 'image' && obj.src && (
         <img 
@@ -139,7 +189,7 @@ export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObj
         </div>
       )}
 
-      {isSelected && (
+      {isSelected && !isEditing && (
         <>
           <div className="absolute -top-1 -left-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
           <div className="absolute -top-1 -right-1 w-2 h-2 bg-white border border-blue-500 rounded-full" />
@@ -154,6 +204,7 @@ export const CanvasObjectItem = React.memo(({ obj, selection }: { obj: CanvasObj
   );
 }, (prev, next) => {
   return prev.obj === next.obj && 
+         prev.editingId === next.editingId &&
          (prev.selection.includes(prev.obj.id) === next.selection.includes(next.obj.id));
 });
 
@@ -178,6 +229,7 @@ export default function Canvas() {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [activeTool, setActiveTool] = useState<'select' | 'rect' | 'circle' | 'text' | 'frame'>('select');
   const [clipboard, setClipboard] = useState<string[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const getPointerPos = (e: React.MouseEvent | MouseEvent | Touch) => {
     const rect = containerRef.current?.getBoundingClientRect();
@@ -271,6 +323,7 @@ export default function Canvas() {
       setDragStart(pos);
     } else {
       if (!e.shiftKey) setSelection([]);
+      setEditingId(null);
     }
   };
 
@@ -304,6 +357,9 @@ export default function Canvas() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (editingId && e.key !== 'Escape') return; 
+    if (e.key === 'Escape') setEditingId(null);
+
     if (e.code === 'Space' && !isPanning) {
       setIsPanning(true);
       return;
@@ -331,8 +387,33 @@ export default function Canvas() {
       e.preventDefault();
       resetZoom();
     } else if (e.key === 'z' && (e.metaKey || e.ctrlKey)) {
+      if (editingId) return; // Don't trigger undo while typing
       if (e.shiftKey) redo();
       else undo();
+    } else if (e.key === 'b' && (e.metaKey || e.ctrlKey)) {
+      if (selection.length > 0) {
+        const obj = objects.find(o => o.id === selection[0]);
+        if (obj?.type === 'text') {
+          e.preventDefault();
+          updateObject(obj.id, { fontWeight: obj.fontWeight === 'bold' ? 'normal' : 'bold' });
+        }
+      }
+    } else if (e.key === 'i' && (e.metaKey || e.ctrlKey)) {
+      if (selection.length > 0) {
+        const obj = objects.find(o => o.id === selection[0]);
+        if (obj?.type === 'text') {
+          e.preventDefault();
+          updateObject(obj.id, { fontStyle: obj.fontStyle === 'italic' ? 'normal' : 'italic' });
+        }
+      }
+    } else if (e.key === 'u' && (e.metaKey || e.ctrlKey)) {
+      if (selection.length > 0) {
+        const obj = objects.find(o => o.id === selection[0]);
+        if (obj?.type === 'text') {
+          e.preventDefault();
+          updateObject(obj.id, { textDecoration: obj.textDecoration === 'underline' ? 'none' : 'underline' });
+        }
+      }
     } else if (e.key === 'c' && (e.metaKey || e.ctrlKey)) {
       setClipboard(selection);
     } else if (e.key === 'v' && (e.metaKey || e.ctrlKey)) {
@@ -456,7 +537,13 @@ export default function Canvas() {
                }} />
 
           {objects.map(obj => (
-            <CanvasObjectItem key={obj.id} obj={obj} selection={selection} />
+            <CanvasObjectItem 
+              key={obj.id} 
+              obj={obj} 
+              selection={selection}
+              editingId={editingId}
+              onStartEditing={(id) => setEditingId(id)}
+            />
           ))}
         </div>
 
