@@ -84,7 +84,7 @@ interface CanvasStore {
   clear: () => void;
   save: () => void;
   setActiveOverlay: (overlay: 'templates' | 'export' | 'settings' | null) => void;
-  loadTemplate: (objects: CanvasObject[]) => void;
+  loadTemplate: (objects: CanvasObject[], templateName?: string) => void;
 }
 
 export const useCanvasStore = create<CanvasStore>()(
@@ -307,14 +307,23 @@ export const useCanvasStore = create<CanvasStore>()(
         console.log("CanvasStore: Setting active overlay to:", activeOverlay);
         set({ activeOverlay });
       },
-      loadTemplate: (templateObjects) => {
-        console.log("CanvasStore: loadTemplate called with objects:", templateObjects);
+      loadTemplate: (templateObjects, templateName) => {
+        console.log(`[STEP 2] Fetching template: ${templateName || 'Unnamed'}`);
         
         if (!templateObjects || !Array.isArray(templateObjects)) {
-          console.error("CanvasStore: Invalid template objects received:", templateObjects);
+          console.error("[STEP 2] Template found but invalid objects:", templateObjects);
+          toast.error("Template found but contains invalid data.");
           return;
         }
 
+        console.log("[STEP 3] Validating JSON...");
+        const frameCount = templateObjects.filter(o => o.type === 'frame').length;
+        const objectCount = templateObjects.length;
+        console.log(`[STEP 3] Stats: Frames: ${frameCount}, Total Objects: ${objectCount}`);
+
+        console.log("[STEP 4] IMPORT: Starting process...");
+        console.log("[STEP 4] Clearing current canvas...");
+        
         // Deep clone first to be absolutely safe
         const clonedObjects = JSON.parse(JSON.stringify(templateObjects));
 
@@ -324,6 +333,7 @@ export const useCanvasStore = create<CanvasStore>()(
           if (obj.id) idMap.set(obj.id, Math.random().toString(36).substring(7));
         });
 
+        console.log("[STEP 4] Importing Objects and restoring layers...");
         const objectsWithIds = clonedObjects.map((obj: any) => {
           const newId = obj.id ? idMap.get(obj.id) || Math.random().toString(36).substring(7) : Math.random().toString(36).substring(7);
           return {
@@ -337,7 +347,7 @@ export const useCanvasStore = create<CanvasStore>()(
           .filter((o: any) => o.type === 'frame')
           .map((o: any) => o.id);
 
-        console.log("CanvasStore: Applying new state with objects:", objectsWithIds.length);
+        console.log("[STEP 5] RENDER: Updating state...");
 
         set((state) => ({
           objects: objectsWithIds,
@@ -351,6 +361,9 @@ export const useCanvasStore = create<CanvasStore>()(
           activeOverlay: null,
           lastSaved: Date.now()
         }));
+
+        console.log("[STEP 6] AFTER IMPORT: Verification complete.");
+        console.log(`[STEP 6] Final count: ${objectsWithIds.length} objects loaded.`);
       },
     }),
     {
