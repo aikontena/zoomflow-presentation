@@ -31,6 +31,14 @@ export default function RightSidebar() {
     }
   };
 
+  const ensureFrameSettings = (settings: Partial<any> = {}) => ({
+    duration: settings.duration ?? 1200,
+    easing: settings.easing ?? 'smooth',
+    camera: settings.camera ?? { x: 0, y: 0, zoom: 1, rotation: 0 },
+    ...settings
+  });
+
+
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="py-4 border-b border-neutral-100 last:border-0">
       <div className="flex items-center justify-between mb-3">
