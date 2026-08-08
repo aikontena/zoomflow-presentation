@@ -315,7 +315,7 @@ const createProfessionalFrame = (
 };
 
 export const generateTemplate = (id: string, name: string, category: string, colorKey: string): Template => {
-  const colors = COLORS[colorKey] || COLORS.business;
+  const colors = COLORS[colorKey] || COLORS['business'];
   const objects: any[] = [];
   const spacing = 1200;
   
