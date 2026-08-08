@@ -332,11 +332,21 @@ export default function TemplateLibrary() {
             <Button 
               onClick={() => {
                 console.log("TemplateLibrary: Use Template clicked for", selectedTemplate.name);
-                console.log("TemplateLibrary: Objects being passed:", selectedTemplate.objects);
-                // Ensure objects are fresh copies
-                const objectsToLoad = JSON.parse(JSON.stringify(selectedTemplate.objects));
-                loadTemplate(objectsToLoad);
-                toast.success(`Loaded ${selectedTemplate.name}`);
+                if (!selectedTemplate.objects || selectedTemplate.objects.length === 0) {
+                  toast.error("Template has no objects");
+                  return;
+                }
+                
+                try {
+                  // Ensure objects are fresh copies
+                  const objectsToLoad = JSON.parse(JSON.stringify(selectedTemplate.objects));
+                  loadTemplate(objectsToLoad);
+                  setActiveOverlay(null); // Close the library after successful load
+                  toast.success(`Loaded ${selectedTemplate.name}`);
+                } catch (error) {
+                  console.error("TemplateLibrary: Error loading template:", error);
+                  toast.error("Failed to load template");
+                }
               }}
               className="w-full bg-primary hover:bg-primary/90 text-white h-11 text-lg font-medium shadow-lg shadow-primary/20 group"
             >
