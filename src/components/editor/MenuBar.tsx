@@ -54,25 +54,33 @@ export default function MenuBar() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (file) setPendingFile(file);
+  };
 
+  const confirmImport = async (mode: 'preserve' | 'convert') => {
+    if (!pendingFile) return;
+    
+    const file = pendingFile;
+    setPendingFile(null);
     setIsImporting(true);
-    const toastId = toast.loading(`Converting ${file.name}...`);
+    const toastId = toast.loading(`${mode === 'convert' ? 'Converting' : 'Importing'} ${file.name}...`);
 
     try {
-      const doc = await SlideImporter.importFile(file);
+      const doc = await SlideImporter.importFile(file, mode);
       loadDocument(doc);
-      toast.success(`${file.name} converted to ZoomCanvas format!`, { id: toastId });
+      toast.success(`${file.name} imported successfully!`, { id: toastId });
     } catch (error: any) {
-      toast.error(error.message || 'Failed to convert file', { id: toastId });
+      toast.error(error.message || 'Failed to import file', { id: toastId });
     } finally {
       setIsImporting(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
+
 
 
   useEffect(() => {
