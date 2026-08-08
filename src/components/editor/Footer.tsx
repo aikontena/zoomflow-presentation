@@ -35,24 +35,27 @@ export default function Footer() {
         <div className="w-px h-6 bg-neutral-200" />
 
         {/* Presentation Zoom */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-neutral-500">
-            <Maximize2 size={14} />
-            <span className="text-[10px] font-bold uppercase tracking-tight">Presentation Zoom</span>
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-neutral-500">
+              <Maximize2 size={14} />
+              <span className="text-[10px] font-bold uppercase tracking-tight">Presentation Zoom</span>
+            </div>
+            <div className="flex items-center gap-3 w-40">
+              <Slider
+                min={0}
+                max={0.8}
+                step={0.01}
+                value={[presentationSettings.zoomPadding ?? 0.1]}
+                onValueChange={([v]) => updatePresentationSettings({ zoomPadding: v })}
+                className="flex-1"
+              />
+              <span className="text-[10px] font-mono text-neutral-600 w-10 text-right">
+                {Math.round((presentationSettings.zoomPadding ?? 0.1) * 100)}%
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-3 w-40">
-            <Slider
-              min={0}
-              max={0.8}
-              step={0.01}
-              value={[presentationSettings.zoomPadding ?? 0.1]}
-              onValueChange={([v]) => updatePresentationSettings({ zoomPadding: v })}
-              className="flex-1"
-            />
-            <span className="text-[10px] font-mono text-neutral-600 w-10 text-right">
-              {Math.round((presentationSettings.zoomPadding ?? 0.1) * 100)}%
-            </span>
-          </div>
+          <p className="text-[9px] text-neutral-400 pl-5 leading-none">Increase to zoom OUT more during presentation</p>
         </div>
       </div>
 
