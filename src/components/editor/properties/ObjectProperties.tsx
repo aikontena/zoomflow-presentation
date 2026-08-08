@@ -14,8 +14,15 @@ import {
   Layers,
   ChevronDown,
   Plus,
-  Minus
+  Minus,
+  Sparkles,
+  Globe,
+  Scissors,
+  ChevronRight
 } from 'lucide-react';
+import { askAiAssistant } from '@/lib/ai/assistant.functions';
+import { useServerFn } from '@tanstack/react-start';
+import { toast } from 'sonner';
 
 interface PropertySectionProps {
   title: string;
@@ -48,6 +55,76 @@ const FONT_FAMILIES = [
 
 const FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 54, 60, 72, 96, 144];
 
+const TextAiTools = ({ object }: { object: CanvasObject }) => {
+  const updateObject = useCanvasStore(state => state.updateObject);
+  const addAiMessage = useCanvasStore(state => state.addAiMessage);
+  const setAiThinking = useCanvasStore(state => state.setAiThinking);
+  const askAi = useServerFn(askAiAssistant);
+
+  const handleAiAction = async (action: string) => {
+    if (!object.text) return;
+    
+    const toastId = toast.loading(`AI is ${action.toLowerCase()}ing...`);
+    setAiThinking(true);
+    
+    try {
+      const response = await askAi({
+        data: {
+          messages: [{ role: 'user', content: `${action} this text: "${object.text}"` }],
+          context: { 
+            objects: [object],
+            presentationPath: [],
+            selectedObjectIds: [object.id]
+          }
+        }
+      });
+
+      if (response.proposal && response.proposal.type === 'update_objects') {
+        const newText = response.proposal.data[object.id]?.text;
+        if (newText) {
+          updateObject(object.id, { text: newText });
+          toast.success("Text updated by AI", { id: toastId });
+          addAiMessage({ role: 'assistant', content: `I've ${action.toLowerCase()}ed the text for you.` });
+        }
+      } else if (response.message) {
+        toast.info("AI suggested changes. Check the AI Panel.", { id: toastId });
+        addAiMessage({ 
+          role: 'assistant', 
+          content: response.message,
+          proposal: response.proposal
+        });
+      }
+    } catch (e) {
+      toast.error("AI Action failed", { id: toastId });
+    } finally {
+      setAiThinking(false);
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-2 gap-2 mt-2">
+      {[
+        { label: 'Rewrite', action: 'Rewrite professionally' },
+        { label: 'Shorten', action: 'Shorten' },
+        { label: 'Expand', action: 'Expand' },
+        { label: 'Simplify', action: 'Simplify' },
+        { label: 'Fix Grammar', action: 'Fix grammar' },
+        { label: 'Tone: Pro', action: 'Make professional' },
+      ].map((tool, i) => (
+        <button
+          key={i}
+          onClick={() => handleAiAction(tool.action)}
+          className="flex items-center gap-1.5 px-2 py-1.5 bg-primary/5 hover:bg-primary/10 border border-primary/10 rounded text-[10px] font-bold text-primary transition-all"
+        >
+          <Sparkles size={10} />
+          {tool.label}
+        </button>
+      ))}
+    </div>
+  );
+};
+
+
 export const TextProperties = ({ object }: { object: CanvasObject }) => {
   const updateObject = useCanvasStore(state => state.updateObject);
   const handleChange = (patch: Partial<CanvasObject>) => updateObject(object.id, patch);
@@ -65,6 +142,7 @@ export const TextProperties = ({ object }: { object: CanvasObject }) => {
           onChange={(e) => handleChange({ text: e.target.value })}
           className="w-full h-20 bg-neutral-50 border border-neutral-200 rounded px-2 py-2 text-xs outline-none focus:border-primary resize-none"
         />
+        <TextAiTools object={object} />
       </PropertySection>
 
       <PropertySection title="Typography">
