@@ -34,7 +34,7 @@ export default function EditorLayout() {
           <div className="flex-1 relative overflow-hidden">
             <Canvas />
           </div>
-          {!isPresenting && <RightSidebar />}
+          {!isPresenting && isRightSidebarVisible && <RightSidebar />}
         </div>
       </div>
 
