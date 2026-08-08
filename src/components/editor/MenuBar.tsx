@@ -116,6 +116,10 @@ export default function MenuBar() {
         { label: 'Toggle Grid', comingSoon: true },
         { label: 'Toggle Rulers', comingSoon: true },
         { label: 'Toggle Minimap', comingSoon: true },
+        { 
+          label: useCanvasStore.getState().isRightSidebarVisible ? "Hide Properties" : "Show Properties", 
+          action: () => useCanvasStore.getState().toggleRightSidebar() 
+        },
         { label: 'Toggle Navigator', comingSoon: true },
         { label: 'Fullscreen', action: () => document.documentElement.requestFullscreen() },
         { label: 'Dark Mode', comingSoon: true },

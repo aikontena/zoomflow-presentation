@@ -12,7 +12,7 @@ import PresentationMode from "./PresentationMode";
 const TemplateLibrary = lazy(() => import("./templates/TemplateLibrary"));
 
 export default function EditorLayout() {
-  const { activeOverlay, setActiveOverlay, isPresenting } = useCanvasStore();
+  const { activeOverlay, setActiveOverlay, isPresenting, isRightSidebarVisible } = useCanvasStore();
 
   useEffect(() => {
     (window as any).useCanvasStore = useCanvasStore;
@@ -34,7 +34,7 @@ export default function EditorLayout() {
           <div className="flex-1 relative overflow-hidden">
             <Canvas />
           </div>
-          {!isPresenting && <RightSidebar />}
+          {!isPresenting && isRightSidebarVisible && <RightSidebar />}
         </div>
       </div>
 
