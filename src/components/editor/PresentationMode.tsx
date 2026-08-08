@@ -147,10 +147,8 @@ export default function PresentationMode() {
   // ---- Pan (drag) & Navigation ------------------------------------------------------------
   const onPointerDown = (e: React.PointerEvent) => {
     // Left mouse click (0) or Middle mouse click (1)
+    if (e.button === 2) return; // Right click ignored
     if (e.button !== 0 && e.button !== 1) return;
-    
-    // If it's the right mouse button (2), we explicitly do nothing to respect the user's request
-    if (e.button === 2) return;
 
     if (!presentationSettings.manualPan) {
       // If manual pan is disabled, still track to detect clicks
