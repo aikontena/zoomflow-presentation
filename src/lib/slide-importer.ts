@@ -1,9 +1,7 @@
 import { CanvasObject, Bookmark } from './canvas-store';
-// @ts-ignore
-import pptx2json from 'pptx2json';
 import * as pdfjs from 'pdfjs-dist';
 // @ts-ignore
-import jszip from 'jszip';
+import JSZip from 'jszip';
 
 // Set worker source for pdfjs-dist using a version-matched CDN
 const PDFJS_VERSION = '4.0.379';
@@ -132,9 +130,6 @@ export class SlideImporter {
         locked: mode === 'preserve' // In preserve mode, background is locked
       });
 
-      // In 'convert' mode, we could attempt to parse text layers here, 
-      // but to fulfill the "identical" requirement, we keep the image as a reference layer.
-
       presentationPath.push(frameId);
       bookmarks.push({
         id: `bm-${frameId}`,
@@ -158,9 +153,19 @@ export class SlideImporter {
 
   private static async importPPT(file: File, mode: 'preserve' | 'convert' | 'ai'): Promise<any> {
     const arrayBuffer = await file.arrayBuffer();
-    const pptx = new pptx2json();
-    const json = await pptx.toJson(arrayBuffer);
+    // @ts-ignore
+    const zip = await JSZip.loadAsync(arrayBuffer) as any;
     
+    // 1. Find all slide files
+    const slideFiles = Object.keys(zip.files).filter(name => name.startsWith('ppt/slides/slide') && name.endsWith('.xml'));
+    slideFiles.sort((a, b) => {
+      const matchA = a.match(/\d+/);
+      const matchB = b.match(/\d+/);
+      const numA = matchA ? parseInt(matchA[0]) : 0;
+      const numB = matchB ? parseInt(matchB[0]) : 0;
+      return numA - numB;
+    });
+
     const objects: CanvasObject[] = [];
     const presentationPath: string[] = [];
     const bookmarks: Bookmark[] = [];
@@ -169,7 +174,7 @@ export class SlideImporter {
     const slideHeight = 720;
     const spacing = mode === 'preserve' ? 1400 : 1800;
 
-    // Seed Background
+    // Background
     objects.push({
       id: 'pptx-bg-' + Math.random().toString(36).substring(7),
       type: 'rectangle',
@@ -183,10 +188,15 @@ export class SlideImporter {
       opacity: 1
     });
 
-    const slides = json.slides || [];
-    
-    for (let i = 0; i < slides.length; i++) {
-      const slide = slides[i];
+    // 2. Process each slide
+    for (let i = 0; i < slideFiles.length; i++) {
+      const slideFile = zip.file(slideFiles[i]);
+      if (!slideFile) continue;
+      
+      const slideXml = await slideFile.async('string');
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(slideXml, 'text/xml');
+      
       let x = i * spacing;
       let y = 0;
       let rotation = 0;
@@ -205,7 +215,7 @@ export class SlideImporter {
 
       const frameId = `pptx-frame-${i}-${Math.random().toString(36).substring(7)}`;
 
-      // 1. Frame Container
+      // Create Frame
       objects.push({
         id: frameId,
         type: 'frame',
@@ -215,7 +225,7 @@ export class SlideImporter {
         height: slideHeight,
         rotation,
         fill: '#ffffff',
-        text: slide.title || `Slide ${i + 1}`,
+        text: `Slide ${i + 1}`,
         shadow: true,
         settings: {
           duration: 1000,
@@ -229,54 +239,38 @@ export class SlideImporter {
         }
       });
 
-      // 2. Extract Content (Text and Images)
-      const elements = slide.elements || [];
-      elements.forEach((el: any, index: number) => {
-        const elId = `${frameId}-el-${index}`;
-        
-        // Basic mapping of PPTX coordinates to our canvas
-        // pptx2json usually gives percentages or EMU, we simplify to relative layout
-        const elWidth = (el.width / 100) * slideWidth || 300;
-        const elHeight = (el.height / 100) * slideHeight || 100;
-        const elX = x + ((el.x / 100) * slideWidth || 50);
-        const elY = y + ((el.y / 100) * slideHeight || 50);
-
-        if (el.type === 'text') {
-          objects.push({
-            id: elId,
-            type: 'text',
-            x: elX,
-            y: elY,
-            width: elWidth,
-            height: elHeight,
-            rotation: rotation + (el.rotation || 0),
-            fill: el.color || '#000000',
-            fontSize: el.fontSize || 24,
-            text: el.text || '',
-            parentId: frameId,
-            locked: mode === 'preserve'
-          });
-        } else if (el.type === 'image') {
-          objects.push({
-            id: elId,
-            type: 'image',
-            x: elX,
-            y: elY,
-            width: elWidth,
-            height: elHeight,
-            rotation: rotation + (el.rotation || 0),
-            src: el.src, // Base64 usually
-            fill: 'transparent', // Added missing property
-            parentId: frameId,
-            locked: mode === 'preserve'
-          });
+      // 3. Extract Text Shapes from XML
+      const textNodes = xmlDoc.getElementsByTagName('a:t');
+      const slideContent: string[] = [];
+      for (let j = 0; j < textNodes.length; j++) {
+        const node = textNodes[j];
+        if (node && node.textContent) {
+          slideContent.push(node.textContent);
         }
-      });
+      }
+
+      // Group text into a block
+      if (slideContent.length > 0) {
+        objects.push({
+          id: `${frameId}-text`,
+          type: 'text',
+          x: x + 100,
+          y: y + 100,
+          width: slideWidth - 200,
+          height: slideHeight - 200,
+          rotation: rotation,
+          fill: '#000000',
+          fontSize: 24,
+          text: slideContent.join(' '),
+          parentId: frameId,
+          locked: mode === 'preserve'
+        });
+      }
 
       presentationPath.push(frameId);
       bookmarks.push({
         id: `bm-${frameId}`,
-        label: slide.title || `Slide ${i + 1}`,
+        label: `Slide ${i + 1}`,
         viewport: { 
           x: -x + (slideWidth * 0.1), 
           y: -y + (slideHeight * 0.1), 

@@ -50,7 +50,6 @@
         "jszip": "^3.10.1",
         "lucide-react": "^0.575.0",
         "pdfjs-dist": "^6.2.108",
-        "pptx2json": "^0.0.10",
         "pptxgenjs": "^4.0.1",
         "react": "^19.2.0",
         "react-day-picker": "^9.14.0",
@@ -1017,8 +1016,6 @@
     "picomatch": ["picomatch@4.0.5", "", {}, "sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A=="],
 
     "postcss": ["postcss@8.5.24", "", { "dependencies": { "nanoid": "^3.3.16", "picocolors": "^1.1.1", "source-map-js": "^1.2.1" } }, "sha512-8RyVklq0owXUTa4xlpzu4l9AaVKIdQvAcOHZWaMh98HgySsUtxRVf/chRe3dsSLqb6i40BzGRzEUddRaI+9TSw=="],
-
-    "pptx2json": ["pptx2json@0.0.10", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/pptx2json/-/pptx2json-0.0.10.tgz", { "dependencies": { "jszip": "^3.7.0", "xml2js": "^0.5.0" } }, "sha512-H4vAxAcSkWDE9gbLvmyIO2DY0kg7w2Tv88E3oDYyXw3zmd6uypV6P/nG/bOSPeHA8rx/Mn3X7Z7WpnTU+XfZPg=="],
 
     "pptxgenjs": ["pptxgenjs@4.0.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/pptxgenjs/-/pptxgenjs-4.0.1.tgz", { "dependencies": { "@types/node": "^22.8.1", "https": "^1.0.0", "image-size": "^1.2.1", "jszip": "^3.10.1" } }, "sha512-TeJISr8wouAuXw4C1F/mC33xbZs/FuEG6nH9FG1Zj+nuPcGMP5YRHl6X+j3HSUnS1f3at6k75ZZXPMZlA5Lj9A=="],
 
