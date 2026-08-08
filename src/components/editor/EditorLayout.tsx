@@ -8,6 +8,7 @@ import RightSidebar from "./RightSidebar";
 import TopToolbar from "./TopToolbar";
 import MenuBar from "./MenuBar";
 import PresentationMode from "./PresentationMode";
+import TemplateConflictDialog from "./TemplateConflictDialog";
 
 const TemplateLibrary = lazy(() => import("./templates/TemplateLibrary"));
 
@@ -39,6 +40,7 @@ export default function EditorLayout() {
       </div>
 
       <PresentationMode />
+      <TemplateConflictDialog />
 
 
       {activeOverlay === 'templates' && (
