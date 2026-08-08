@@ -303,7 +303,10 @@ export const useCanvasStore = create<CanvasStore>()(
 
       clear: () => set({ objects: [], selection: [], history: { past: [], future: [] }, lastSaved: null }),
       save: () => set({ lastSaved: Date.now() }),
-      setActiveOverlay: (activeOverlay) => set({ activeOverlay }),
+      setActiveOverlay: (activeOverlay) => {
+        console.log("CanvasStore: Setting active overlay to:", activeOverlay);
+        set({ activeOverlay });
+      },
       loadTemplate: (templateObjects) => {
         console.log("CanvasStore: loadTemplate called with objects:", templateObjects);
         
@@ -312,13 +315,16 @@ export const useCanvasStore = create<CanvasStore>()(
           return;
         }
 
+        // Deep clone first to be absolutely safe
+        const clonedObjects = JSON.parse(JSON.stringify(templateObjects));
+
         // Generate a unique ID mapping to ensure parents and children stay connected but have new IDs
         const idMap = new Map<string, string>();
-        templateObjects.forEach(obj => {
+        clonedObjects.forEach((obj: any) => {
           if (obj.id) idMap.set(obj.id, Math.random().toString(36).substring(7));
         });
 
-        const objectsWithIds = templateObjects.map(obj => {
+        const objectsWithIds = clonedObjects.map((obj: any) => {
           const newId = obj.id ? idMap.get(obj.id) || Math.random().toString(36).substring(7) : Math.random().toString(36).substring(7);
           return {
             ...obj,
@@ -328,8 +334,8 @@ export const useCanvasStore = create<CanvasStore>()(
         });
         
         const presentationPath = objectsWithIds
-          .filter(o => o.type === 'frame')
-          .map(o => o.id);
+          .filter((o: any) => o.type === 'frame')
+          .map((o: any) => o.id);
 
         console.log("CanvasStore: Applying new state with objects:", objectsWithIds.length);
 
