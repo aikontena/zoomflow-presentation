@@ -6,6 +6,7 @@ import Canvas from "./Canvas";
 import LeftSidebar from "./LeftSidebar";
 import RightSidebar from "./RightSidebar";
 import TopToolbar from "./TopToolbar";
+import Footer from "./Footer";
 import MenuBar from "./MenuBar";
 import PresentationMode from "./PresentationMode";
 import TemplateConflictDialog from "./TemplateConflictDialog";
@@ -38,6 +39,8 @@ export default function EditorLayout() {
           {!isPresenting && isRightSidebarVisible && <RightSidebar />}
         </div>
       </div>
+
+      {!isPresenting && <Footer />}
 
       <PresentationMode />
       <TemplateConflictDialog />
