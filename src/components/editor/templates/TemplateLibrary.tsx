@@ -317,11 +317,11 @@ export default function TemplateLibrary() {
               <div className="space-y-3">
                 <h4 className="text-xs uppercase font-bold text-neutral-400 tracking-wider">Primary Colors</h4>
                 <div className="flex gap-2">
-                  {['#3B82F6', '#1E293B', '#F1F5F9', '#FFFFFF'].map((color, i) => (
+                  {selectedTemplate.objects.filter(o => o.type === 'rectangle' || o.type === 'circle').slice(0, 4).map((obj, i) => (
                     <div 
                       key={i} 
                       className="w-8 h-8 rounded-full border border-neutral-200 shadow-sm"
-                      style={{ backgroundColor: color }}
+                      style={{ backgroundColor: obj.fill || '#3B82F6' }}
                     />
                   ))}
                 </div>
