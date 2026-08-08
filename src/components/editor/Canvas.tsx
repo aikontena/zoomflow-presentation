@@ -243,6 +243,7 @@ export default function Canvas() {
       {/* Canvas Area */}
       <div 
         ref={containerRef}
+        id="canvas-container"
         className="relative flex-1 touch-none overflow-hidden"
         style={{ cursor: isPanning ? 'grabbing' : activeTool === 'select' ? 'default' : 'crosshair' }}
         onMouseDown={handleMouseDown}

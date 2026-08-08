@@ -4,9 +4,9 @@ import { Sparkles, Send } from 'lucide-react';
 export const AIPanel: React.FC = () => {
   const [prompt, setPrompt] = useState(`'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
                                             
-                                            Why the slide in the canvas not appear the same with the slide at the left side pages
+                                            the selection slide in file should same showed in navigation panel. want to know which actully the position of the slide in the canvas
 
-Analyze the file at this link: https://aiframework.cloud/storage/v1/object/public/prompt-images/uploads/1786182681580-0c056dbc-9cef-4dcf-ba51-4ff2fa0fc69c.png`);
+Analyze the file at this link: https://aiframework.cloud/storage/v1/object/public/prompt-images/uploads/1786182918739-57c52d41-3682-4bcc-8fc5-362ee7beb819.png`);
 
   return (
     <div className="flex flex-col h-full bg-white">
