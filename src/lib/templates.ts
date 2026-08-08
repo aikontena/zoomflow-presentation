@@ -30,7 +30,7 @@ const createProfessionalFrame = (
   title: string, 
   content: string, 
   type: 'title' | 'content' | 'chart' | 'image' | 'closing' | 'grid' | 'feature', 
-  colors: any,
+  colors: { primary: string; secondary: string; accent: string; bg: string; text: string; shapes: string[] },
   x: number,
   y: number
 ) => {
