@@ -202,18 +202,30 @@ export function useViewportController() {
     const availableHeight = window.innerHeight;
 
     // Apply zoom padding from settings
+    // A padding of 0 means the frame takes 100% of the screen.
+    // A padding of 0.8 means the frame takes only 20% of the screen (zoomed out more).
     const paddingMultiplier = 1 - (presentationSettings.zoomPadding ?? 0.1);
-    const zoomX = (availableWidth * paddingMultiplier) / frame.width;
-    const zoomY = (availableHeight * paddingMultiplier) / frame.height;
-    const zoom = Math.min(zoomX, zoomY);
+    
+    // Use the effective viewport area for the calculation
+    const effectiveWidth = availableWidth * paddingMultiplier;
+    const effectiveHeight = availableHeight * paddingMultiplier;
+
+    const zoomX = effectiveWidth / frame.width;
+    const zoomY = effectiveHeight / frame.height;
+    
+    // We take the minimum to ensure the whole frame fits within the effective area
+    let zoom = Math.min(zoomX, zoomY);
+
+    // Limit extreme zoom-in for very small frames
+    zoom = Math.min(zoom, 10); 
 
     const centerX = frame.x + frame.width / 2;
     const centerY = frame.y + frame.height / 2;
 
     const target = {
       zoom,
-      x: window.innerWidth / 2 - centerX * zoom,
-      y: window.innerHeight / 2 - centerY * zoom,
+      x: availableWidth / 2 - centerX * zoom,
+      y: availableHeight / 2 - centerY * zoom,
       rotation: frame.rotation || 0
     };
 
