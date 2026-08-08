@@ -142,7 +142,7 @@ const createProfessionalFrame = (
         parentId: frameId
       });
     }
-  } else {
+  } else if (type === 'content') {
     // Content Slide Layout
     objects.push({
       id: `slide-head-${frameId}`,
