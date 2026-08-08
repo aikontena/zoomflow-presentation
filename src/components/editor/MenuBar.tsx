@@ -282,7 +282,7 @@ export default function MenuBar() {
             </button>
 
             {activeMenu === menu.label && (
-              <div className="absolute top-full left-0 mt-0.5 w-56 bg-white border border-neutral-200 rounded-lg shadow-xl py-1 animate-in fade-in slide-in-from-top-1 duration-150">
+              <div className="absolute top-full left-0 mt-0.5 w-56 bg-white border border-neutral-200 rounded-lg shadow-xl py-1 animate-in fade-in slide-in-from-top-1 duration-150 text-neutral-900">
                 {menu.items.map((item, idx) => (
                   <div key={`${item.label}-${idx}`} className="relative group/item">
                     <button
@@ -318,7 +318,7 @@ export default function MenuBar() {
                     </button>
 
                     {item.submenu && (
-                      <div className="absolute top-0 left-full ml-px w-48 bg-white border border-neutral-200 rounded-lg shadow-xl py-1 hidden group-hover/item:block animate-in fade-in slide-in-from-left-1 duration-150">
+                      <div className="absolute top-0 left-full ml-px w-48 bg-white border border-neutral-200 rounded-lg shadow-xl py-1 hidden group-hover/item:block animate-in fade-in slide-in-from-left-1 duration-150 text-neutral-900">
                         {item.submenu.map((sub, sidx) => (
                           <button
                             key={`${sub.label}-${sidx}`}
