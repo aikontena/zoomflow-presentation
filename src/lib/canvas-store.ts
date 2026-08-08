@@ -32,6 +32,7 @@ export interface PresentationSettings {
   showProgressBar: boolean;
   showFrameTitles: boolean;
   darkBackground: boolean;
+  type: 'linear' | 'spatial' | 'spiral' | 'grid';
 }
 
 interface CanvasStore {
@@ -107,6 +108,7 @@ export const useCanvasStore = create<CanvasStore>()(
         showProgressBar: true,
         showFrameTitles: true,
         darkBackground: false,
+        type: 'spatial',
       },
       setSnapEnabled: (snapEnabled) => set({ snapEnabled }),
       history: { past: [], future: [] },

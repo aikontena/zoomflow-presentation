@@ -151,6 +151,15 @@ export default function MenuBar() {
         { label: 'Presentation Settings', comingSoon: true },
         { label: 'Transition Settings', comingSoon: true },
         { label: 'Presentation Path', comingSoon: true },
+        { 
+          label: 'Presentation Type', 
+          submenu: [
+            { label: 'Spatial (Zoom)', action: () => useCanvasStore.getState().updatePresentationSettings({ type: 'spatial' }) },
+            { label: 'Linear (Fade)', action: () => useCanvasStore.getState().updatePresentationSettings({ type: 'linear' }) },
+            { label: 'Spiral', action: () => useCanvasStore.getState().updatePresentationSettings({ type: 'spiral' }) },
+            { label: 'Grid', action: () => useCanvasStore.getState().updatePresentationSettings({ type: 'grid' }) },
+          ] 
+        },
         { label: 'Speaker Notes', comingSoon: true },
       ]
     },
@@ -207,34 +216,54 @@ export default function MenuBar() {
             {activeMenu === menu.label && (
               <div className="absolute top-full left-0 mt-0.5 w-56 bg-white border border-neutral-200 rounded-lg shadow-xl py-1 animate-in fade-in slide-in-from-top-1 duration-150">
                 {menu.items.map((item, idx) => (
-                  <button
-                    key={`${item.label}-${idx}`}
-                    disabled={item.comingSoon}
-                    onClick={() => {
-                      if (item.action) item.action();
-                      setActiveMenu(null);
-                    }}
-                    className={`w-full flex items-center justify-between px-3 py-1.5 text-[11px] group ${
-                      item.comingSoon 
-                        ? 'text-neutral-300 cursor-not-allowed' 
-                        : 'text-neutral-700 hover:bg-primary hover:text-white'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      {item.label}
-                      {item.comingSoon && (
-                        <span className="text-[9px] px-1 rounded bg-neutral-100 text-neutral-400 group-hover:bg-white/20 group-hover:text-white">
-                          Coming Soon
+                  <div key={`${item.label}-${idx}`} className="relative group/item">
+                    <button
+                      disabled={item.comingSoon}
+                      onClick={() => {
+                        if (item.action) {
+                          item.action();
+                          setActiveMenu(null);
+                        }
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-1.5 text-[11px] ${
+                        item.comingSoon 
+                          ? 'text-neutral-300 cursor-not-allowed' 
+                          : 'text-neutral-700 hover:bg-primary hover:text-white'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        {item.label}
+                        {item.comingSoon && (
+                          <span className="text-[9px] px-1 rounded bg-neutral-100 text-neutral-400 group-hover:bg-white/20 group-hover:text-white">
+                            Coming Soon
+                          </span>
+                        )}
+                      </span>
+                      {item.shortcut && (
+                        <span className={`text-[10px] font-mono ${item.comingSoon ? 'text-neutral-200' : 'text-neutral-400 group-hover/item:text-white/70'}`}>
+                          {item.shortcut}
                         </span>
                       )}
-                    </span>
-                    {item.shortcut && (
-                      <span className={`text-[10px] font-mono ${item.comingSoon ? 'text-neutral-200' : 'text-neutral-400 group-hover:text-white/70'}`}>
-                        {item.shortcut}
-                      </span>
+                      {item.submenu && <ChevronRight size={12} />}
+                    </button>
+
+                    {item.submenu && (
+                      <div className="absolute top-0 left-full ml-px w-48 bg-white border border-neutral-200 rounded-lg shadow-xl py-1 hidden group-hover/item:block animate-in fade-in slide-in-from-left-1 duration-150">
+                        {item.submenu.map((sub, sidx) => (
+                          <button
+                            key={`${sub.label}-${sidx}`}
+                            onClick={() => {
+                              if (sub.action) sub.action();
+                              setActiveMenu(null);
+                            }}
+                            className="w-full flex items-center px-3 py-1.5 text-[11px] text-neutral-700 hover:bg-primary hover:text-white"
+                          >
+                            {sub.label}
+                          </button>
+                        ))}
+                      </div>
                     )}
-                    {item.submenu && <ChevronRight size={12} />}
-                  </button>
+                  </div>
                 ))}
               </div>
             )}
