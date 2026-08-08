@@ -304,8 +304,10 @@ export const useCanvasStore = create<CanvasStore>()(
       clear: () => set({ objects: [], selection: [], history: { past: [], future: [] }, lastSaved: null }),
       save: () => set({ lastSaved: Date.now() }),
       setActiveOverlay: (activeOverlay) => set({ activeOverlay }),
-      loadTemplate: (objects) => {
-        const objectsWithIds = objects.map(obj => ({
+      loadTemplate: (templateObjects) => {
+        console.log("Loading template with objects:", templateObjects);
+        
+        const objectsWithIds = templateObjects.map(obj => ({
           ...obj,
           id: obj.id || Math.random().toString(36).substring(7)
         }));
