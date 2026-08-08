@@ -304,8 +304,15 @@ export const useCanvasStore = create<CanvasStore>()(
       clear: () => set({ objects: [], selection: [], history: { past: [], future: [] }, lastSaved: null }),
       save: () => set({ lastSaved: Date.now() }),
       setActiveOverlay: (activeOverlay) => set({ activeOverlay }),
-      loadTemplate: (objects) => {
-        const objectsWithIds = objects.map(obj => ({
+      loadTemplate: (templateObjects) => {
+        console.log("CanvasStore: loadTemplate called with objects:", templateObjects);
+        
+        if (!templateObjects || !Array.isArray(templateObjects)) {
+          console.error("CanvasStore: Invalid template objects received:", templateObjects);
+          return;
+        }
+
+        const objectsWithIds = templateObjects.map(obj => ({
           ...obj,
           id: obj.id || Math.random().toString(36).substring(7)
         }));
@@ -314,10 +321,13 @@ export const useCanvasStore = create<CanvasStore>()(
           .filter(o => o.type === 'frame')
           .map(o => o.id);
 
+        console.log("CanvasStore: Applying new state with objects:", objectsWithIds.length);
+
         set((state) => ({
           objects: objectsWithIds,
           presentationPath,
           selection: [],
+          viewport: { x: 100, y: 100, zoom: 0.8 },
           history: { past: [...state.history.past, state.objects].slice(-50), future: [] },
           activeOverlay: null
         }));

@@ -331,6 +331,8 @@ export default function TemplateLibrary() {
           <div className="p-6 bg-white border-t border-neutral-200 space-y-3">
             <Button 
               onClick={() => {
+                console.log("TemplateLibrary: Use Template clicked for", selectedTemplate.name);
+                console.log("TemplateLibrary: Objects being passed:", selectedTemplate.objects);
                 loadTemplate(selectedTemplate.objects);
                 toast.success(`Loaded ${selectedTemplate.name}`);
               }}
@@ -343,7 +345,8 @@ export default function TemplateLibrary() {
               variant="outline" 
               className="w-full h-11 font-medium"
               onClick={() => {
-                loadTemplate(selectedTemplate.objects);
+                console.log("TemplateLibrary: Duplicate Template clicked for", selectedTemplate.name);
+                loadTemplate([...selectedTemplate.objects]);
                 toast.info(`Duplicated ${selectedTemplate.name} as draft`);
               }}
             >
