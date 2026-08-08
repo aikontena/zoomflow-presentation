@@ -111,7 +111,7 @@ interface CanvasStore {
   clear: () => void;
   save: () => void;
   setActiveOverlay: (overlay: 'templates' | 'export' | 'settings' | 'presentation' | null) => void;
-  loadDocument: (doc: { objects: CanvasObject[]; viewport: { x: number; y: number; zoom: number; rotation?: number }; presentationPath: string[] }) => void;
+  loadDocument: (doc: { objects: CanvasObject[]; viewport: { x: number; y: number; zoom: number; rotation?: number }; presentationPath: string[]; bookmarks?: Bookmark[] }) => void;
   loadTemplate: (template: any) => void;
 }
 
@@ -389,10 +389,12 @@ export const useCanvasStore = create<CanvasStore>()(
         const objects = [...doc.objects];
         const presentationPath = [...doc.presentationPath];
         const viewport = { x: doc.viewport.x, y: doc.viewport.y, zoom: doc.viewport.zoom, rotation: doc.viewport.rotation || 0 };
+        const bookmarks = doc.bookmarks || [];
         set({
           objects,
           presentationPath,
           viewport,
+          bookmarks,
           selection: [],
           history: { past: [], future: [] },
           activeOverlay: null,

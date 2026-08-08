@@ -1,10 +1,11 @@
-import { CanvasObject } from "./canvas-store";
+import { CanvasObject, Bookmark } from "./canvas-store";
 import { toast } from "sonner";
 
 export interface CanvasDocument {
   objects: CanvasObject[];
   viewport: { x: number; y: number; zoom: number };
   presentationPath: string[];
+  bookmarks?: Bookmark[];
 }
 
 export class TemplateLoader {
@@ -115,7 +116,8 @@ export class TemplateLoader {
     return {
       objects: finalObjects,
       viewport,
-      presentationPath
+      presentationPath,
+      bookmarks: templateData.bookmarks || []
     };
   }
 }
