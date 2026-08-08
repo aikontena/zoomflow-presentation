@@ -9,11 +9,17 @@ import { useViewportController } from './ViewportController';
 
 export default function Canvas() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { 
-    objects, viewport, setViewport, selection, setSelection, 
-    updateObject, deleteObjects, addObject, undo, redo,
-    duplicateObjects
-  } = useCanvasStore();
+  const objects = useCanvasStore(state => state.objects);
+  const viewport = useCanvasStore(state => state.viewport);
+  const selection = useCanvasStore(state => state.selection);
+  const setViewport = useCanvasStore(state => state.setViewport);
+  const setSelection = useCanvasStore(state => state.setSelection);
+  const updateObject = useCanvasStore(state => state.updateObject);
+  const deleteObjects = useCanvasStore(state => state.deleteObjects);
+  const addObject = useCanvasStore(state => state.addObject);
+  const undo = useCanvasStore(state => state.undo);
+  const redo = useCanvasStore(state => state.redo);
+  const duplicateObjects = useCanvasStore(state => state.duplicateObjects);
   
   const { zoomTo, resetZoom } = useViewportController();
   
