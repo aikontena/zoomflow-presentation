@@ -24,6 +24,7 @@ import { DynamicTemplateThumbnail } from './templates/DynamicTemplateThumbnail';
 import { useCanvasStore } from '@/lib/canvas-store';
 import { TEMPLATES } from '@/lib/templates';
 import { toast } from 'sonner';
+import { useViewportController } from './ViewportController';
 
 
 const TABS = [
