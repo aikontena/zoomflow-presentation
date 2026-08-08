@@ -215,6 +215,8 @@ export default function Canvas() {
     }
   };
 
+  console.log("[Canvas] Rendering objects. Count:", objects.length, "Viewport:", viewport);
+  
   return (
     <div className="relative h-full w-full overflow-hidden bg-[#f8f9fa] outline-none flex flex-col" 
          tabIndex={0}
@@ -249,9 +251,13 @@ export default function Canvas() {
           {objects.map(obj => {
             const isSelected = selection.includes(obj.id);
             return (
-              <div 
-                key={obj.id}
-                style={{
+              <React.Fragment key={obj.id}>
+                {(() => {
+                  console.log(`[Canvas] Rendering object: ID=${obj.id}, Type=${obj.type}, X=${obj.x}, Y=${obj.y}, W=${obj.width}, H=${obj.height}, Opacity=${obj.opacity ?? 1}`);
+                  return null;
+                })()}
+                <div 
+                  style={{
                   position: 'absolute',
                   left: obj.x,
                   top: obj.y,
@@ -299,7 +305,8 @@ export default function Canvas() {
                   </>
                 )}
               </div>
-            );
+            </React.Fragment>
+          );
           })}
         </div>
 

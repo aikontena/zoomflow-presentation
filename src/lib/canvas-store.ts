@@ -313,6 +313,7 @@ export const useCanvasStore = create<CanvasStore>()(
       loadDocument: (doc) => {
         console.log("[CanvasStore] Loading new document...");
         
+        console.log("[CanvasStore] Document loaded. Objects:", doc.objects.length, "Frames:", doc.presentationPath.length, "Selection:", 0);
         set((state) => ({
           objects: doc.objects,
           presentationPath: doc.presentationPath,
