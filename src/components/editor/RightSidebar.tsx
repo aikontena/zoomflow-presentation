@@ -358,24 +358,16 @@ export default function RightSidebar() {
           </>
         )}
 
-        {selectedObject.type === 'text' && (
-          <Section title="Typography">
-            <InputRow label="Font Size">
-              <input 
-                type="number" 
-                value={selectedObject.fontSize || 16}
-                onChange={(e) => handleChange('fontSize', parseInt(e.target.value))}
-                className="w-12 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary text-right"
-              />
-            </InputRow>
-          </Section>
-        )}
+        {selectedObject.type === 'text' && <TextProperties object={selectedObject} />}
+        {(selectedObject.type === 'image' || selectedObject.type === 'video') && <MediaProperties object={selectedObject} />}
+        {(selectedObject.type === 'rectangle' || selectedObject.type === 'circle') && <ShapeProperties object={selectedObject} />}
 
         {selectedObject.type === 'icon' && (
           <Section title="Icon Settings">
             <IconProperties object={selectedObject} />
           </Section>
         )}
+
 
       </div>
     </div>
