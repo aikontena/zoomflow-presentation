@@ -119,15 +119,19 @@ export const TextProperties = ({ object }: { object: CanvasObject }) => {
             { icon: Italic, key: 'fontStyle', activeVal: 'italic', defaultVal: 'normal' },
             { icon: Underline, key: 'textDecoration', activeVal: 'underline', defaultVal: 'none' },
             { icon: Strikethrough, key: 'textDecoration', activeVal: 'line-through', defaultVal: 'none' },
+            { label: 'TT', key: 'textTransform', activeVal: 'uppercase', defaultVal: 'none' },
           ].map((btn, i) => (
             <button
               key={i}
-              onClick={() => handleChange({ [btn.key]: (object as any)[btn.key] === btn.activeVal ? btn.defaultVal : btn.activeVal })}
-              className={`p-2 rounded border transition-colors ${
+              onClick={() => {
+                const currentVal = (object as any)[btn.key];
+                handleChange({ [btn.key]: currentVal === btn.activeVal ? btn.defaultVal : btn.activeVal });
+              }}
+              className={`p-2 rounded border transition-colors flex items-center justify-center min-w-[32px] ${
                 (object as any)[btn.key] === btn.activeVal ? 'bg-primary text-white border-primary' : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50'
               }`}
             >
-              <btn.icon size={14} />
+              {btn.icon ? <btn.icon size={14} /> : <span className="text-[10px] font-bold">{btn.label}</span>}
             </button>
           ))}
         </div>
