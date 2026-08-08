@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CanvasObject } from '@/lib/canvas-store';
+import { type CanvasObject } from '@/lib/canvas-store';
 import { IconRenderer } from '../IconRenderer';
 
 interface DynamicTemplateThumbnailProps {
