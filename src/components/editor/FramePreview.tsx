@@ -30,17 +30,16 @@ export const FramePreview: React.FC<FramePreviewProps> = ({ frame, allObjects })
     );
   });
 
-  // Calculate scaling to fit the frame into the preview container (aspect-video)
-  // The container in LeftSidebar is aspect-video, let's assume it's roughly 160x90 or similar
-  // We'll use relative positioning for the objects
+  const safeFrameWidth = Math.max(frame.width, 1);
+  const safeFrameHeight = Math.max(frame.height, 1);
   
   return (
     <div className="relative w-full h-full overflow-hidden pointer-events-none" style={{ backgroundColor: frame.fill }}>
       {containedObjects.map(obj => {
-        const relX = ((obj.x - frame.x) / frame.width) * 100;
-        const relY = ((obj.y - frame.y) / frame.height) * 100;
-        const relWidth = (obj.width / frame.width) * 100;
-        const relHeight = (obj.height / frame.height) * 100;
+        const relX = ((obj.x - frame.x) / safeFrameWidth) * 100;
+        const relY = ((obj.y - frame.y) / safeFrameHeight) * 100;
+        const relWidth = (obj.width / safeFrameWidth) * 100;
+        const relHeight = (obj.height / safeFrameHeight) * 100;
 
         return (
           <div
