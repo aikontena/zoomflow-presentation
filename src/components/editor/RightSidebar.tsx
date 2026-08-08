@@ -315,7 +315,13 @@ export default function RightSidebar() {
                     type="number" 
                     value={selectedObject.settings?.duration || 1200}
                     onChange={(e) => {
-                      const settings = { ...(selectedObject.settings || {}), duration: parseInt(e.target.value) };
+                      const settings = { 
+                        duration: 1200,
+                        easing: 'smooth' as const,
+                        camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
+                        ...(selectedObject.settings || {}), 
+                        duration: parseInt(e.target.value) 
+                      };
                       updateObject(selectedObject.id, { settings });
                     }}
                     className="w-full bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary"
@@ -327,7 +333,13 @@ export default function RightSidebar() {
                   <select 
                     value={selectedObject.settings?.easing || 'smooth'}
                     onChange={(e) => {
-                      const settings = { ...(selectedObject.settings || {}), easing: e.target.value as any };
+                      const settings = { 
+                        duration: 1200,
+                        easing: 'smooth' as const,
+                        camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
+                        ...(selectedObject.settings || {}), 
+                        easing: e.target.value as any 
+                      };
                       updateObject(selectedObject.id, { settings });
                     }}
                     className="w-full bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary"
@@ -346,7 +358,7 @@ export default function RightSidebar() {
             <Section title="Speaker Notes">
               <textarea 
                 value={selectedObject.speakerNotes || ''}
-                onChange={(e) => handleChange('speakerNotes', e.target.value)}
+                onChange={(e) => updateObject(selectedObject.id, { speakerNotes: e.target.value })}
                 placeholder="Add notes for this frame..."
                 className="w-full h-32 bg-neutral-50 border border-neutral-200 rounded px-2 py-2 text-xs outline-none focus:border-primary resize-none font-medium leading-relaxed"
               />
@@ -356,6 +368,7 @@ export default function RightSidebar() {
             </Section>
           </>
         )}
+
 
         {selectedObject.type === 'text' && <TextProperties object={selectedObject} />}
         {(selectedObject.type === 'image' || selectedObject.type === 'video') && <MediaProperties object={selectedObject} />}
