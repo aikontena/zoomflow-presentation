@@ -309,7 +309,6 @@ export default function LeftSidebar() {
                       key={t.id} 
                       onClick={() => {
                         requestTemplate(t);
-                        toast.success(`Loaded ${t.name}`);
                       }}
                       className="aspect-video bg-neutral-100 rounded-md border border-neutral-200 hover:border-primary cursor-pointer transition-colors overflow-hidden group relative"
                     >

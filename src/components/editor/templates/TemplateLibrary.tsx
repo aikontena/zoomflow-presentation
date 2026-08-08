@@ -346,7 +346,6 @@ export default function TemplateLibrary() {
               className="w-full h-11 font-medium"
               onClick={() => {
                 requestTemplate(selectedTemplate);
-                toast.info(`Duplicated ${selectedTemplate.name} as draft`);
                 setActiveOverlay(null);
               }}
             >

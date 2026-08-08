@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Layout, Plus, Search } from 'lucide-react';
 import { CANVAS_LAYOUTS } from '@/lib/canvas-templates';
 import { useCanvasStore } from '@/lib/canvas-store';
-import { toast } from 'sonner';
 
 export const CanvasTemplateLibrary: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,7 +40,6 @@ export const CanvasTemplateLibrary: React.FC = () => {
               key={layout.id}
               onClick={() => {
                 requestTemplate(layout);
-                toast.success(`Applied ${layout.name} layout`);
               }}
               className="group flex flex-col gap-2 p-2 rounded-xl border border-neutral-100 hover:border-primary hover:bg-neutral-50 transition-all text-left"
             >
