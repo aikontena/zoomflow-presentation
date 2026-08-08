@@ -54,7 +54,6 @@ export interface PresentationSettings {
   autoFit?: boolean;
   backgroundColor?: string;
 }
-}
 
 interface CanvasStore {
   objects: CanvasObject[];
