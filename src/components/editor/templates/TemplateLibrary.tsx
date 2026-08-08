@@ -110,7 +110,7 @@ function TemplateCard({ template, viewMode, isSelected, isFavorite, onClick, onF
 }
 
 export default function TemplateLibrary() {
-  const { setActiveOverlay, loadDocument } = useCanvasStore();
+  const { setActiveOverlay, loadTemplate } = useCanvasStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -330,18 +330,10 @@ export default function TemplateLibrary() {
 
           <div className="p-6 bg-white border-t border-neutral-200 space-y-3">
             <Button 
-              onClick={async () => {
+              onClick={() => {
                 console.log("[UI] Template button clicked:", selectedTemplate.name);
-                
-                try {
-                  const { TemplateLoader } = await import('@/lib/template-loader');
-                  const doc = await TemplateLoader.load(selectedTemplate);
-                  loadDocument(doc);
-                  toast.success(`Template "${selectedTemplate.name}" applied`);
-                } catch (error) {
-                  console.error("[ERROR] UI: Failed to apply template:", error);
-                  toast.error("Failed to apply template");
-                }
+                loadTemplate(selectedTemplate);
+                setActiveOverlay(null);
               }}
               className="w-full bg-primary hover:bg-primary/90 text-white h-11 text-lg font-medium shadow-lg shadow-primary/20 group"
             >
@@ -351,15 +343,10 @@ export default function TemplateLibrary() {
             <Button 
               variant="outline" 
               className="w-full h-11 font-medium"
-              onClick={async () => {
-                try {
-                  const { TemplateLoader } = await import('@/lib/template-loader');
-                  const doc = await TemplateLoader.load(selectedTemplate);
-                  loadDocument(doc);
-                  toast.info(`Duplicated ${selectedTemplate.name} as draft`);
-                } catch (error) {
-                  toast.error("Failed to duplicate template");
-                }
+              onClick={() => {
+                loadTemplate(selectedTemplate);
+                toast.info(`Duplicated ${selectedTemplate.name} as draft`);
+                setActiveOverlay(null);
               }}
             >
               Duplicate Template
