@@ -198,7 +198,7 @@ export default function LeftSidebar() {
                     <div 
                       key={t.id} 
                       onClick={() => {
-                        loadTemplate(JSON.parse(JSON.stringify(t.objects)));
+                        loadTemplate(t);
                         toast.success(`Loaded ${t.name}`);
                       }}
                       className="aspect-video bg-neutral-100 rounded-md border border-neutral-200 hover:border-primary cursor-pointer transition-colors overflow-hidden group relative"
