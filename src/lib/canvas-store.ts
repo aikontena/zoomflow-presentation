@@ -54,6 +54,7 @@ export interface PresentationSettings {
   zoomOutBeforeStart?: boolean;
   autoFit?: boolean;
   backgroundColor?: string;
+  backgroundImage?: string;
   // Manual camera controls (Prezi-style free navigation)
   zoomSpeed: number; // multiplier for wheel zoom intensity
   smoothness: string; // easing used for camera button moves
