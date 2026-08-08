@@ -215,8 +215,6 @@ export default function Canvas() {
     }
   };
 
-  console.log("[Canvas] Rendering objects. Count:", objects.length, "Viewport:", viewport);
-  
   return (
     <div className="relative h-full w-full overflow-hidden bg-[#f8f9fa] outline-none flex flex-col" 
          tabIndex={0}
@@ -305,8 +303,7 @@ export default function Canvas() {
                   </>
                 )}
               </div>
-            </React.Fragment>
-          );
+            );
           })}
         </div>
 
