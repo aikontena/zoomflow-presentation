@@ -155,7 +155,7 @@ export default function LeftSidebar() {
                                 selection.includes(frameId) ? 'border-primary ring-2 ring-primary/20' : 'border-neutral-200 hover:border-neutral-300'
                               }`}
                             >
-                              <FramePreview frame={frame} allObjects={objects} />
+                            <FramePreview frame={frame} allObjects={objects} />
                               <div className="absolute bottom-0 inset-x-0 bg-white/90 backdrop-blur-sm p-2 text-[10px] font-medium border-t border-neutral-100 flex justify-between items-center">
                                 <span className="truncate max-w-[180px]">{frame.text || `Frame ${index + 1}`}</span>
                                 <span className="text-neutral-400 font-mono">#{index + 1}</span>
