@@ -27,6 +27,11 @@ export function useViewportController() {
       const progress = Math.min(elapsed / duration, 1);
       
       let ease = 0;
+      let currentX = start.x + (target.x - start.x) * progress; // Default linear
+      let currentY = start.y + (target.y - start.y) * progress;
+      let currentZoom = start.zoom + (target.zoom - start.zoom) * progress;
+      let currentRotation = startRotation + (targetRotation - startRotation) * progress;
+
       switch (easing) {
         case 'ease-in':
           ease = progress * progress * progress;
