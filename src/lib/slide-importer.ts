@@ -266,6 +266,7 @@ export class SlideImporter {
             height: elHeight,
             rotation: rotation + (el.rotation || 0),
             src: el.src, // Base64 usually
+            fill: 'transparent', // Added missing property
             parentId: frameId,
             locked: mode === 'preserve'
           });
