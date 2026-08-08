@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useCanvasStore, CanvasObject } from '@/lib/canvas-store';
 import { IconRenderer } from './IconRenderer';
+import { getIconMeta } from '@/lib/icon-registry';
 import { toast } from 'sonner';
 import ZoomControls from './ZoomControls';
 import MiniMap from './MiniMap';
