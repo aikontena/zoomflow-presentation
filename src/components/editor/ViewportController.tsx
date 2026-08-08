@@ -70,18 +70,29 @@ export function useViewportController() {
           }
           break;
         case 'morph':
-          // Slow start, very fast middle, slow end for "intelligent" feel
           ease = progress < 0.5 ? 8 * progress * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 4) / 2;
+          break;
+        case 'vortex':
+          // Fast spin at the start
+          ease = 1 - Math.pow(1 - progress, 3);
+          currentRotation += Math.sin(progress * Math.PI) * 45;
+          break;
+        case 'origami':
+          // Back and forth movement
+          ease = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+          currentZoom *= (1 + Math.sin(progress * Math.PI) * 0.2);
+          break;
+        case 'pan':
+          ease = progress; // Linear
+          break;
+        case 'orbit':
+          ease = 1 - Math.pow(1 - progress, 3);
+          const orbitOffset = Math.sin(progress * Math.PI) * 200;
+          currentX += orbitOffset;
           break;
         default: // 'smooth'
           ease = 1 - Math.pow(1 - progress, 3);
       }
-
-      // 2. PATH INTERPOLATION (Prezi-style spatial paths)
-      let currentX = start.x + (target.x - start.x) * ease;
-      let currentY = start.y + (target.y - start.y) * ease;
-      let currentZoom = start.zoom + (target.zoom - start.zoom) * ease;
-      let currentRotation = startRotation + (targetRotation - startRotation) * ease;
 
       if (pathType === 'curved' || pathType === 'spiral') {
         // Add an arc to the movement to avoid linear "sliding"
