@@ -57,9 +57,14 @@ export function PresentationPathPanel() {
     
     addObject({
       type: 'frame',
-      x: (window.innerWidth / 2 - viewport.x) / viewport.zoom - 400,
       x: frame.x + 50,
-      y: frame.y + 50
+      y: frame.y + 50,
+      width: frame.width,
+      height: frame.height,
+      rotation: frame.rotation,
+      fill: frame.fill,
+      text: `${frame.text} (Copy)`,
+      settings: frame.settings ? { ...frame.settings } : undefined
     });
   };
 
