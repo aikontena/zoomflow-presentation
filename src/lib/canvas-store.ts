@@ -85,6 +85,8 @@ interface CanvasStore {
   clear: () => void;
   save: () => void;
   setActiveOverlay: (overlay: 'templates' | 'export' | 'settings' | null) => void;
+  loadDocument: (doc: { objects: CanvasObject[]; viewport: { x: number; y: number; zoom: number }; presentationPath: string[] }) => void;
+  // Legacy alias for compatibility during migration, to be removed later
   loadTemplate: (objects: CanvasObject[], templateName?: string) => void;
 }
 
@@ -308,53 +310,14 @@ export const useCanvasStore = create<CanvasStore>()(
         console.log("CanvasStore: Setting active overlay to:", activeOverlay);
         set({ activeOverlay });
       },
-      loadTemplate: (templateObjects, templateName) => {
-        console.log(`[STEP 2] Fetching template: ${templateName || 'Unnamed'}`);
+      loadDocument: (doc) => {
+        console.log("[CanvasStore] Loading new document...");
         
-        if (!templateObjects || !Array.isArray(templateObjects)) {
-          console.error("[STEP 2] Template found but invalid objects:", templateObjects);
-          toast.error("Template found but contains invalid data.");
-          return;
-        }
-
-        console.log("[STEP 3] Validating JSON...");
-        const frameCount = templateObjects.filter(o => o.type === 'frame').length;
-        const objectCount = templateObjects.length;
-        console.log(`[STEP 3] Stats: Frames: ${frameCount}, Total Objects: ${objectCount}`);
-
-        console.log("[STEP 4] IMPORT: Starting process...");
-        console.log("[STEP 4] Clearing current canvas...");
-        
-        // Deep clone first to be absolutely safe
-        const clonedObjects = JSON.parse(JSON.stringify(templateObjects));
-
-        // Generate a unique ID mapping to ensure parents and children stay connected but have new IDs
-        const idMap = new Map<string, string>();
-        clonedObjects.forEach((obj: any) => {
-          if (obj.id) idMap.set(obj.id, Math.random().toString(36).substring(7));
-        });
-
-        console.log("[STEP 4] Importing Objects and restoring layers...");
-        const objectsWithIds = clonedObjects.map((obj: any) => {
-          const newId = obj.id ? idMap.get(obj.id) || Math.random().toString(36).substring(7) : Math.random().toString(36).substring(7);
-          return {
-            ...obj,
-            id: newId,
-            parentId: obj.parentId ? idMap.get(obj.parentId) || obj.parentId : undefined
-          };
-        });
-        
-        const presentationPath = objectsWithIds
-          .filter((o: any) => o.type === 'frame')
-          .map((o: any) => o.id);
-
-        console.log("[STEP 5] RENDER: Updating state...");
-
         set((state) => ({
-          objects: objectsWithIds,
-          presentationPath,
+          objects: doc.objects,
+          presentationPath: doc.presentationPath,
           selection: [],
-          viewport: { x: 100, y: 100, zoom: 0.8 },
+          viewport: doc.viewport,
           history: { 
             past: [state.objects, ...state.history.past].slice(0, 50), 
             future: [] 
@@ -362,9 +325,18 @@ export const useCanvasStore = create<CanvasStore>()(
           activeOverlay: null,
           lastSaved: Date.now()
         }));
+        
+        toast.success("Document loaded successfully");
+      },
 
-        console.log("[STEP 6] AFTER IMPORT: Verification complete.");
-        console.log(`[STEP 6] Final count: ${objectsWithIds.length} objects loaded.`);
+      // Legacy support - delegates to loadDocument
+      loadTemplate: (templateObjects, templateName) => {
+        console.warn("loadTemplate is deprecated, use TemplateLoader + loadDocument");
+        import('./template-loader').then(({ TemplateLoader }) => {
+          TemplateLoader.load({ objects: templateObjects }).then(doc => {
+            get().loadDocument(doc);
+          });
+        });
       },
     }),
     {

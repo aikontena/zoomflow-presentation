@@ -110,7 +110,7 @@ function TemplateCard({ template, viewMode, isSelected, isFavorite, onClick, onF
 }
 
 export default function TemplateLibrary() {
-  const { setActiveOverlay, loadTemplate } = useCanvasStore();
+  const { setActiveOverlay, loadDocument } = useCanvasStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -330,28 +330,17 @@ export default function TemplateLibrary() {
 
           <div className="p-6 bg-white border-t border-neutral-200 space-y-3">
             <Button 
-              onClick={() => {
-                console.log("[STEP 1] Template button clicked");
-                console.log(`[STEP 1] Template ID: ${selectedTemplate.id}`);
-                console.log(`[STEP 1] Template Name: ${selectedTemplate.name}`);
-                
-                if (!selectedTemplate.objects || selectedTemplate.objects.length === 0) {
-                  console.error("[STEP 2] Template has no objects");
-                  toast.error("Template has no objects");
-                  return;
-                }
+              onClick={async () => {
+                console.log("[UI] Template button clicked:", selectedTemplate.name);
                 
                 try {
-                  // Ensure objects are fresh copies
-                  const objectsToLoad = JSON.parse(JSON.stringify(selectedTemplate.objects));
-                  loadTemplate(objectsToLoad, selectedTemplate.name);
-                  // setActiveOverlay(null) is now called inside loadTemplate, 
-                  // but we ensure it happens here too just in case
-                  setActiveOverlay(null); 
-                  toast.success(`Loaded ${selectedTemplate.name}`);
+                  const { TemplateLoader } = await import('@/lib/template-loader');
+                  const doc = await TemplateLoader.load(selectedTemplate);
+                  loadDocument(doc);
+                  toast.success(`Template "${selectedTemplate.name}" applied`);
                 } catch (error) {
-                  console.error("[ERROR] TemplateLibrary: Error loading template:", error);
-                  toast.error("Failed to load template");
+                  console.error("[ERROR] UI: Failed to apply template:", error);
+                  toast.error("Failed to apply template");
                 }
               }}
               className="w-full bg-primary hover:bg-primary/90 text-white h-11 text-lg font-medium shadow-lg shadow-primary/20 group"
@@ -362,10 +351,15 @@ export default function TemplateLibrary() {
             <Button 
               variant="outline" 
               className="w-full h-11 font-medium"
-              onClick={() => {
-                console.log("TemplateLibrary: Duplicate Template clicked for", selectedTemplate.name);
-                loadTemplate([...selectedTemplate.objects]);
-                toast.info(`Duplicated ${selectedTemplate.name} as draft`);
+              onClick={async () => {
+                try {
+                  const { TemplateLoader } = await import('@/lib/template-loader');
+                  const doc = await TemplateLoader.load(selectedTemplate);
+                  loadDocument(doc);
+                  toast.info(`Duplicated ${selectedTemplate.name} as draft`);
+                } catch (error) {
+                  toast.error("Failed to duplicate template");
+                }
               }}
             >
               Duplicate Template
