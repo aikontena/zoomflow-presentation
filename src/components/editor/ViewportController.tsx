@@ -192,15 +192,19 @@ export function useViewportController() {
   }, [animateViewport]);
 
   const zoomToFrame = useCallback((frameId: string, duration?: number, easingOverride?: string) => {
-    const currentObjects = useCanvasStore.getState().objects;
+    const state = useCanvasStore.getState();
+    const currentObjects = state.objects;
+    const presentationSettings = state.presentationSettings;
     const frame = currentObjects.find(o => o.id === frameId);
     if (!frame) return;
 
     const availableWidth = window.innerWidth;
     const availableHeight = window.innerHeight;
 
-    const zoomX = availableWidth / frame.width;
-    const zoomY = availableHeight / frame.height;
+    // Apply zoom padding from settings
+    const paddingMultiplier = 1 - (presentationSettings.zoomPadding ?? 0.1);
+    const zoomX = (availableWidth * paddingMultiplier) / frame.width;
+    const zoomY = (availableHeight * paddingMultiplier) / frame.height;
     const zoom = Math.min(zoomX, zoomY);
 
     const centerX = frame.x + frame.width / 2;

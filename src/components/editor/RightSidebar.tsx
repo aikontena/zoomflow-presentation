@@ -72,6 +72,19 @@ export default function RightSidebar() {
                   <span className="text-[10px] w-12">{presentationSettings.transitionDuration}ms</span>
                 </div>
               </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-medium text-neutral-500 uppercase">Zoom Padding</label>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="range" 
+                    min="0" max="0.5" step="0.05"
+                    value={presentationSettings.zoomPadding ?? 0.1}
+                    onChange={(e) => updatePresentationSettings({ zoomPadding: parseFloat(e.target.value) })}
+                    className="flex-1 accent-primary" 
+                  />
+                  <span className="text-[10px] w-12">{Math.round((presentationSettings.zoomPadding ?? 0.1) * 100)}%</span>
+                </div>
+              </div>
               
               <div className="flex items-center justify-between">
                 <label className="text-xs text-neutral-500">Auto-play</label>
@@ -102,6 +115,28 @@ export default function RightSidebar() {
                   className="rounded border-neutral-300 text-primary"
                 />
               </div>
+            </div>
+          </Section>
+          
+          <Section title="Canvas Navigation">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-neutral-500">Snap to Objects</label>
+                <input 
+                  type="checkbox"
+                  checked={useCanvasStore.getState().snapEnabled}
+                  onChange={(e) => useCanvasStore.getState().setSnapEnabled(e.target.checked)}
+                  className="rounded border-neutral-300 text-primary"
+                />
+              </div>
+              <button 
+                onClick={() => {
+                  useCanvasStore.getState().setViewport({ x: 0, y: 0, zoom: 1, rotation: 0 });
+                }}
+                className="w-full py-2 bg-neutral-100 hover:bg-neutral-200 rounded text-[11px] font-bold text-neutral-600 transition-colors"
+              >
+                Reset Canvas View
+              </button>
             </div>
           </Section>
 
