@@ -26,6 +26,33 @@ export const createLayout = (id: string, name: string, category: string, colorKe
   const bookmarks: Bookmark[] = [];
   const presentationPath: string[] = [];
 
+  // Add background art to all templates
+  objects.push({
+    id: `bg-art-${id}`,
+    type: 'rectangle',
+    x: -5000, y: -5000,
+    width: 15000, height: 10000,
+    fill: colors.bg,
+    locked: true,
+    opacity: 1
+  });
+
+  // Add stylized grid pattern as background objects
+  for (let i = 0; i < 20; i++) {
+    objects.push({
+      id: `bg-accent-${id}-${i}`,
+      type: Math.random() > 0.5 ? 'circle' : 'rectangle',
+      x: (Math.random() - 0.5) * 10000,
+      y: (Math.random() - 0.5) * 10000,
+      width: 400 + Math.random() * 800,
+      height: 400 + Math.random() * 800,
+      fill: colors.grid,
+      opacity: 0.1,
+      locked: true,
+      rotation: Math.random() * 360
+    });
+  }
+
   // Base Logic for specific layouts would go here.
   // For the prompt, I will generate a generic but structured layout based on the name.
   // I'll implement a few specialized generators and use a fallback for the 50 layouts.
