@@ -197,23 +197,29 @@ export default function Canvas() {
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    const iconName = e.dataTransfer.getData('iconName');
-    if (iconName) {
-      const pos = getPointerPos(e as any);
-      addObject({
-        type: 'icon',
-        iconName,
-        x: pos.x - 24,
-        y: pos.y - 24,
-        width: 48,
-        height: 48,
-        rotation: 0,
-        fill: '#3b82f6',
-        opacity: 1
-      });
-      toast.success('Icon dropped onto canvas');
+    const iconName = e.dataTransfer.getData('iconName') || e.dataTransfer.getData('text/plain');
+    if (!iconName) return;
+    if (!getIconMeta(iconName)) {
+      toast.error('Unknown icon');
+      return;
     }
+    const pos = getPointerPos(e as any);
+    const id = addObject({
+      type: 'icon',
+      iconName,
+      x: Math.round(pos.x - 24),
+      y: Math.round(pos.y - 24),
+      width: 48,
+      height: 48,
+      rotation: 0,
+      fill: '#3b82f6',
+      strokeWidth: 2,
+      opacity: 1
+    });
+    if (typeof id === 'string') setSelection([id]);
+    toast.success('Icon dropped onto canvas');
   };
+
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-[#f8f9fa] outline-none flex flex-col" 
