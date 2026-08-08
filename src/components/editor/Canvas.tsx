@@ -165,6 +165,16 @@ export default function Canvas() {
     } else if (e.key === '=' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       zoomTo((viewport.zoom || 1) * 1.2);
+    } else if (e.key === 's' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      useCanvasStore.getState().save();
+      toast.success('Project saved');
+    } else if (e.key === 'n' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      if(confirm('Clear current canvas and start new?')) useCanvasStore.getState().clear();
+    } else if (e.key === 'f5') {
+      e.preventDefault();
+      useCanvasStore.getState().startPresentation();
     } else if (e.key === '-' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       zoomTo((viewport.zoom || 1) / 1.2);
