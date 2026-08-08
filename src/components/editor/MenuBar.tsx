@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import { SlideImporter } from '@/lib/slide-importer';
 import { toast } from 'sonner';
+import { ImportModal } from './ImportModal';
+
 
 
 interface MenuItem {
@@ -52,25 +54,33 @@ export default function MenuBar() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (file) setPendingFile(file);
+  };
 
+  const confirmImport = async (mode: 'preserve' | 'convert') => {
+    if (!pendingFile) return;
+    
+    const file = pendingFile;
+    setPendingFile(null);
     setIsImporting(true);
-    const toastId = toast.loading(`Converting ${file.name}...`);
+    const toastId = toast.loading(`${mode === 'convert' ? 'Converting' : 'Importing'} ${file.name}...`);
 
     try {
-      const doc = await SlideImporter.importFile(file);
+      const doc = await SlideImporter.importFile(file, mode);
       loadDocument(doc);
-      toast.success(`${file.name} converted to ZoomCanvas format!`, { id: toastId });
+      toast.success(`${file.name} imported successfully!`, { id: toastId });
     } catch (error: any) {
-      toast.error(error.message || 'Failed to convert file', { id: toastId });
+      toast.error(error.message || 'Failed to import file', { id: toastId });
     } finally {
       setIsImporting(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
+
 
 
   useEffect(() => {
@@ -319,6 +329,15 @@ export default function MenuBar() {
           <span>Shortcuts Active</span>
         </div>
       </div>
+
+      <ImportModal 
+        isOpen={!!pendingFile}
+        onClose={() => setPendingFile(null)}
+        onConfirm={confirmImport}
+        fileName={pendingFile?.name || ''}
+        fileType={pendingFile?.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'pptx'}
+      />
     </div>
+
   );
 }
