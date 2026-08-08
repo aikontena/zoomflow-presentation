@@ -333,7 +333,9 @@ export default function TemplateLibrary() {
               onClick={() => {
                 console.log("TemplateLibrary: Use Template clicked for", selectedTemplate.name);
                 console.log("TemplateLibrary: Objects being passed:", selectedTemplate.objects);
-                loadTemplate(selectedTemplate.objects);
+                // Ensure objects are fresh copies
+                const objectsToLoad = JSON.parse(JSON.stringify(selectedTemplate.objects));
+                loadTemplate(objectsToLoad);
                 toast.success(`Loaded ${selectedTemplate.name}`);
               }}
               className="w-full bg-primary hover:bg-primary/90 text-white h-11 text-lg font-medium shadow-lg shadow-primary/20 group"
