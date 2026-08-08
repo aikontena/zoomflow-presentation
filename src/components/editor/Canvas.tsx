@@ -252,7 +252,7 @@ export default function Canvas() {
         onMouseLeave={handleMouseUp}
       >
         <div style={{
-          transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom || 1})`,
+          transform: `translate(${viewport.x || 0}px, ${viewport.y || 0}px) scale(${viewport.zoom || 1})`,
           transformOrigin: '0 0'
         }}>
           {/* Grid Background */}
@@ -289,7 +289,7 @@ export default function Canvas() {
                   userSelect: 'none',
                   filter: obj.shadow ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.25))' : undefined,
                   boxShadow: isSelected ? '0 0 0 2px #3b82f6' : (obj.type === 'frame' ? '0 4px 6px -1px rgb(0 0 0 / 0.1)' : 'none'),
-                  zIndex: obj.type === 'frame' ? -1 : 1,
+                  zIndex: obj.type === 'frame' ? 0 : 1,
                   opacity: obj.opacity ?? 1,
                 }}>
 

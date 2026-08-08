@@ -20,7 +20,13 @@ export class TemplateLoader {
       throw new Error("Invalid template data: Not an object");
     }
 
-    const sourceObjects = Array.isArray(templateData.objects) ? templateData.objects : [];
+    // Support both the full template object and just the objects array
+    let sourceObjects = [];
+    if (Array.isArray(templateData.objects)) {
+      sourceObjects = templateData.objects;
+    } else if (Array.isArray(templateData)) {
+      sourceObjects = templateData;
+    }
     
     if (sourceObjects.length === 0) {
       console.warn("[TemplateLoader] Template has no objects.");
@@ -80,8 +86,8 @@ export class TemplateLoader {
       const contentHeight = bounds.maxY - bounds.minY;
       
       // Target viewport size (approximate editor area)
-      const targetWidth = 1200; 
-      const targetHeight = 800;
+      const targetWidth = window?.innerWidth || 1200; 
+      const targetHeight = window?.innerHeight || 800;
 
       const zoomX = targetWidth / (contentWidth + padding * 2);
       const zoomY = targetHeight / (contentHeight + padding * 2);

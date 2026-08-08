@@ -83,7 +83,7 @@ interface CanvasStore {
   save: () => void;
   setActiveOverlay: (overlay: 'templates' | 'export' | 'settings' | 'presentation' | null) => void;
   loadDocument: (doc: { objects: CanvasObject[]; viewport: { x: number; y: number; zoom: number }; presentationPath: string[] }) => void;
-  loadTemplate: (objects: CanvasObject[], templateName?: string) => void;
+  loadTemplate: (template: any) => void;
 }
 
 export const useCanvasStore = create<CanvasStore>()(
@@ -321,9 +321,9 @@ export const useCanvasStore = create<CanvasStore>()(
         toast.success("Template applied successfully");
       },
 
-      loadTemplate: (templateObjects, templateName) => {
+      loadTemplate: (template) => {
         import('./template-loader').then(({ TemplateLoader }) => {
-          TemplateLoader.load({ objects: templateObjects }).then(doc => {
+          TemplateLoader.load(template).then(doc => {
             get().loadDocument(doc);
           });
         });
