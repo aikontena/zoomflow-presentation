@@ -109,27 +109,60 @@ export const AIPanel: React.FC = () => {
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
         {aiMessages.length === 0 && (
-          <div className="space-y-6 pt-4">
-            <div className="bg-primary/5 rounded-2xl p-6 border border-primary/10">
-              <h4 className="text-sm font-bold text-primary mb-2">How can I help you today?</h4>
+          <div className="space-y-6 pt-2">
+            <div className="bg-primary/5 rounded-2xl p-5 border border-primary/10">
+              <h4 className="text-sm font-bold text-primary mb-2 flex items-center gap-2">
+                <Bot size={16} /> How can I help?
+              </h4>
               <p className="text-[11px] text-neutral-600 leading-relaxed mb-4">
-                I can help you build spatial presentations, refine your content, suggest visuals, and optimize your camera paths.
+                I'm your spatial co-pilot. I can build layouts, refine content, and optimize your presentation's camera path.
               </p>
-              <div className="grid grid-cols-1 gap-2">
-                {[
-                  "Create a business presentation about AI trends",
-                  "Rewrite my selected text to sound more professional",
-                  "Suggest a better camera path for my slides",
-                  "Generate speaker notes for this frame"
-                ].map((suggestion, i) => (
-                  <button 
-                    key={i}
-                    onClick={() => setInput(suggestion)}
-                    className="text-left p-2.5 text-[10px] bg-white border border-neutral-100 rounded-lg hover:border-primary/30 hover:bg-primary/5 transition-all text-neutral-700 font-medium shadow-sm"
-                  >
-                    "{suggestion}"
-                  </button>
-                ))}
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h5 className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest px-1">Quick Generation</h5>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { label: 'SWOT Analysis', action: 'Generate a SWOT analysis layout' },
+                      { label: 'Project Timeline', action: 'Create a 5-step project timeline' },
+                      { label: 'Mind Map', action: 'Generate a mind map for a new product' },
+                      { label: 'Pitch Deck', action: 'Structure a 10-slide pitch deck' },
+                    ].map((tool, i) => (
+                      <button 
+                        key={i}
+                        onClick={() => {
+                          setInput(tool.action);
+                          // We don't auto-send, let the user see it and edit if they want
+                        }}
+                        className="text-left p-2.5 text-[10px] bg-white border border-neutral-100 rounded-xl hover:border-primary/30 hover:bg-primary/5 transition-all text-neutral-700 font-bold shadow-sm"
+                      >
+                        {tool.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h5 className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest px-1">Presentation Assistant</h5>
+                  <div className="grid grid-cols-1 gap-2">
+                    {[
+                      { label: 'Analyze Flow & Path', icon: Camera, action: 'Analyze my current presentation path and suggest improvements' },
+                      { label: 'Suggest Better Transitions', icon: RefreshCcw, action: 'Suggest better spatial transitions between my frames' },
+                      { label: 'Generate Speaker Notes', icon: FileText, action: 'Generate professional speaker notes for all frames' },
+                    ].map((tool, i) => (
+                      <button 
+                        key={i}
+                        onClick={() => {
+                          setInput(tool.action);
+                        }}
+                        className="flex items-center gap-3 w-full p-2.5 text-[10px] bg-white border border-neutral-100 rounded-xl hover:border-primary/30 hover:bg-primary/5 transition-all text-neutral-700 font-bold shadow-sm"
+                      >
+                        <tool.icon size={14} className="text-primary" />
+                        {tool.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
