@@ -121,6 +121,9 @@ interface CanvasStore {
   setActiveOverlay: (overlay: 'templates' | 'export' | 'settings' | 'presentation' | null) => void;
   loadDocument: (doc: { objects: CanvasObject[]; viewport: { x: number; y: number; zoom: number; rotation?: number }; presentationPath: string[]; bookmarks?: Bookmark[] }) => void;
   loadTemplate: (template: any) => void;
+  pendingTemplate: any | null;
+  requestTemplate: (template: any) => void;
+  resolveTemplateConflict: (choice: 'keep' | 'new' | 'duplicate') => void;
   randomizeTransitions: () => void;
 }
 
