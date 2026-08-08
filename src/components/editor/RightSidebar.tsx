@@ -1,5 +1,5 @@
 import React from 'react';
-import { useCanvasStore } from '@/lib/canvas-store';
+import { useCanvasStore, CanvasObject } from '@/lib/canvas-store';
 import { 
   Move, 
   Maximize, 
@@ -18,10 +18,12 @@ import {
 import { IconRenderer } from './IconRenderer';
 import { IconProperties } from './icons/IconProperties';
 import { toast } from 'sonner';
+import { TextProperties, MediaProperties, ShapeProperties } from './properties/ObjectProperties';
 
 export default function RightSidebar() {
   const { objects, selection, updateObject, presentationSettings, updatePresentationSettings } = useCanvasStore();
   const selectedObject = objects.find(o => selection.includes(o.id));
+
 
   const handleChange = (key: string, value: any) => {
     if (selectedObject) {
