@@ -57,9 +57,16 @@ export default function PresentationMode() {
 
   useEffect(() => {
     if (isPresenting && presentationPath[currentFrameIndex]) {
-      zoomToFrame(presentationPath[currentFrameIndex], presentationSettings.transitionDuration);
+      const frameId = presentationPath[currentFrameIndex];
+      const frame = objects.find(o => o.id === frameId);
+      
+      // Use frame-specific duration and easing if available, otherwise fallback to global
+      const duration = frame?.settings?.duration ?? presentationSettings.transitionDuration;
+      const easing = frame?.settings?.easing ?? 'smooth';
+      
+      zoomToFrame(frameId, duration, easing);
     }
-  }, [currentFrameIndex, isPresenting, presentationPath, zoomToFrame, presentationSettings.transitionDuration]);
+  }, [currentFrameIndex, isPresenting, presentationPath, zoomToFrame, presentationSettings.transitionDuration, objects]);
 
   if (!isPresenting) {
     return null;
@@ -72,14 +79,21 @@ export default function PresentationMode() {
     <div 
       className={`fixed inset-0 z-[100] flex flex-col overflow-hidden select-none transition-colors duration-500 ${presentationSettings.darkBackground ? 'bg-neutral-950' : 'bg-white'}`}
       onMouseMove={handleMouseMove}
+      onClick={(e) => {
+        // Simple click to advance (if not clicking controls)
+        if (e.target === e.currentTarget) {
+          nextFrame();
+        }
+      }}
     >
-      <div className="flex-1 relative overflow-hidden flex items-center justify-center">
-        {/* Render the full canvas context during presentation */}
+      <div className="flex-1 relative overflow-hidden flex items-center justify-center pointer-events-none">
+        {/* Camera Stage */}
         <div 
-          className="absolute inset-0 transition-transform duration-700 ease-in-out"
+          className="absolute inset-0"
           style={{
-            transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom || 1})`,
-            transformOrigin: '0 0'
+            transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom || 1}) rotate(${viewport.rotation || 0}deg)`,
+            transformOrigin: '50% 50%', // Centered camera rotation
+            transition: 'none', // Handled by ViewportController requestAnimationFrame at 60fps
           }}
         >
           {objects.map(obj => (
@@ -126,7 +140,7 @@ export default function PresentationMode() {
         <LaserPointer />
         
         {presentationSettings.showFrameTitles && currentFrame && (
-          <div className={`absolute top-8 left-1/2 -translate-x-1/2 px-6 py-2 rounded-full backdrop-blur-md border animate-in fade-in slide-in-from-top-4 duration-500 ${presentationSettings.darkBackground ? 'bg-white/10 border-white/20 text-white' : 'bg-black/5 border-black/10 text-black'}`}>
+          <div className={`absolute top-8 left-1/2 -translate-x-1/2 px-6 py-2 rounded-full backdrop-blur-md border animate-in fade-in slide-in-from-top-4 duration-500 pointer-events-auto ${presentationSettings.darkBackground ? 'bg-white/10 border-white/20 text-white' : 'bg-black/5 border-black/10 text-black'}`}>
             <h2 className="text-lg font-medium">{currentFrame.text || `Frame ${currentFrameIndex + 1}`}</h2>
           </div>
         )}
@@ -140,7 +154,7 @@ export default function PresentationMode() {
         />
       )}
 
-      <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 transition-all duration-300 transform ${showControls ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+      <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 transition-all duration-300 transform pointer-events-auto ${showControls ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
         <PresentationControls 
           onToggleNotes={() => setShowPresenterNotes(!showPresenterNotes)}
           dark={presentationSettings.darkBackground}
@@ -156,7 +170,7 @@ export default function PresentationMode() {
 
       <button 
         onClick={stopPresentation}
-        className={`fixed top-4 right-4 p-2 rounded-full transition-all duration-300 transform ${showControls ? 'opacity-100 scale-100' : 'opacity-0 scale-75'} hover:bg-black/10 ${presentationSettings.darkBackground ? 'text-white hover:bg-white/10' : 'text-black'}`}
+        className={`fixed top-4 right-4 p-2 rounded-full transition-all duration-300 transform pointer-events-auto ${showControls ? 'opacity-100 scale-100' : 'opacity-0 scale-75'} hover:bg-black/10 ${presentationSettings.darkBackground ? 'text-white hover:bg-white/10' : 'text-black'}`}
       >
         <X size={24} />
       </button>

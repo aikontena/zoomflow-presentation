@@ -2,6 +2,19 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { toast } from "sonner";
 
+export interface CameraState {
+  x: number;
+  y: number;
+  zoom: number;
+  rotation: number;
+}
+
+export interface FrameSettings {
+  duration: number;
+  easing: 'smooth' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'cinematic' | 'fast' | 'slow';
+  camera: CameraState;
+}
+
 export interface CanvasObject {
   id: string;
   type: "rectangle" | "circle" | "text" | "image" | "frame" | "icon";
@@ -22,6 +35,8 @@ export interface CanvasObject {
   shadow?: boolean;
   parentId?: string;
   speakerNotes?: string;
+  // Frame-specific settings
+  settings?: FrameSettings;
 }
 
 export interface PresentationSettings {
@@ -37,9 +52,8 @@ export interface PresentationSettings {
 
 interface CanvasStore {
   objects: CanvasObject[];
-  frames: { id: string; name: string; order: number }[];
   selection: string[];
-  viewport: { x: number; y: number; zoom: number };
+  viewport: { x: number; y: number; zoom: number; rotation: number };
   activeOverlay: 'templates' | 'export' | 'settings' | 'presentation' | null;
   isRightSidebarVisible: boolean;
   toggleRightSidebar: () => void;
@@ -62,7 +76,7 @@ interface CanvasStore {
   updateObject: (id: string, patch: Partial<CanvasObject>) => void;
   deleteObjects: (ids: string[]) => void;
   setSelection: (ids: string[]) => void;
-  setViewport: (v: { x: number; y: number; zoom: number }) => void;
+  setViewport: (v: { x: number; y: number; zoom: number; rotation?: number }) => void;
   
   history: {
     past: CanvasObject[][];
@@ -77,12 +91,11 @@ interface CanvasStore {
   bringForward: (ids: string[]) => void;
   sendBackward: (ids: string[]) => void;
 
-
   lastSaved: number | null;
   clear: () => void;
   save: () => void;
   setActiveOverlay: (overlay: 'templates' | 'export' | 'settings' | 'presentation' | null) => void;
-  loadDocument: (doc: { objects: CanvasObject[]; viewport: { x: number; y: number; zoom: number }; presentationPath: string[] }) => void;
+  loadDocument: (doc: { objects: CanvasObject[]; viewport: { x: number; y: number; zoom: number; rotation?: number }; presentationPath: string[] }) => void;
   loadTemplate: (template: any) => void;
 }
 
@@ -90,9 +103,8 @@ export const useCanvasStore = create<CanvasStore>()(
   persist(
     (set, get) => ({
       objects: [],
-      frames: [],
       selection: [],
-      viewport: { x: 0, y: 0, zoom: 1 },
+      viewport: { x: 0, y: 0, zoom: 1, rotation: 0 },
       activeOverlay: null,
       isRightSidebarVisible: true,
       toggleRightSidebar: () => set((state) => ({ isRightSidebarVisible: !state.isRightSidebarVisible })),
@@ -101,7 +113,7 @@ export const useCanvasStore = create<CanvasStore>()(
       currentFrameIndex: 0,
       presentationPath: [],
       presentationSettings: {
-        transitionDuration: 800,
+        transitionDuration: 1200,
         autoPlay: false,
         autoPlayInterval: 5000,
         loop: false,
@@ -125,6 +137,16 @@ export const useCanvasStore = create<CanvasStore>()(
         }
         if (path.length === 0) return;
         const startIndex = startFromFrameId ? path.indexOf(startFromFrameId) : 0;
+        
+        // Try to enter fullscreen
+        try {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+          }
+        } catch (e) {
+          console.warn("Could not enter fullscreen", e);
+        }
+
         set({ 
           isPresenting: true, 
           currentFrameIndex: startIndex === -1 ? 0 : startIndex,
@@ -133,7 +155,12 @@ export const useCanvasStore = create<CanvasStore>()(
         });
       },
 
-      stopPresentation: () => set({ isPresenting: false, activeOverlay: null }),
+      stopPresentation: () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        }
+        set({ isPresenting: false, activeOverlay: null });
+      },
 
       nextFrame: () => {
         const { currentFrameIndex, presentationPath, presentationSettings } = get();
@@ -166,7 +193,20 @@ export const useCanvasStore = create<CanvasStore>()(
 
       addObject: (obj) => {
         const id = Math.random().toString(36).substring(7);
-        const newObj = { ...obj, id };
+        let newObj = { ...obj, id };
+        
+        // Default settings for new frames
+        if (obj.type === 'frame') {
+          newObj = {
+            ...newObj,
+            settings: {
+              duration: 1200,
+              easing: 'smooth',
+              camera: { x: obj.x, y: obj.y, zoom: 1, rotation: obj.rotation || 0 }
+            }
+          } as any;
+        }
+
         set((state) => {
           const nextPath = obj.type === 'frame' ? [...state.presentationPath, id] : state.presentationPath;
           return {
@@ -175,7 +215,7 @@ export const useCanvasStore = create<CanvasStore>()(
               past: [...state.history.past, state.objects].slice(-50),
               future: [],
             },
-            objects: [...state.objects, newObj],
+            objects: [...state.objects, newObj as CanvasObject],
             presentationPath: nextPath
           };
         });
@@ -219,8 +259,8 @@ export const useCanvasStore = create<CanvasStore>()(
 
       setViewport: (viewport) => {
         const current = get().viewport;
-        if (current.x === viewport.x && current.y === viewport.y && current.zoom === viewport.zoom) return;
-        set({ viewport });
+        if (current.x === viewport.x && current.y === viewport.y && current.zoom === viewport.zoom && current.rotation === (viewport.rotation || 0)) return;
+        set({ viewport: { ...current, ...viewport } });
       },
 
       undo: () => {
@@ -301,14 +341,14 @@ export const useCanvasStore = create<CanvasStore>()(
         });
       },
 
-      clear: () => set({ objects: [], selection: [], history: { past: [], future: [] }, lastSaved: null }),
+      clear: () => set({ objects: [], selection: [], history: { past: [], future: [] }, lastSaved: null, presentationPath: [] }),
       save: () => set({ lastSaved: Date.now() }),
       setActiveOverlay: (activeOverlay) => set({ activeOverlay }),
 
       loadDocument: (doc) => {
         const objects = [...doc.objects];
         const presentationPath = [...doc.presentationPath];
-        const viewport = { ...doc.viewport };
+        const viewport = { x: doc.viewport.x, y: doc.viewport.y, zoom: doc.viewport.zoom, rotation: doc.viewport.rotation || 0 };
         set({
           objects,
           presentationPath,
@@ -324,9 +364,7 @@ export const useCanvasStore = create<CanvasStore>()(
       loadTemplate: (template) => {
         console.log("[Store] loadTemplate triggered for:", template.id);
         import('./template-loader').then(({ TemplateLoader }) => {
-          // Pass the specific template object directly
           TemplateLoader.load(template).then(doc => {
-            console.log("[Store] Template processed, loading doc with", doc.objects.length, "objects");
             get().loadDocument(doc);
           }).catch(err => {
             console.error("[Store] Template loading failed:", err);

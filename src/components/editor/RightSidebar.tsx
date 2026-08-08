@@ -194,17 +194,73 @@ export default function RightSidebar() {
         </Section>
 
         {selectedObject.type === 'frame' && (
-          <Section title="Speaker Notes">
-            <textarea 
-              value={selectedObject.speakerNotes || ''}
-              onChange={(e) => handleChange('speakerNotes', e.target.value)}
-              placeholder="Add notes for this frame..."
-              className="w-full h-32 bg-neutral-50 border border-neutral-200 rounded px-2 py-2 text-xs outline-none focus:border-primary resize-none font-medium leading-relaxed"
-            />
-            <p className="text-[10px] text-neutral-400">
-              These notes are only visible in Presenter View.
-            </p>
-          </Section>
+          <>
+            <Section title="Camera & Transition">
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-medium text-neutral-500 uppercase">Transition Duration (ms)</label>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="number" 
+                      value={selectedObject.settings?.duration || 1200}
+                      onChange={(e) => {
+                        const settings = { ...(selectedObject.settings || {}), duration: parseInt(e.target.value) };
+                        handleChange('settings', settings);
+                      }}
+                      className="w-full bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-medium text-neutral-500 uppercase">Easing Style</label>
+                  <select 
+                    value={selectedObject.settings?.easing || 'smooth'}
+                    onChange={(e) => {
+                      const settings = { ...(selectedObject.settings || {}), easing: e.target.value };
+                      handleChange('settings', settings);
+                    }}
+                    className="w-full bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary"
+                  >
+                    <option value="smooth">Smooth</option>
+                    <option value="ease-in">Ease In</option>
+                    <option value="ease-out">Ease Out</option>
+                    <option value="ease-in-out">Ease In Out</option>
+                    <option value="cinematic">Cinematic</option>
+                    <option value="fast">Fast</option>
+                    <option value="slow">Slow</option>
+                  </select>
+                </div>
+
+                <button 
+                  onClick={() => {
+                    const { viewport } = useCanvasStore.getState();
+                    const settings = { 
+                      ...(selectedObject.settings || {}), 
+                      camera: { x: viewport.x, y: viewport.y, zoom: viewport.zoom, rotation: viewport.rotation } 
+                    };
+                    handleChange('settings', settings);
+                    toast.success('Camera position captured');
+                  }}
+                  className="w-full py-2 bg-neutral-100 hover:bg-neutral-200 rounded text-[11px] font-bold text-neutral-600 transition-colors"
+                >
+                  Capture Current Camera
+                </button>
+              </div>
+            </Section>
+
+            <Section title="Speaker Notes">
+              <textarea 
+                value={selectedObject.speakerNotes || ''}
+                onChange={(e) => handleChange('speakerNotes', e.target.value)}
+                placeholder="Add notes for this frame..."
+                className="w-full h-32 bg-neutral-50 border border-neutral-200 rounded px-2 py-2 text-xs outline-none focus:border-primary resize-none font-medium leading-relaxed"
+              />
+              <p className="text-[10px] text-neutral-400">
+                Visible in Presenter View.
+              </p>
+            </Section>
+          </>
         )}
 
         {selectedObject.type === 'text' && (
