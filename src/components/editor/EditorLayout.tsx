@@ -6,6 +6,7 @@ import Canvas from "./Canvas";
 import LeftSidebar from "./LeftSidebar";
 import RightSidebar from "./RightSidebar";
 import TopToolbar from "./TopToolbar";
+import MenuBar from "./MenuBar";
 import PresentationMode from "./PresentationMode";
 
 const TemplateLibrary = lazy(() => import("./templates/TemplateLibrary"));
@@ -19,7 +20,12 @@ export default function EditorLayout() {
 
   return (
     <div className="h-screen w-full overflow-hidden bg-white flex flex-col relative">
-      {!isPresenting && <TopToolbar />}
+      {!isPresenting && (
+        <>
+          <MenuBar />
+          <TopToolbar />
+        </>
+      )}
       
       <div className="flex-1 flex overflow-hidden">
         {!isPresenting && <LeftSidebar />}

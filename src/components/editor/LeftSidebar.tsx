@@ -16,6 +16,7 @@ import {
   Plus
 } from 'lucide-react';
 import { IconLibrary } from './IconLibrary';
+import { AIPanel } from './AIPanel';
 import { useCanvasStore } from '@/lib/canvas-store';
 import { TEMPLATES } from '@/lib/templates';
 import { toast } from 'sonner';
@@ -212,18 +213,7 @@ export default function LeftSidebar() {
                 <p>Click or drag to upload</p>
               </div>
             )}
-            {activeTab === 'ai' && (
-              <div className="space-y-4">
-                <textarea 
-                  className="w-full p-3 rounded-lg border border-neutral-200 focus:ring-2 focus:ring-primary outline-none text-neutral-900"
-                  placeholder="Describe what you want to generate..."
-                  rows={4}
-                />
-                <button className="w-full bg-primary text-white py-2 rounded-lg font-medium shadow-sm hover:shadow-md transition-all">
-                  Generate
-                </button>
-              </div>
-            )}
+            {activeTab === 'ai' && <AIPanel />}
             {activeTab === 'icons' && <IconLibrary />}
             {activeTab === 'history' && (
               <div className="space-y-4">
