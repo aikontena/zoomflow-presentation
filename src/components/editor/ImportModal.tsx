@@ -22,8 +22,8 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] animate-in fade-in duration-200" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-xl shadow-2xl p-6 z-[101] animate-in zoom-in-95 duration-200 border border-neutral-200">
+        <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1000] animate-in fade-in duration-200" />
+        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-xl shadow-2xl p-6 z-[1001] animate-in zoom-in-95 duration-200 border border-neutral-200">
           <div className="flex items-center justify-between mb-6">
             <Dialog.Title className="text-lg font-bold text-neutral-900 flex items-center gap-2">
               <FileText className="text-primary" size={20} />
