@@ -72,10 +72,10 @@ export const TextProperties = ({ object }: { object: CanvasObject }) => {
           <select
             value={object.fontFamily || 'Inter'}
             onChange={(e) => handleChange({ fontFamily: e.target.value })}
-            className="w-32 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none"
+            className="w-32 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none text-neutral-900"
           >
             {FONT_FAMILIES.map(font => (
-              <option key={font} value={font}>{font}</option>
+              <option key={font} value={font} className="text-neutral-900">{font}</option>
             ))}
           </select>
         </InputRow>
@@ -100,7 +100,7 @@ export const TextProperties = ({ object }: { object: CanvasObject }) => {
                 onChange={(e) => handleChange({ fontSize: parseInt(e.target.value) })}
               >
                 {FONT_SIZES.map(size => (
-                  <option key={size} value={size}>{size}</option>
+                  <option key={size} value={size} className="text-neutral-900">{size}</option>
                 ))}
               </select>
             </div>
@@ -255,11 +255,11 @@ export const MediaProperties = ({ object }: { object: CanvasObject }) => {
           <select
             value={object.objectFit || 'contain'}
             onChange={(e) => handleChange({ objectFit: e.target.value as any })}
-            className="w-24 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none"
+            className="w-24 bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none text-neutral-900"
           >
-            <option value="contain">Fit</option>
-            <option value="cover">Fill</option>
-            <option value="fill">Stretch</option>
+            <option value="contain" className="text-neutral-900">Fit</option>
+            <option value="cover" className="text-neutral-900">Fill</option>
+            <option value="fill" className="text-neutral-900">Stretch</option>
           </select>
         </InputRow>
         <InputRow label="Radius">
