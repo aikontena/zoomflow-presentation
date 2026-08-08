@@ -12,7 +12,7 @@ export function useViewportController() {
   const { viewport, setViewport, objects, selection } = useCanvasStore();
   const animationFrameRef = useRef<number | null>(null);
 
-  const animateViewport = useCallback((target: Viewport, duration: number = 300, easing: string = 'smooth') => {
+  const animateViewport = useCallback((target: Viewport, duration: number = 300, easing: string = 'smooth', pathType: string = 'linear') => {
     const start = { ...useCanvasStore.getState().viewport };
     const startTime = performance.now();
     const targetRotation = target.rotation ?? 0;
@@ -27,6 +27,11 @@ export function useViewportController() {
       const progress = Math.min(elapsed / duration, 1);
       
       let ease = 0;
+      let currentX = start.x + (target.x - start.x) * progress; // Default linear
+      let currentY = start.y + (target.y - start.y) * progress;
+      let currentZoom = start.zoom + (target.zoom - start.zoom) * progress;
+      let currentRotation = startRotation + (targetRotation - startRotation) * progress;
+
       switch (easing) {
         case 'ease-in':
           ease = progress * progress * progress;
@@ -38,13 +43,22 @@ export function useViewportController() {
           ease = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
           break;
         case 'cinematic':
-          ease = 1 - Math.pow(1 - progress, 4); // Quartic ease out
+          ease = 1 - Math.pow(1 - progress, 4);
           break;
         case 'fast':
           ease = 1 - Math.pow(1 - progress, 5);
           break;
         case 'slow':
           ease = 1 - Math.pow(1 - progress, 2);
+          break;
+        case 'elastic':
+          const c4 = (2 * Math.PI) / 3;
+          ease = progress === 0 ? 0 : progress === 1 ? 1 : -Math.pow(2, 10 * progress - 10) * Math.sin((progress * 10 - 10.75) * c4);
+          break;
+        case 'spring':
+          const c1 = 1.70158;
+          const c3 = c1 + 1;
+          ease = 1 + c3 * Math.pow(progress - 1, 3) + c1 * Math.pow(progress - 1, 2);
           break;
         case 'bounce':
           const n1 = 7.5625;
@@ -60,15 +74,48 @@ export function useViewportController() {
             ease = n1 * (p -= 2.625 / d1) * p + 0.984375;
           }
           break;
-        default: // 'smooth' / 'ease'
-          ease = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+        case 'morph':
+          ease = progress < 0.5 ? 8 * progress * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 4) / 2;
+          break;
+        case 'pan':
+          ease = progress;
+          break;
+        default: // 'smooth'
+          ease = 1 - Math.pow(1 - progress, 3);
+      }
+
+      // Default interpolation using the ease
+      currentX = start.x + (target.x - start.x) * ease;
+      currentY = start.y + (target.y - start.y) * ease;
+      currentZoom = start.zoom + (target.zoom - start.zoom) * ease;
+      currentRotation = startRotation + (targetRotation - startRotation) * ease;
+
+      // Specialized visual overrides
+      if (easing === 'vortex') {
+        currentRotation += Math.sin(progress * Math.PI) * 45;
+      } else if (easing === 'origami') {
+        currentZoom *= (1 + Math.sin(progress * Math.PI) * 0.2);
+      } else if (easing === 'orbit') {
+        const orbitOffset = Math.sin(progress * Math.PI) * 200;
+        currentX += orbitOffset;
+      }
+
+      if (pathType === 'curved' || pathType === 'spiral') {
+        const angle = progress * Math.PI;
+        const curveIntensity = pathType === 'spiral' ? 200 : 100;
+        const offset = Math.sin(angle) * curveIntensity * (1 - ease);
+        currentX += offset;
+        currentY += offset;
+      } else if (pathType === 'zoom-out') {
+        const zoomDip = Math.sin(progress * Math.PI) * (start.zoom * 0.5);
+        currentZoom -= zoomDip * (1 - progress);
       }
 
       const current = {
-        x: start.x + (target.x - start.x) * ease,
-        y: start.y + (target.y - start.y) * ease,
-        zoom: start.zoom + (target.zoom - start.zoom) * ease,
-        rotation: startRotation + (targetRotation - startRotation) * ease,
+        x: currentX,
+        y: currentY,
+        zoom: currentZoom,
+        rotation: currentRotation,
       };
 
       // 1. Direct DOM manipulation for maximum performance during presentation
@@ -191,7 +238,7 @@ export function useViewportController() {
     animateViewport(target);
   }, [animateViewport]);
 
-  const zoomToFrame = useCallback((frameId: string, duration?: number, easingOverride?: string) => {
+  const zoomToFrame = useCallback((frameId: string, duration?: number, easingOverride?: string, pathTypeOverride?: string) => {
     const state = useCanvasStore.getState();
     const currentObjects = state.objects;
     const presentationSettings = state.presentationSettings;
@@ -231,8 +278,9 @@ export function useViewportController() {
 
     const finalDuration = duration ?? frame.settings?.duration ?? 800;
     const finalEasing = easingOverride ?? frame.settings?.easing ?? 'smooth';
+    const finalPathType = pathTypeOverride ?? frame.settings?.pathType ?? 'linear';
 
-    animateViewport(target, finalDuration, finalEasing);
+    animateViewport(target, finalDuration, finalEasing, finalPathType);
   }, [animateViewport]);
 
   const resetZoom = useCallback(() => {

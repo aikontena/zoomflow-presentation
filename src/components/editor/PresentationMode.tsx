@@ -7,7 +7,7 @@ import PresentationMiniMap from './PresentationMiniMap';
 import LaserPointer from './LaserPointer';
 import PresenterView from './PresenterView';
 import { applyCamera, clampZoom, getCamera, normalizedDelta, zoomAtPoint } from '@/lib/camera-utils';
-import { X } from 'lucide-react';
+import { X, Sparkles } from 'lucide-react';
 
 export default function PresentationMode() {
   const isPresenting = useCanvasStore(state => state.isPresenting);
@@ -23,6 +23,7 @@ export default function PresentationMode() {
   const { zoomToFrame, fitToScreen, resetZoom, zoomTo } = useViewportController();
   const [showControls, setShowControls] = useState(true);
   const [showPresenterNotes, setShowPresenterNotes] = useState(false);
+  const [fadeOpacity, setFadeOpacity] = useState(0);
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const panRef = useRef<{ startX: number; startY: number; camX: number; camY: number; moved: boolean } | null>(null);
@@ -120,8 +121,19 @@ export default function PresentationMode() {
 
       const duration = frame?.settings?.duration ?? presentationSettings.transitionDuration;
       const easing = frame?.settings?.easing ?? presentationSettings.smoothness ?? 'smooth';
+      const pathType = frame?.settings?.pathType ?? 'linear';
 
-      zoomToFrame(frameId, duration, easing);
+      // Special visual effects triggers
+      if (easing === 'fade') {
+        setFadeOpacity(1);
+        setTimeout(() => setFadeOpacity(0), duration / 2);
+      } else if (easing === 'cut') {
+        // Cut is instant
+        zoomToFrame(frameId, 0, 'smooth', 'linear');
+        return;
+      }
+
+      zoomToFrame(frameId, duration, easing, pathType);
     }
   }, [currentFrameIndex, isPresenting, presentationPath, zoomToFrame, presentationSettings.transitionDuration, presentationSettings.smoothness, objects]);
 
@@ -194,6 +206,12 @@ export default function PresentationMode() {
       onDoubleClick={onDoubleClick}
     >
       <div className="flex-1 relative overflow-hidden pointer-events-none">
+        {/* Transition Overlay (Fade) */}
+        <div 
+          className="fixed inset-0 z-[110] bg-black pointer-events-none transition-opacity duration-300" 
+          style={{ opacity: fadeOpacity }}
+        />
+        
         {/* Camera Stage (GPU Accelerated Container) */}
         <div
           id="presentation-camera-container"

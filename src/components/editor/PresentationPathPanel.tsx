@@ -196,7 +196,7 @@ export function PresentationPathPanel() {
                   <div className="p-3 border-t border-neutral-100 bg-neutral-50/50 rounded-b-xl space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1">
-                        <label className="text-[9px] font-bold text-neutral-400 uppercase">Transition</label>
+                        <label className="text-[9px] font-bold text-neutral-400 uppercase">Duration</label>
                         <select 
                           value={frame.settings?.duration || 1200}
                           onChange={(e) => updateObject(frameId, { 
@@ -204,32 +204,63 @@ export function PresentationPathPanel() {
                           })}
                           className="w-full text-[10px] bg-white border border-neutral-200 rounded px-1.5 py-1 outline-none"
                         >
-                          <option value="200">0.2s</option>
-                          <option value="500">0.5s</option>
-                          <option value="1000">1.0s</option>
-                          <option value="2000">2.0s</option>
-                          <option value="3000">3.0s</option>
-                          <option value="5000">5.0s</option>
+                          <option value="500">Fast (0.5s)</option>
+                          <option value="1200">Medium (1.2s)</option>
+                          <option value="2500">Slow (2.5s)</option>
+                          <option value="4000">Epic (4.0s)</option>
                         </select>
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[9px] font-bold text-neutral-400 uppercase">Animation</label>
+                        <label className="text-[9px] font-bold text-neutral-400 uppercase">Path Style</label>
                         <select 
-                          value={frame.settings?.easing || 'smooth'}
+                          value={frame.settings?.pathType || 'linear'}
                           onChange={(e) => updateObject(frameId, { 
-                            settings: { ...frame.settings!, easing: e.target.value as any } 
+                            settings: { ...frame.settings!, pathType: e.target.value as any } 
                           })}
                           className="w-full text-[10px] bg-white border border-neutral-200 rounded px-1.5 py-1 outline-none"
                         >
-                          <option value="smooth">Smooth</option>
-                          <option value="ease">Ease</option>
-                          <option value="ease-in">Ease In</option>
-                          <option value="ease-out">Ease Out</option>
-                          <option value="ease-in-out">Ease In Out</option>
-                          <option value="cinematic">Cinematic</option>
-                          <option value="bounce">Bounce</option>
+                          <option value="linear">Linear (Direct)</option>
+                          <option value="curved">Curved (Prezi)</option>
+                          <option value="spiral">Spiral (Dynamic)</option>
+                          <option value="zoom-out">Distant (Outer Space)</option>
                         </select>
                       </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-bold text-neutral-400 uppercase">Transition Effect</label>
+                      <select 
+                        value={frame.settings?.easing || 'smooth'}
+                        onChange={(e) => updateObject(frameId, { 
+                          settings: { ...frame.settings!, easing: e.target.value as any } 
+                        })}
+                        className="w-full text-[10px] bg-white border border-neutral-200 rounded px-1.5 py-1 outline-none"
+                      >
+                        <optgroup label="Spatial">
+                          <option value="morph">Morph (Smart Zoom)</option>
+                          <option value="smooth">Smooth Slide</option>
+                          <option value="cinematic">Cinematic Ease</option>
+                        </optgroup>
+                        <optgroup label="Dynamic">
+                          <option value="pan">Pan & Rotate</option>
+                          <option value="orbit">Orbit (3D Feel)</option>
+                          <option value="spring">Springy</option>
+                          <option value="elastic">Elastic</option>
+                          <option value="bounce">Bounce</option>
+                        </optgroup>
+                        <optgroup label="Classic">
+                          <option value="fade">Fade In</option>
+                          <option value="push">Push</option>
+                          <option value="reveal">Reveal</option>
+                          <option value="cut">Instant Cut</option>
+                        </optgroup>
+                        <optgroup label="Artistic">
+                          <option value="wind">Wind Drift</option>
+                          <option value="fall">Gravity Fall</option>
+                          <option value="origami">Origami Fold</option>
+                          <option value="vortex">Vortex Spin</option>
+                        </optgroup>
+                      </select>
                     </div>
 
                     <div className="flex items-center justify-between py-1">
