@@ -356,6 +356,8 @@ export default function Canvas() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (editingId && e.key !== 'Escape') return; // Let textarea handle typing unless Escape
+
     if (e.code === 'Space' && !isPanning) {
       setIsPanning(true);
       return;
