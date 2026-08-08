@@ -137,7 +137,10 @@ export default function MenuBar() {
       label: 'Insert',
       items: [
         { label: 'Frame', action: () => addObject({ type: 'frame', x: 100, y: 100, width: 800, height: 450, rotation: 0, fill: '#ffffff', text: 'New Frame' }) },
-        { label: 'Text', action: () => addObject({ type: 'text', x: 100, y: 100, width: 200, height: 50, rotation: 0, fill: '#000000', text: 'New Text', fontSize: 24, fontFamily: 'Inter' }) },
+        { label: 'Text', action: () => {
+          const id = addObject({ type: 'text', x: 100, y: 100, width: 200, height: 50, rotation: 0, fill: '#000000', text: 'New Text', fontSize: 24, fontFamily: 'Inter' });
+          if (id) setSelection([id]);
+        }},
         { label: 'Rectangle', action: () => addObject({ type: 'rectangle', x: 100, y: 100, width: 100, height: 100, rotation: 0, fill: '#3b82f6' }) },
         { label: 'Circle', action: () => addObject({ type: 'circle', x: 100, y: 100, width: 100, height: 100, rotation: 0, fill: '#3b82f6' }) },
         { label: 'Image', action: () => {
