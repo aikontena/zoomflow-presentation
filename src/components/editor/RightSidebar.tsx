@@ -117,6 +117,28 @@ export default function RightSidebar() {
               </div>
             </div>
           </Section>
+          
+          <Section title="Canvas Navigation">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-neutral-500">Snap to Objects</label>
+                <input 
+                  type="checkbox"
+                  checked={useCanvasStore.getState().snapEnabled}
+                  onChange={(e) => useCanvasStore.getState().setSnapEnabled(e.target.checked)}
+                  className="rounded border-neutral-300 text-primary"
+                />
+              </div>
+              <button 
+                onClick={() => {
+                  useCanvasStore.getState().setViewport({ x: 0, y: 0, zoom: 1, rotation: 0 });
+                }}
+                className="w-full py-2 bg-neutral-100 hover:bg-neutral-200 rounded text-[11px] font-bold text-neutral-600 transition-colors"
+              >
+                Reset Canvas View
+              </button>
+            </div>
+          </Section>
 
           <div className="mt-8 flex flex-col items-center justify-center text-neutral-400 gap-2 opacity-50">
             <Layers size={32} strokeWidth={1.5} />
