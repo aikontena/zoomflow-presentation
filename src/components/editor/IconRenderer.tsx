@@ -19,16 +19,20 @@ export const IconRenderer: React.FC<IconRendererProps> = ({
   absoluteStrokeWidth = true,
 }) => {
   const IconComponent = getIconComponent(name);
+  // lucide computes strokeWidth * 24 / Number(size) when absoluteStrokeWidth is on,
+  // which yields NaN for non-numeric sizes like "100%".
+  const numericSize = typeof size === 'number' || !Number.isNaN(Number(size));
 
   return (
     <IconComponent
       size={size}
       color={color}
       className={className}
-      strokeWidth={strokeWidth}
-      absoluteStrokeWidth={absoluteStrokeWidth}
+      strokeWidth={Number.isFinite(strokeWidth) ? strokeWidth : 2}
+      absoluteStrokeWidth={numericSize ? absoluteStrokeWidth : false}
     />
   );
+
 };
 
 export default IconRenderer;
