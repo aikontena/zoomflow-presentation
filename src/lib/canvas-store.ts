@@ -320,6 +320,7 @@ export const useCanvasStore = create<CanvasStore>()(
           objects: objectsWithIds,
           presentationPath,
           selection: [],
+          viewport: { x: 100, y: 100, zoom: 0.8 }, // Adjust viewport to see template
           history: { past: [...state.history.past, state.objects].slice(-50), future: [] },
           activeOverlay: null
         }));
