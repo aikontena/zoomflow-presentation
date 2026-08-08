@@ -331,6 +331,7 @@ export default function TemplateLibrary() {
           <div className="p-6 bg-white border-t border-neutral-200 space-y-3">
             <Button 
               onClick={() => {
+                console.log("TemplateLibrary: Use Template clicked for", selectedTemplate.name);
                 loadTemplate(selectedTemplate.objects);
                 toast.success(`Loaded ${selectedTemplate.name}`);
               }}
