@@ -40,6 +40,8 @@ interface CanvasStore {
   selection: string[];
   viewport: { x: number; y: number; zoom: number };
   activeOverlay: 'templates' | 'export' | 'settings' | 'presentation' | null;
+  isRightSidebarVisible: boolean;
+  toggleRightSidebar: () => void;
   snapEnabled: boolean;
   setSnapEnabled: (enabled: boolean) => void;
   
