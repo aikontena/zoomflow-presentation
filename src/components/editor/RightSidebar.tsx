@@ -319,14 +319,14 @@ export default function RightSidebar() {
                       });
                       updateObject(selectedObject.id, { settings });
                     }}
-                    className="w-full bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary"
+                    className="w-full bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary text-neutral-900"
                   >
-                    <option value="smooth">Smooth Morph</option>
-                    <option value="cinematic">Cinematic Zoom</option>
-                    <option value="vortex">Vortex Spin</option>
-                    <option value="origami">Origami Fold</option>
-                    <option value="fade">Cross Fade</option>
-                    <option value="bounce">Spring Bounce</option>
+                    <option value="smooth" className="text-neutral-900">Smooth Morph</option>
+                    <option value="cinematic" className="text-neutral-900">Cinematic Zoom</option>
+                    <option value="vortex" className="text-neutral-900">Vortex Spin</option>
+                    <option value="origami" className="text-neutral-900">Origami Fold</option>
+                    <option value="fade" className="text-neutral-900">Cross Fade</option>
+                    <option value="bounce" className="text-neutral-900">Spring Bounce</option>
                   </select>
                 </div>
               </div>
