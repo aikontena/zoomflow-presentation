@@ -55,9 +55,19 @@ export interface PresentationSettings {
   backgroundColor?: string;
 }
 
+export interface Bookmark {
+  id: string;
+  label: string;
+  viewport: { x: number; y: number; zoom: number; rotation: number };
+}
+
 interface CanvasStore {
   objects: CanvasObject[];
   selection: string[];
+  bookmarks: Bookmark[];
+  addBookmark: (label: string) => void;
+  deleteBookmark: (id: string) => void;
+  goToBookmark: (id: string) => void;
   viewport: { x: number; y: number; zoom: number; rotation: number };
   activeOverlay: 'templates' | 'export' | 'settings' | 'presentation' | null;
   isRightSidebarVisible: boolean;
@@ -109,6 +119,24 @@ export const useCanvasStore = create<CanvasStore>()(
     (set, get) => ({
       objects: [],
       selection: [],
+      bookmarks: [],
+      addBookmark: (label) => {
+        const id = Math.random().toString(36).substring(7);
+        const { viewport } = get();
+        set((state) => ({
+          bookmarks: [...state.bookmarks, { id, label, viewport: { ...viewport } }]
+        }));
+        toast.success(`Bookmark "${label}" added`);
+      },
+      deleteBookmark: (id) => set((state) => ({
+        bookmarks: state.bookmarks.filter(b => b.id !== id)
+      })),
+      goToBookmark: (id) => {
+        const bookmark = get().bookmarks.find(b => b.id === id);
+        if (bookmark) {
+          get().setViewport(bookmark.viewport);
+        }
+      },
       viewport: { x: 0, y: 0, zoom: 1, rotation: 0 },
       activeOverlay: null,
       isRightSidebarVisible: true,
@@ -390,6 +418,7 @@ export const useCanvasStore = create<CanvasStore>()(
         viewport: state.viewport,
         presentationPath: state.presentationPath,
         presentationSettings: state.presentationSettings,
+        bookmarks: state.bookmarks,
         lastSaved: state.lastSaved
       }),
     }
