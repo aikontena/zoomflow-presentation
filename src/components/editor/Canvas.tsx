@@ -249,13 +249,9 @@ export default function Canvas() {
           {objects.map(obj => {
             const isSelected = selection.includes(obj.id);
             return (
-              <React.Fragment key={obj.id}>
-                {(() => {
-                  console.log(`[Canvas] Rendering object: ID=${obj.id}, Type=${obj.type}, X=${obj.x}, Y=${obj.y}, W=${obj.width}, H=${obj.height}, Opacity=${obj.opacity ?? 1}`);
-                  return null;
-                })()}
-                <div 
-                  style={{
+              <div 
+                key={obj.id}
+                style={{
                   position: 'absolute',
                   left: obj.x,
                   top: obj.y,
