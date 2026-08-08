@@ -202,10 +202,23 @@ export function useViewportController() {
     const availableHeight = window.innerHeight;
 
     // Apply zoom padding from settings
+    // A padding of 0 means tight fit, 0.5 means frame takes 50% of the screen.
+    // However, if the user says "still no improve", they likely want MORE space or the calculation is inverted/too subtle.
+    // The previous code: paddingMultiplier = 1 - (0.1) = 0.9. Frame takes 90% of screen.
+    // If they set 0.5, multiplier is 0.5. Frame takes 50%.
+    // Let's ensure the padding is applied to both axes correctly and potentially increase the influence.
     const paddingMultiplier = 1 - (presentationSettings.zoomPadding ?? 0.1);
+    
+    // Calculate zoom needed to fit the frame into the viewport with padding
     const zoomX = (availableWidth * paddingMultiplier) / frame.width;
     const zoomY = (availableHeight * paddingMultiplier) / frame.height;
-    const zoom = Math.min(zoomX, zoomY);
+    
+    // We take the minimum to ensure the whole frame fits
+    let zoom = Math.min(zoomX, zoomY);
+
+    // Add a safety cap: don't zoom in beyond a reasonable level for small frames
+    // unless explicitly zoomed to that level.
+    zoom = Math.min(zoom, 5); 
 
     const centerX = frame.x + frame.width / 2;
     const centerY = frame.y + frame.height / 2;
