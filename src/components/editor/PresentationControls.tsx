@@ -150,7 +150,7 @@ export default function PresentationControls({
             <div className="space-y-2">
               <div className="flex justify-between text-xs">
                 <span>Zoom Speed</span>
-                <span className="font-mono">{presentationSettings.zoomSpeed.toFixed(1)}x</span>
+                <span className="font-mono">{(presentationSettings.zoomSpeed ?? 1).toFixed(1)}x</span>
               </div>
               <Slider
                 min={0.2}
@@ -164,7 +164,7 @@ export default function PresentationControls({
             <div className="space-y-2">
               <div className="flex justify-between text-xs">
                 <span>Transition Duration</span>
-                <span className="font-mono">{(presentationSettings.transitionDuration / 1000).toFixed(1)}s</span>
+                <span className="font-mono">{((presentationSettings.transitionDuration ?? 1200) / 1000).toFixed(1)}s</span>
               </div>
               <Slider
                 min={200}
