@@ -61,7 +61,7 @@ export interface IconMeta {
 }
 
 /** Ordered keyword rules — first match wins. */
-const CATEGORY_RULES: [IconCategory, string[]][] = [
+const CATEGORY_RULES: [IconCategory | "Transport", string[]][] = [
   ["Artificial Intelligence", ["bot", "brain", "sparkle", "wand", "atom-ai", "cpu", "circuit", "binary"]],
   ["Programming", ["code", "terminal", "git", "braces", "bracket", "bug", "regex", "webhook", "command", "variable", "function", "curly"]],
   ["Charts", ["chart", "graph", "trending", "activity", "gauge", "sigma", "percent", "waves"]],
