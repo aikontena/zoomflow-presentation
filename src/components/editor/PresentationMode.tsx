@@ -200,6 +200,13 @@ export default function PresentationMode() {
     <div
       ref={rootRef}
       className={`fixed inset-0 z-[100] flex flex-col overflow-hidden select-none transition-colors duration-500 ${presentationSettings.darkBackground ? 'bg-neutral-950' : 'bg-white'} ${presentationSettings.manualPan ? 'cursor-grab active:cursor-grabbing' : ''}`}
+      style={{
+        backgroundColor: presentationSettings.backgroundColor || (presentationSettings.darkBackground ? '#0a0a0a' : '#ffffff'),
+        backgroundImage: presentationSettings.backgroundImage ? `url(${presentationSettings.backgroundImage})` : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
