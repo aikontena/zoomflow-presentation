@@ -228,6 +228,7 @@ export default function Canvas() {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [activeTool, setActiveTool] = useState<'select' | 'rect' | 'circle' | 'text' | 'frame'>('select');
   const [clipboard, setClipboard] = useState<string[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const getPointerPos = (e: React.MouseEvent | MouseEvent | Touch) => {
     const rect = containerRef.current?.getBoundingClientRect();
@@ -321,6 +322,7 @@ export default function Canvas() {
       setDragStart(pos);
     } else {
       if (!e.shiftKey) setSelection([]);
+      setEditingId(null);
     }
   };
 
