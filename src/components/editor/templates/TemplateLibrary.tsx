@@ -28,7 +28,6 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useCanvasStore } from '@/lib/canvas-store';
 import { toast } from 'sonner';
-import { toast } from 'sonner';
 
 interface TemplateCardProps {
   template: Template;
