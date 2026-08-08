@@ -118,9 +118,21 @@ export default function LeftSidebar() {
                       return (
                         <div key={frameId} className="group relative flex flex-col gap-2">
                           <div 
-                            onClick={() => setSelection([frameId])}
+                            onClick={() => {
+                              setSelection([frameId]);
+                              // Pan viewport to the frame
+                              const currentZoom = useCanvasStore.getState().viewport.zoom;
+                              const rect = document.getElementById('canvas-container')?.getBoundingClientRect();
+                              if (rect && frame) {
+                                setViewport({
+                                  x: (rect.width / 2) - (frame.x + frame.width / 2) * currentZoom,
+                                  y: (rect.height / 2) - (frame.y + frame.height / 2) * currentZoom,
+                                  zoom: currentZoom
+                                });
+                              }
+                            }}
                             className={`aspect-video rounded-lg border-2 overflow-hidden relative transition-all cursor-pointer shadow-sm ${
-                              selection.includes(frameId) ? 'border-primary' : 'border-neutral-200 hover:border-neutral-300'
+                              selection.includes(frameId) ? 'border-primary ring-2 ring-primary/20' : 'border-neutral-200 hover:border-neutral-300'
                             }`}
                           >
                             <FramePreview frame={frame} allObjects={objects} />
