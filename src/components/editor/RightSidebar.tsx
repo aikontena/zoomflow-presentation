@@ -1,5 +1,5 @@
 import React from 'react';
-import { useCanvasStore, CanvasObject } from '@/lib/canvas-store';
+import { useCanvasStore, CanvasObject, FrameSettings } from '@/lib/canvas-store';
 import { 
   Move, 
   Maximize, 
@@ -24,20 +24,18 @@ export default function RightSidebar() {
   const { objects, selection, updateObject, presentationSettings, updatePresentationSettings } = useCanvasStore();
   const selectedObject = objects.find(o => selection.includes(o.id));
 
-
   const handleChange = (key: string, value: any) => {
     if (selectedObject) {
       updateObject(selectedObject.id, { [key]: value });
     }
   };
 
-  const ensureFrameSettings = (settings: Partial<any> = {}) => ({
+  const ensureFrameSettings = (settings: Partial<FrameSettings> = {}): FrameSettings => ({
     duration: settings.duration ?? 1200,
     easing: settings.easing ?? 'smooth',
     camera: settings.camera ?? { x: 0, y: 0, zoom: 1, rotation: 0 },
     ...settings
   });
-
 
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="py-4 border-b border-neutral-100 last:border-0">
@@ -74,7 +72,7 @@ export default function RightSidebar() {
                 <div className="flex items-center gap-2">
                   <input 
                     type="range" 
-                    min="100" max="2000" step="100"
+                    min="100" max="2500" step="100"
                     value={presentationSettings.transitionDuration}
                     onChange={(e) => updatePresentationSettings({ transitionDuration: parseInt(e.target.value) })}
                     className="flex-1 accent-primary" 
@@ -273,39 +271,16 @@ export default function RightSidebar() {
           </InputRow>
         </Section>
 
-        <Section title="Style">
-          <InputRow label="Fill">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-neutral-400 uppercase font-mono">{selectedObject.fill}</span>
-              <input 
-                type="color" 
-                value={selectedObject.fill}
-                onChange={(e) => handleChange('fill', e.target.value)}
-                className="w-6 h-6 rounded border-none cursor-pointer"
-              />
-            </div>
-          </InputRow>
-          <InputRow label="Opacity">
-            <input 
-              type="range" 
-              min="0" max="1" step="0.1"
-              value={selectedObject.opacity ?? 1}
-              onChange={(e) => handleChange('opacity', parseFloat(e.target.value))}
-              className="w-24 accent-primary"
-            />
-          </InputRow>
-        </Section>
-
         {selectedObject.type === 'frame' && (
           <>
             <Section title="Camera Settings">
               <button 
                 onClick={() => {
                   const { viewport } = useCanvasStore.getState();
-                  const settings = { 
+                  const settings = ensureFrameSettings({ 
                     ...(selectedObject.settings || {}), 
                     camera: { x: viewport.x, y: viewport.y, zoom: viewport.zoom, rotation: viewport.rotation } 
-                  };
+                  });
                   updateObject(selectedObject.id, { settings });
                   toast.success('Camera position captured');
                 }}
@@ -323,13 +298,10 @@ export default function RightSidebar() {
                     type="number" 
                     value={selectedObject.settings?.duration || 1200}
                     onChange={(e) => {
-                      const settings = { 
-                        duration: 1200,
-                        easing: 'smooth' as const,
-                        camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
+                      const settings = ensureFrameSettings({ 
                         ...(selectedObject.settings || {}), 
                         duration: parseInt(e.target.value) 
-                      };
+                      });
                       updateObject(selectedObject.id, { settings });
                     }}
                     className="w-full bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary"
@@ -341,13 +313,10 @@ export default function RightSidebar() {
                   <select 
                     value={selectedObject.settings?.easing || 'smooth'}
                     onChange={(e) => {
-                      const settings = { 
-                        duration: 1200,
-                        easing: 'smooth' as const,
-                        camera: { x: 0, y: 0, zoom: 1, rotation: 0 },
+                      const settings = ensureFrameSettings({ 
                         ...(selectedObject.settings || {}), 
                         easing: e.target.value as any 
-                      };
+                      });
                       updateObject(selectedObject.id, { settings });
                     }}
                     className="w-full bg-neutral-50 border border-neutral-200 rounded px-2 py-1 text-xs outline-none focus:border-primary"
@@ -377,7 +346,6 @@ export default function RightSidebar() {
           </>
         )}
 
-
         {selectedObject.type === 'text' && <TextProperties object={selectedObject} />}
         {(selectedObject.type === 'image' || selectedObject.type === 'video') && <MediaProperties object={selectedObject} />}
         {(selectedObject.type === 'rectangle' || selectedObject.type === 'circle') && <ShapeProperties object={selectedObject} />}
@@ -387,7 +355,6 @@ export default function RightSidebar() {
             <IconProperties object={selectedObject} />
           </Section>
         )}
-
 
       </div>
     </div>
