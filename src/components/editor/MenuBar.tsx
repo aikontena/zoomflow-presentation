@@ -137,20 +137,30 @@ export default function MenuBar() {
       label: 'Insert',
       items: [
         { label: 'Frame', action: () => addObject({ type: 'frame', x: 100, y: 100, width: 800, height: 450, rotation: 0, fill: '#ffffff', text: 'New Frame' }) },
-        { label: 'Text', action: () => addObject({ type: 'text', x: 100, y: 100, width: 200, height: 50, rotation: 0, fill: '#000000', text: 'New Text' }) },
+        { label: 'Text', action: () => addObject({ type: 'text', x: 100, y: 100, width: 200, height: 50, rotation: 0, fill: '#000000', text: 'New Text', fontSize: 24, fontFamily: 'Inter' }) },
         { label: 'Rectangle', action: () => addObject({ type: 'rectangle', x: 100, y: 100, width: 100, height: 100, rotation: 0, fill: '#3b82f6' }) },
         { label: 'Circle', action: () => addObject({ type: 'circle', x: 100, y: 100, width: 100, height: 100, rotation: 0, fill: '#3b82f6' }) },
-        { label: 'Arrow', comingSoon: true },
-        { label: 'Line', comingSoon: true },
-        { label: 'Image', action: () => setActiveOverlay('templates') }, // or asset library
-        { label: 'Icon', action: () => { /* UI focuses icons in sidebar */ } },
-        { label: 'Video', comingSoon: true },
-        { label: 'Import PPTX / PDF', action: () => fileInputRef.current?.click() },
+        { label: 'Image', action: () => {
+          const input = document.createElement('input');
+          input.type = 'file';
+          input.accept = 'image/*';
+          input.onchange = (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = (event) => addObject({ type: 'image', x: 100, y: 100, width: 300, height: 200, rotation: 0, fill: 'transparent', src: event.target?.result as string });
+              reader.readAsDataURL(file);
+            }
+          };
+          input.click();
+        }},
+        { label: 'Video', action: () => addObject({ type: 'video', x: 100, y: 100, width: 480, height: 270, rotation: 0, fill: '#000000', text: 'Video Placeholder' }) },
+        { label: 'Icon', action: () => setActiveOverlay('templates') },
         { label: 'Chart', comingSoon: true },
-
         { label: 'Table', comingSoon: true },
-        { label: 'Sticky Note', comingSoon: true },
-        { label: 'Comment', comingSoon: true },
+        { label: 'PDF', action: () => fileInputRef.current?.click() },
+        { label: 'QR Code', comingSoon: true },
+        { label: 'Equation', comingSoon: true },
       ]
     },
     {
