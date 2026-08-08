@@ -161,7 +161,7 @@ export default function LeftSidebar() {
                               <div className="absolute bottom-0 inset-x-0 bg-white/90 backdrop-blur-sm p-2 text-[10px] font-medium border-t border-neutral-100 flex justify-between items-center">
                                 <span className="truncate max-w-[180px]">{frame.text || `Frame ${index + 1}`}</span>
                                 <div className="flex items-center gap-1.5">
-                                  {frame.settings?.rotation !== 0 && (
+                                  {frame.settings?.camera?.rotation !== 0 && (
                                     <div className="w-1 h-1 bg-amber-400 rounded-full" title="Camera Rotation Active" />
                                   )}
                                   <span className="text-neutral-400 font-mono">#{index + 1}</span>
