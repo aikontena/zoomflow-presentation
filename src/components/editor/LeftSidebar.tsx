@@ -18,6 +18,7 @@ import {
 import { IconLibrary } from './IconLibrary';
 import { AIPanel } from './AIPanel';
 import { FramePreview } from './FramePreview';
+import { DynamicTemplateThumbnail } from './templates/DynamicTemplateThumbnail';
 import { useCanvasStore } from '@/lib/canvas-store';
 import { TEMPLATES } from '@/lib/templates';
 import { toast } from 'sonner';
@@ -203,7 +204,11 @@ export default function LeftSidebar() {
                       }}
                       className="aspect-video bg-neutral-100 rounded-md border border-neutral-200 hover:border-primary cursor-pointer transition-colors overflow-hidden group relative"
                     >
-                      <img src={t.thumbnail} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                      <DynamicTemplateThumbnail 
+                        objects={t.objects} 
+                        name={t.name} 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" 
+                      />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
                         <Plus size={20} className="text-white" />
                       </div>
