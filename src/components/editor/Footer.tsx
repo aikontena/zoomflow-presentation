@@ -9,7 +9,7 @@ export default function Footer() {
   if (isPresenting) return null;
 
   return (
-    <div className="h-12 border-t border-neutral-200 bg-white flex items-center px-4 justify-between select-none">
+    <div className="h-[60px] border-t border-neutral-200 bg-white flex items-center px-4 justify-between select-none">
       <div className="flex items-center gap-6">
         {/* Transition Speed */}
         <div className="flex items-center gap-3">
