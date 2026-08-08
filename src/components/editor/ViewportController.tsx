@@ -46,6 +46,19 @@ export function useViewportController() {
         case 'slow':
           ease = 1 - Math.pow(1 - progress, 2);
           break;
+        case 'bounce':
+          const n1 = 7.5625;
+          const d1 = 2.75;
+          if (progress < 1 / d1) {
+            ease = n1 * progress * progress;
+          } else if (progress < 2 / d1) {
+            ease = n1 * (progress -= 1.5 / d1) * progress + 0.75;
+          } else if (progress < 2.5 / d1) {
+            ease = n1 * (progress -= 2.25 / d1) * progress + 0.9375;
+          } else {
+            ease = n1 * (progress -= 2.625 / d1) * progress + 0.984375;
+          }
+          break;
         default: // 'smooth' / 'ease'
           ease = 1 - Math.pow(1 - progress, 3); // easeOutCubic
       }

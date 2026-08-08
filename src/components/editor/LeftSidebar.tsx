@@ -13,8 +13,10 @@ import {
   Settings,
   Clock,
   History,
-  Plus
+  Plus,
+  MonitorPlay
 } from 'lucide-react';
+import { PresentationPathPanel } from './PresentationPathPanel';
 import { IconLibrary } from './IconLibrary';
 import { AIPanel } from './AIPanel';
 import { FramePreview } from './FramePreview';
@@ -25,6 +27,7 @@ import { toast } from 'sonner';
 
 
 const TABS = [
+  { id: 'path', label: 'Path', icon: MonitorPlay },
   { id: 'pages', label: 'Pages', icon: FileText },
   { id: 'layers', label: 'Layers', icon: Layers },
   { id: 'assets', label: 'Assets', icon: Image },
@@ -110,6 +113,7 @@ export default function LeftSidebar() {
             </button>
           </div>
           <div className="flex-1 p-4 text-sm text-neutral-500 overflow-y-auto">
+            {activeTab === 'path' && <PresentationPathPanel />}
             {activeTab === 'pages' && (
               <div className="space-y-4">
                 <div className="flex flex-col gap-4">
