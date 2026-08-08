@@ -12,13 +12,14 @@ export interface Template {
   objects: any[];
 }
 
-const COLORS = {
+const COLORS: Record<string, any> = {
   business: { primary: '#1E293B', secondary: '#3B82F6', accent: '#60A5FA', bg: '#F8FAFC', text: '#1E293B', shapes: ['#E2E8F0', '#CBD5E1'] },
   startup: { primary: '#10B981', secondary: '#059669', accent: '#34D399', bg: '#F0FDF4', text: '#064E3B', shapes: ['#DCFCE7', '#BBF7D0'] },
   marketing: { primary: '#EC4899', secondary: '#DB2777', accent: '#F472B6', bg: '#FDF2F8', text: '#831843', shapes: ['#FCE7F3', '#FBCFE8'] },
   minimal: { primary: '#18181B', secondary: '#3F3F46', accent: '#A1A1AA', bg: '#FFFFFF', text: '#18181B', shapes: ['#F4F4F5', '#E4E4E7'] },
   dark: { primary: '#FFFFFF', secondary: '#94A3B8', accent: '#3B82F6', bg: '#0F172A', text: '#F8FAFC', shapes: ['#1E293B', '#334155'] },
-  academic: { primary: '#4338CA', secondary: '#6366F1', accent: '#818CF8', bg: '#EEF2FF', text: '#312E81', shapes: ['#E0E7FF', '#C7D2FE'] }
+  academic: { primary: '#4338CA', secondary: '#6366F1', accent: '#818CF8', bg: '#EEF2FF', text: '#312E81', shapes: ['#E0E7FF', '#C7D2FE'] },
+  creative: { primary: '#F97316', secondary: '#FB923C', accent: '#FDBA74', bg: '#FFF7ED', text: '#7C2D12', shapes: ['#FFEDD5', '#FED7AA'] }
 };
 
 const ICONS = ['Briefcase', 'TrendingUp', 'Target', 'Users', 'Zap', 'Shield', 'Globe', 'Cpu', 'Layers', 'PieChart'];
@@ -28,8 +29,8 @@ const createProfessionalFrame = (
   frameIndex: number, 
   title: string, 
   content: string, 
-  type: 'title' | 'content' | 'chart' | 'image' | 'closing', 
-  colors: any,
+  type: 'title' | 'content' | 'chart' | 'image' | 'closing' | 'grid' | 'feature', 
+  colors: { primary: string; secondary: string; accent: string; bg: string; text: string; shapes: string[] },
   x: number,
   y: number
 ) => {
@@ -141,7 +142,7 @@ const createProfessionalFrame = (
         parentId: frameId
       });
     }
-  } else {
+  } else if (type === 'content') {
     // Content Slide Layout
     objects.push({
       id: `slide-head-${frameId}`,
@@ -210,27 +211,127 @@ const createProfessionalFrame = (
       fill: colors.primary,
       parentId: frameId
     });
+  } else if (type === 'grid') {
+    // 2x2 Grid Layout
+    objects.push({
+      id: `slide-head-${frameId}`,
+      type: 'text',
+      x: x + 50, y: y + 40,
+      width: 600, height: 40,
+      text: title,
+      fontSize: 32,
+      fill: colors.primary,
+      parentId: frameId
+    });
+
+    const gridItems = [
+      { label: "Market Growth", icon: "TrendingUp" },
+      { label: "Team Synergy", icon: "Users" },
+      { label: "Quick Delivery", icon: "Zap" },
+      { label: "Global Reach", icon: "Globe" }
+    ];
+
+    gridItems.forEach((item, idx) => {
+      const gx = x + 80 + (idx % 2) * 350;
+      const gy = y + 120 + Math.floor(idx / 2) * 150;
+
+      objects.push({
+        id: `grid-bg-${frameId}-${idx}`,
+        type: 'rectangle',
+        x: gx, y: gy,
+        width: 280, height: 120,
+        fill: colors.shapes[0],
+        opacity: 0.5,
+        parentId: frameId
+      });
+
+      objects.push({
+        id: `grid-icon-${frameId}-${idx}`,
+        type: 'icon',
+        x: gx + 20, y: gy + 30,
+        width: 40, height: 40,
+        iconName: item.icon,
+        fill: colors.primary,
+        parentId: frameId
+      });
+
+      objects.push({
+        id: `grid-text-${frameId}-${idx}`,
+        type: 'text',
+        x: gx + 80, y: gy + 40,
+        width: 180, height: 40,
+        text: item.label,
+        fontSize: 18,
+        fill: colors.text,
+        parentId: frameId
+      });
+    });
+  } else if (type === 'feature') {
+    // Large Feature Slide
+    objects.push({
+      id: `feat-rect-${frameId}`,
+      type: 'rectangle',
+      x: x + 50, y: y + 80,
+      width: 700, height: 300,
+      fill: colors.primary,
+      opacity: 0.05,
+      parentId: frameId
+    });
+
+    objects.push({
+      id: `feat-icon-${frameId}`,
+      type: 'icon',
+      x: x + 350, y: y + 120,
+      width: 100, height: 100,
+      iconName: "Sparkles",
+      fill: colors.accent,
+      parentId: frameId
+    });
+
+    objects.push({
+      id: `feat-title-${frameId}`,
+      type: 'text',
+      x: x + 100, y: y + 240,
+      width: 600, height: 60,
+      text: title,
+      fontSize: 42,
+      fill: colors.primary,
+      parentId: frameId
+    });
+
+    objects.push({
+      id: `feat-desc-${frameId}`,
+      type: 'text',
+      x: x + 150, y: y + 310,
+      width: 500, height: 40,
+      text: content,
+      fontSize: 20,
+      fill: colors.secondary,
+      parentId: frameId
+    });
   }
 
   return objects;
 };
 
-const generateTemplate = (id: string, name: string, category: string, colorKey: keyof typeof COLORS): Template => {
-  const colors = COLORS[colorKey];
+export const generateTemplate = (id: string, name: string, category: string, colorKey: string): Template => {
+  const colors = COLORS[colorKey] || COLORS['business'];
   const objects: any[] = [];
   const spacing = 1200;
   
   const sections = [
     { title: name, content: "Strategic Analysis & 2026 Roadmap\nPresented by Creative Team", type: 'title' as const },
+    { title: "Core Features", content: "AI Integration\nReal-time Collaboration\nZooming Engine\nCloud Persistence", type: 'grid' as const },
     { title: "Market Landscape", content: "Competitor analysis indicates gap in GenAI\nUser adoption increased by 200%\nMobile-first strategy is mandatory\nGlobal reach expanded to 45 countries", type: 'content' as const },
     { title: "Strategic Pillars", content: "Scalable Cloud Infrastructure\nHuman-Centric AI Design\nSustainable Growth Model\nSecurity by Design Principles", type: 'content' as const },
+    { title: "Key Innovation", content: "Breaking boundaries with spatial presentation layouts.", type: 'feature' as const },
     { title: "Execution Plan", content: "Phase 1: Research & Discovery\nPhase 2: Rapid Prototyping\nPhase 3: Beta Launch & Feedback\nPhase 4: Global Scale Out", type: 'content' as const },
     { title: "Financial Summary", content: "Revenue Growth: +45% YoY\nCustomer LTV: $1,200\nAcquisition Cost: -$250\nNet Retention: 112%", type: 'content' as const },
     { title: "Next Steps", content: "Schedule Follow-up Meeting\nReview Q3 Objectives\nFinalize Budget Allocation\nApprove Technology Stack", type: 'content' as const }
   ];
 
   sections.forEach((sec, i) => {
-    // Spiral or grid layout for zoom-out effects
+    // Spiral layout for spatial effect
     const x = Math.cos(i * 0.8) * i * spacing;
     const y = Math.sin(i * 0.8) * i * spacing;
     objects.push(...createProfessionalFrame(id, i, sec.title, sec.content, sec.type, colors, x, y));
@@ -246,7 +347,7 @@ const generateTemplate = (id: string, name: string, category: string, colorKey: 
     difficulty: 'Intermediate',
     popularity: 900 + Math.floor(Math.random() * 100),
     tags: [category.toLowerCase(), 'professional', 'high-quality', 'presentation-ready'],
-    thumbnail: `https://picsum.photos/seed/${id}/800/450`,
+    thumbnail: '', // Thumbnail is now generated dynamically in the UI
     objects
   };
 };

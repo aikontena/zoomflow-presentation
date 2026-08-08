@@ -5,18 +5,16 @@ import {
   List, 
   Filter, 
   Star, 
-  ExternalLink, 
-  Plus, 
-  MoreVertical,
-  Clock,
-  Layers,
   ArrowRight,
   TrendingUp,
   Layout,
   Sparkles,
-  X
+  Clock,
+  Layers
 } from 'lucide-react';
-import { TEMPLATES, Template } from '@/lib/templates';
+import { TEMPLATES } from '@/lib/templates';
+import type { Template } from '@/lib/templates';
+import { DynamicTemplateThumbnail } from './DynamicTemplateThumbnail';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -51,11 +49,10 @@ function TemplateCard({ template, viewMode, isSelected, isFavorite, onClick, onF
       } ${isSelected ? 'ring-2 ring-primary ring-offset-2' : ''}`}
     >
       <div className={`relative bg-neutral-100 overflow-hidden ${viewMode === 'grid' ? 'aspect-video' : 'w-32 aspect-video rounded-md shrink-0'}`}>
-        <img 
-          src={template.thumbnail} 
-          alt={template.name}
+        <DynamicTemplateThumbnail 
+          objects={template.objects} 
+          name={template.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-          loading="lazy"
         />
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
           <Button 
@@ -264,7 +261,11 @@ export default function TemplateLibrary() {
           <ScrollArea className="flex-1">
             <div className="p-6 space-y-6">
               <div className="aspect-video rounded-xl overflow-hidden shadow-lg border border-neutral-200">
-                <img src={selectedTemplate.thumbnail} alt="Preview" className="w-full h-full object-cover" />
+                <DynamicTemplateThumbnail 
+                  objects={selectedTemplate.objects} 
+                  name={selectedTemplate.name} 
+                  className="w-full h-full" 
+                />
               </div>
 
               <div className="space-y-2">
