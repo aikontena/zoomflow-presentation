@@ -159,10 +159,8 @@ export class SlideImporter {
     // 1. Find all slide files
     const slideFiles = Object.keys(zip.files).filter(name => name.startsWith('ppt/slides/slide') && name.endsWith('.xml'));
     slideFiles.sort((a, b) => {
-      const matchA = a.match(/\d+/);
-      const matchB = b.match(/\d+/);
-      const numA = matchA ? parseInt(matchA[0]) : 0;
-      const numB = matchB ? parseInt(matchB[0]) : 0;
+      const numA = parseInt(a.replace(/[^\d]/g, '')) || 0;
+      const numB = parseInt(b.replace(/[^\d]/g, '')) || 0;
       return numA - numB;
     });
 
@@ -190,7 +188,7 @@ export class SlideImporter {
 
     // 2. Process each slide
     for (let i = 0; i < slideFiles.length; i++) {
-      const slideFile = zip.file(slideFiles[i]);
+      const slideFile = zip.file(slideFiles[i]) as any;
       if (!slideFile) continue;
       
       const slideXml = await slideFile.async('string');
