@@ -289,7 +289,7 @@ export default function Canvas() {
                   userSelect: 'none',
                   filter: obj.shadow ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.25))' : undefined,
                   boxShadow: isSelected ? '0 0 0 2px #3b82f6' : (obj.type === 'frame' ? '0 4px 6px -1px rgb(0 0 0 / 0.1)' : 'none'),
-                  zIndex: obj.type === 'frame' ? -1 : 1,
+                  zIndex: obj.type === 'frame' ? 0 : 1,
                   opacity: obj.opacity ?? 1,
                 }}>
 

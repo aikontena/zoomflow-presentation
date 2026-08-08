@@ -20,7 +20,13 @@ export class TemplateLoader {
       throw new Error("Invalid template data: Not an object");
     }
 
-    const sourceObjects = Array.isArray(templateData.objects) ? templateData.objects : [];
+    // Support both the full template object and just the objects array
+    let sourceObjects = [];
+    if (Array.isArray(templateData.objects)) {
+      sourceObjects = templateData.objects;
+    } else if (Array.isArray(templateData)) {
+      sourceObjects = templateData;
+    }
     
     if (sourceObjects.length === 0) {
       console.warn("[TemplateLoader] Template has no objects.");
