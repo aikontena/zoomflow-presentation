@@ -123,7 +123,7 @@ interface CanvasStore {
   loadTemplate: (template: any) => void;
   pendingTemplate: any | null;
   requestTemplate: (template: any) => void;
-  resolveTemplateConflict: (choice: 'keep' | 'new' | 'duplicate') => void;
+  resolveTemplateConflict: (choice: 'keep' | 'new' | 'duplicate' | 'replace') => void;
   randomizeTransitions: () => void;
 }
 
