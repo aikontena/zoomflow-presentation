@@ -161,8 +161,10 @@ export class SlideImporter {
     // 1. Find all slide files
     const slideFiles = Object.keys(zip.files).filter(name => name.startsWith('ppt/slides/slide') && name.endsWith('.xml'));
     slideFiles.sort((a, b) => {
-      const numA = parseInt(a.match(/\d+/)![0]);
-      const numB = parseInt(b.match(/\d+/)![0]);
+      const matchA = a.match(/\d+/);
+      const matchB = b.match(/\d+/);
+      const numA = matchA ? parseInt(matchA[0]) : 0;
+      const numB = matchB ? parseInt(matchB[0]) : 0;
       return numA - numB;
     });
 
@@ -190,7 +192,10 @@ export class SlideImporter {
 
     // 2. Process each slide
     for (let i = 0; i < slideFiles.length; i++) {
-      const slideXml = await zip.file(slideFiles[i])!.async('string');
+      const slideFile = zip.file(slideFiles[i]);
+      if (!slideFile) continue;
+      
+      const slideXml = await slideFile.async('string');
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(slideXml, 'text/xml');
       
@@ -237,16 +242,16 @@ export class SlideImporter {
       });
 
       // 3. Extract Text Shapes from XML
-      // Note: This is a simplified extraction of <a:t> (text) inside <p:sp> (shapes)
       const textNodes = xmlDoc.getElementsByTagName('a:t');
       const slideContent: string[] = [];
       for (let j = 0; j < textNodes.length; j++) {
-        if (textNodes[j].textContent) {
-          slideContent.push(textNodes[j].textContent!);
+        const textContent = textNodes[j]?.textContent;
+        if (textContent) {
+          slideContent.push(textContent);
         }
       }
 
-      // Group text into a single block per slide for now to ensure visual parity
+      // Group text into a block
       if (slideContent.length > 0) {
         objects.push({
           id: `${frameId}-text`,
@@ -263,10 +268,6 @@ export class SlideImporter {
           locked: mode === 'preserve'
         });
       }
-
-      // 4. Handle Images (simplified)
-      // For images, we'd need to parse relationships. For now, we extract them if possible.
-      // This is a placeholder for high-fidelity image mapping.
 
       presentationPath.push(frameId);
       bookmarks.push({
