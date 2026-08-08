@@ -18,6 +18,8 @@ export interface CanvasObject {
   src?: string;
   iconName?: string;
   opacity?: number;
+  locked?: boolean;
+  shadow?: boolean;
   parentId?: string;
   speakerNotes?: string;
 }
