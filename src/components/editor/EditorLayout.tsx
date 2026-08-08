@@ -24,7 +24,7 @@ export default function EditorLayout() {
         <>
           <MenuBar />
           <TopToolbar />
-        <>
+        </>
       )}
       
       <div className="flex-1 flex overflow-hidden">
