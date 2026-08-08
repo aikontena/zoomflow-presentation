@@ -130,9 +130,6 @@ export class SlideImporter {
         locked: mode === 'preserve' // In preserve mode, background is locked
       });
 
-      // In 'convert' mode, we could attempt to parse text layers here, 
-      // but to fulfill the "identical" requirement, we keep the image as a reference layer.
-
       presentationPath.push(frameId);
       bookmarks.push({
         id: `bm-${frameId}`,
@@ -156,6 +153,7 @@ export class SlideImporter {
 
   private static async importPPT(file: File, mode: 'preserve' | 'convert' | 'ai'): Promise<any> {
     const arrayBuffer = await file.arrayBuffer();
+    // @ts-ignore
     const zip = await JSZip.loadAsync(arrayBuffer);
     
     // 1. Find all slide files
@@ -245,9 +243,9 @@ export class SlideImporter {
       const textNodes = xmlDoc.getElementsByTagName('a:t');
       const slideContent: string[] = [];
       for (let j = 0; j < textNodes.length; j++) {
-        const textContent = textNodes[j]?.textContent;
-        if (textContent) {
-          slideContent.push(textContent);
+        const node = textNodes[j];
+        if (node && node.textContent) {
+          slideContent.push(node.textContent);
         }
       }
 
