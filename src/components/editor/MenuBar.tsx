@@ -61,13 +61,18 @@ export default function MenuBar() {
     if (file) setPendingFile(file);
   };
 
-  const confirmImport = async (mode: 'preserve' | 'convert') => {
+  const confirmImport = async (mode: 'preserve' | 'convert' | 'ai') => {
     if (!pendingFile) return;
     
     const file = pendingFile;
     setPendingFile(null);
     setIsImporting(true);
-    const toastId = toast.loading(`${mode === 'convert' ? 'Converting' : 'Importing'} ${file.name}...`);
+    
+    let statusText = 'Importing...';
+    if (mode === 'convert') statusText = 'Converting...';
+    if (mode === 'ai') statusText = 'Generating Spatial Path...';
+    
+    const toastId = toast.loading(`${statusText} ${file.name}`);
 
     try {
       const doc = await SlideImporter.importFile(file, mode);

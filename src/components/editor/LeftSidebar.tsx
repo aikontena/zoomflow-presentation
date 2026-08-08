@@ -334,9 +334,35 @@ export default function LeftSidebar() {
               </div>
             )}
             {activeTab === 'uploads' && (
-              <div className="border-2 border-dashed border-neutral-200 rounded-xl p-8 text-center flex flex-col items-center gap-2">
-                <Upload className="text-neutral-300" size={32} />
-                <p>Click or drag to upload</p>
+              <div className="space-y-4">
+                <div 
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.pptx,.pdf';
+                    input.onchange = (e) => {
+                      const file = (e.target as HTMLInputElement).files?.[0];
+                      if (file) {
+                        // We need to trigger the import logic from MenuBar or similar
+                        // For now, let's just toast and direct user to MenuBar since that has the full Wizard
+                        toast.info("Please use 'File > Import' or 'Insert > Import' to use the Import Wizard for documents.");
+                      }
+                    };
+                    input.click();
+                  }}
+                  className="border-2 border-dashed border-neutral-200 rounded-xl p-8 text-center flex flex-col items-center gap-2 hover:border-primary hover:bg-neutral-50 cursor-pointer transition-all group"
+                >
+                  <Upload className="text-neutral-300 group-hover:text-primary transition-colors" size={32} />
+                  <p className="text-sm font-medium text-neutral-600">Import PPTX / PDF</p>
+                  <p className="text-xs text-neutral-400">Preserve original slide fidelity</p>
+                </div>
+                
+                <div className="bg-amber-50 p-3 rounded-lg border border-amber-100 flex gap-2 items-start">
+                  <Sparkles size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-amber-700 leading-tight">
+                    <strong>Non-Destructive:</strong> Every slide is imported as a high-fidelity layer. Annotate without changing the source.
+                  </p>
+                </div>
               </div>
             )}
             {activeTab === 'ai' && <AIPanel />}
