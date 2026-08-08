@@ -343,10 +343,42 @@ export default function Canvas() {
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    
+    // Check for files first
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const files = Array.from(e.dataTransfer.files);
+      const pos = getPointerPos(e as any);
+      
+      files.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const src = event.target?.result as string;
+          const type = file.type.startsWith('video/') ? 'video' : 
+                       file.type.startsWith('audio/') ? 'audio' :
+                       file.type === 'application/pdf' ? 'pdf' : 'image';
+          
+          const id = addObject({
+            type: type as any,
+            x: Math.round(pos.x - 100 + (index * 20)),
+            y: Math.round(pos.y - 100 + (index * 20)),
+            width: type === 'image' ? 300 : type === 'video' ? 480 : 200,
+            height: type === 'image' ? 200 : type === 'video' ? 270 : 50,
+            rotation: 0,
+            fill: type === 'image' || type === 'video' ? 'transparent' : '#3b82f6',
+            src,
+            text: type === 'audio' ? file.name : undefined
+          });
+          if (typeof id === 'string') setSelection([id]);
+        };
+        reader.readAsDataURL(file);
+      });
+      return;
+    }
+
     const iconName = e.dataTransfer.getData('iconName') || e.dataTransfer.getData('text/plain');
     if (!iconName) return;
     if (!getIconMeta(iconName)) {
-      toast.error('Unknown icon');
+      // It might be just text if not an icon name
       return;
     }
     const pos = getPointerPos(e as any);
