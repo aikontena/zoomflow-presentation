@@ -3,8 +3,12 @@ import { useCanvasStore } from '@/lib/canvas-store';
 import { 
   ChevronRight, 
   ExternalLink,
-  Keyboard
+  Keyboard,
+  Upload
 } from 'lucide-react';
+import { SlideImporter } from '@/lib/slide-importer';
+import { toast } from 'sonner';
+
 
 interface MenuItem {
   label: string;
@@ -40,8 +44,32 @@ export default function MenuBar() {
     sendBackward,
     setViewport,
     viewport,
-    updateObject
+    updateObject,
+    loadDocument
   } = useCanvasStore();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isImporting, setIsImporting] = useState(false);
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    const toastId = toast.loading(`Converting ${file.name}...`);
+
+    try {
+      const doc = await SlideImporter.importFile(file);
+      loadDocument(doc);
+      toast.success(`${file.name} converted to ZoomCanvas format!`, { id: toastId });
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to convert file', { id: toastId });
+    } finally {
+      setIsImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -58,8 +86,9 @@ export default function MenuBar() {
       label: 'File',
       items: [
         { label: 'New Presentation', action: () => { if(confirm('Clear current canvas and start new?')) clear(); } },
+        { label: 'Import PPTX / PDF', icon: <Upload size={12} />, action: () => fileInputRef.current?.click() },
         { label: 'Open Presentation', comingSoon: true },
-        { label: 'Open Recent', comingSoon: true },
+
         { label: 'Save', shortcut: 'Ctrl+S', action: () => save() },
         { label: 'Save As', shortcut: 'Ctrl+Shift+S', action: () => save() },
         { label: 'Duplicate', action: () => duplicateObjects(selection) },
@@ -99,8 +128,9 @@ export default function MenuBar() {
         { label: 'Image', action: () => setActiveOverlay('templates') }, // or asset library
         { label: 'Icon', action: () => { /* UI focuses icons in sidebar */ } },
         { label: 'Video', comingSoon: true },
-        { label: 'PDF', comingSoon: true },
+        { label: 'Import PPTX / PDF', action: () => fileInputRef.current?.click() },
         { label: 'Chart', comingSoon: true },
+
         { label: 'Table', comingSoon: true },
         { label: 'Sticky Note', comingSoon: true },
         { label: 'Comment', comingSoon: true },
@@ -198,7 +228,15 @@ export default function MenuBar() {
 
   return (
     <div className="h-8 bg-neutral-50 border-b border-neutral-200 flex items-center px-2 select-none relative z-50" ref={menuRef}>
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        className="hidden" 
+        accept=".pdf,.pptx"
+        onChange={handleFileUpload}
+      />
       <div className="flex items-center">
+
         {menus.map((menu) => (
           <div key={menu.label} className="relative">
             <button
