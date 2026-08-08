@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useCanvasStore, CanvasObject } from '@/lib/canvas-store';
 import { IconRenderer } from './IconRenderer';
+import { getIconMeta } from '@/lib/icon-registry';
 import { toast } from 'sonner';
 import ZoomControls from './ZoomControls';
 import MiniMap from './MiniMap';
@@ -197,23 +198,29 @@ export default function Canvas() {
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    const iconName = e.dataTransfer.getData('iconName');
-    if (iconName) {
-      const pos = getPointerPos(e as any);
-      addObject({
-        type: 'icon',
-        iconName,
-        x: pos.x - 24,
-        y: pos.y - 24,
-        width: 48,
-        height: 48,
-        rotation: 0,
-        fill: '#3b82f6',
-        opacity: 1
-      });
-      toast.success('Icon dropped onto canvas');
+    const iconName = e.dataTransfer.getData('iconName') || e.dataTransfer.getData('text/plain');
+    if (!iconName) return;
+    if (!getIconMeta(iconName)) {
+      toast.error('Unknown icon');
+      return;
     }
+    const pos = getPointerPos(e as any);
+    const id = addObject({
+      type: 'icon',
+      iconName,
+      x: Math.round(pos.x - 24),
+      y: Math.round(pos.y - 24),
+      width: 48,
+      height: 48,
+      rotation: 0,
+      fill: '#3b82f6',
+      strokeWidth: 2,
+      opacity: 1
+    });
+    if (typeof id === 'string') setSelection([id]);
+    toast.success('Icon dropped onto canvas');
   };
+
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-[#f8f9fa] outline-none flex flex-col" 
@@ -267,12 +274,14 @@ export default function Canvas() {
                   justifyContent: 'center',
                   color: obj.fill || 'black',
                   fontSize: obj.fontSize || (obj.type === 'frame' ? 12 : 16),
-                  pointerEvents: 'auto',
+                  pointerEvents: obj.locked ? 'none' : 'auto',
                   userSelect: 'none',
+                  filter: obj.shadow ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.25))' : undefined,
                   boxShadow: isSelected ? '0 0 0 2px #3b82f6' : (obj.type === 'frame' ? '0 4px 6px -1px rgb(0 0 0 / 0.1)' : 'none'),
                   zIndex: obj.type === 'frame' ? -1 : 1,
                   opacity: obj.opacity ?? 1,
                 }}>
+
                 {obj.type === 'frame' && (
                   <div className="absolute -top-6 left-0 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
                     {obj.text || 'Frame Title'}
