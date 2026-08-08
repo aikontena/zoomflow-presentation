@@ -4,9 +4,9 @@ import { Sparkles, Send } from 'lucide-react';
 export const AIPanel: React.FC = () => {
   const [prompt, setPrompt] = useState(`'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
                                             
-                                            bahagian kanan ini sangat menganggu. sangat penting ker ataupun boleh di hide and unhide
+                                            Why the slide in the canvas not appear the same with the slide at the left side pages
 
-Analyze the file at this link: https://aiframework.cloud/storage/v1/object/public/prompt-images/uploads/1786182197285-8bd589fd-84ae-4995-8888-42b05f966b87.png`);
+Analyze the file at this link: https://aiframework.cloud/storage/v1/object/public/prompt-images/uploads/1786182681580-0c056dbc-9cef-4dcf-ba51-4ff2fa0fc69c.png`);
 
   return (
     <div className="flex flex-col h-full bg-white">
