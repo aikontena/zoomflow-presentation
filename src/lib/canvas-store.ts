@@ -141,6 +141,8 @@ interface CanvasStore {
   toggleRightSidebar: () => void;
   snapEnabled: boolean;
   setSnapEnabled: (enabled: boolean) => void;
+  activeTool: 'select' | 'rect' | 'circle' | 'text' | 'frame';
+  setActiveTool: (tool: 'select' | 'rect' | 'circle' | 'text' | 'frame') => void;
   
   isPresenting: boolean;
   currentFrameIndex: number;
@@ -244,6 +246,8 @@ export const useCanvasStore = create<CanvasStore>()(
         showMiniMap: true,
       },
       setSnapEnabled: (snapEnabled) => set({ snapEnabled }),
+      activeTool: 'select',
+      setActiveTool: (activeTool) => set({ activeTool }),
       history: { past: [], future: [] },
       lastSaved: Date.now(),
 

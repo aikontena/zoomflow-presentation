@@ -2,7 +2,6 @@ import React from 'react';
 import { useCanvasStore } from '@/lib/canvas-store';
 import { 
   ChevronRight, 
-  Keyboard,
   Upload,
   Bold,
   Italic,
@@ -16,7 +15,12 @@ import {
   Minus,
   Palette,
   Undo2,
-  Redo2
+  Redo2,
+  Square,
+  Circle as CircleIcon,
+  Type,
+  Layout,
+  MousePointer2
 } from 'lucide-react';
 import { SlideImporter } from '@/lib/slide-importer';
 import { toast } from 'sonner';
@@ -197,7 +201,9 @@ export default function MenuBar() {
     setViewport,
     viewport,
     updateObject,
-    loadDocument
+    loadDocument,
+    activeTool,
+    setActiveTool
   } = useCanvasStore();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -410,6 +416,26 @@ export default function MenuBar() {
         accept=".pdf,.pptx"
         onChange={handleFileUpload}
       />
+      <div className="flex items-center gap-1 border-r border-neutral-200 pr-2 mr-2">
+        {[
+          { id: 'select', icon: MousePointer2, label: 'Select (V)', shortcut: 'v' },
+          { id: 'frame', icon: Layout, label: 'Frame (F)', shortcut: 'f' },
+          { id: 'text', icon: Type, label: 'Text (T)', shortcut: 't' },
+          { id: 'rect', icon: Square, label: 'Rectangle (R)', shortcut: 'r' },
+          { id: 'circle', icon: CircleIcon, label: 'Circle (O)', shortcut: 'o' },
+        ].map((tool) => (
+          <button
+            key={tool.id}
+            onClick={() => setActiveTool(tool.id as any)}
+            className={`p-1.5 rounded transition-colors ${
+              activeTool === tool.id ? 'bg-primary text-white' : 'hover:bg-neutral-200 text-neutral-600'
+            }`}
+            title={tool.label}
+          >
+            <tool.icon size={14} />
+          </button>
+        ))}
+      </div>
       <div className="flex items-center">
         {menus.map((menu) => (
           <div key={menu.label} className="relative">
@@ -489,10 +515,6 @@ export default function MenuBar() {
       </div>
       
       <div className="ml-auto flex items-center gap-4 pr-2">
-        <div className="flex items-center gap-1.5 text-[10px] text-neutral-400">
-          <Keyboard size={12} />
-          <span>Shortcuts Active</span>
-        </div>
       </div>
 
       <ImportModal 
