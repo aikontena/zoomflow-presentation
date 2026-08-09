@@ -516,10 +516,6 @@ export default function MenuBar() {
       </div>
       
       <div className="ml-auto flex items-center gap-4 pr-2">
-        <div className="flex items-center gap-1.5 text-[10px] text-neutral-400">
-          <Keyboard size={12} />
-          <span>Shortcuts Active</span>
-        </div>
       </div>
 
       <ImportModal 
