@@ -13,7 +13,8 @@ import {
   ChevronDown,
   RefreshCw,
   Box,
-  FileText
+  FileText,
+  ChevronRight
 } from 'lucide-react';
 import { IconRenderer } from './IconRenderer';
 import { IconProperties } from './icons/IconProperties';
@@ -21,8 +22,30 @@ import { toast } from 'sonner';
 import { TextProperties, MediaProperties, ShapeProperties } from './properties/ObjectProperties';
 
 export default function RightSidebar() {
-  const { objects, selection, updateObject, presentationSettings, updatePresentationSettings } = useCanvasStore();
+  const { 
+    objects, 
+    selection, 
+    updateObject, 
+    presentationSettings, 
+    updatePresentationSettings,
+    isRightSidebarVisible,
+    setRightSidebarVisible
+  } = useCanvasStore();
   const selectedObject = objects.find(o => selection.includes(o.id));
+
+  if (!isRightSidebarVisible) {
+    return (
+      <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50">
+        <button 
+          onClick={() => setRightSidebarVisible(true)}
+          className="p-2 bg-white border border-neutral-200 border-r-0 rounded-l-xl shadow-lg text-neutral-500 hover:text-primary transition-all group"
+          title="Show Properties"
+        >
+          <ChevronRight size={20} className="rotate-180 group-hover:-translate-x-0.5 transition-transform" />
+        </button>
+      </div>
+    );
+  }
 
   const handleChange = (key: string, value: any) => {
     if (selectedObject) {
@@ -61,8 +84,15 @@ export default function RightSidebar() {
   if (!selectedObject) {
     return (
       <div className="w-64 h-full bg-white border-l border-neutral-200 flex flex-col overflow-y-auto">
-        <div className="p-4 border-b border-neutral-100">
+        <div className="p-4 border-b border-neutral-100 flex items-center justify-between">
           <h2 className="font-semibold text-neutral-900">Project Settings</h2>
+          <button 
+            onClick={() => setRightSidebarVisible(false)}
+            className="p-1.5 hover:bg-neutral-100 rounded-lg text-neutral-400 hover:text-neutral-600 transition-colors"
+            title="Hide Panel"
+          >
+            <ChevronRight size={18} />
+          </button>
         </div>
         <div className="p-4 flex-1">
           <Section title="Presentation Mode">
@@ -217,8 +247,15 @@ export default function RightSidebar() {
 
   return (
     <div className="w-64 h-full bg-white border-l border-neutral-200 flex flex-col overflow-y-auto">
-      <div className="p-4 border-b border-neutral-100">
+      <div className="p-4 border-b border-neutral-100 flex items-center justify-between">
         <h2 className="font-semibold text-neutral-900 capitalize">{selectedObject.type} Properties</h2>
+        <button 
+          onClick={() => setRightSidebarVisible(false)}
+          className="p-1.5 hover:bg-neutral-100 rounded-lg text-neutral-400 hover:text-neutral-600 transition-colors"
+          title="Hide Panel"
+        >
+          <ChevronRight size={18} />
+        </button>
       </div>
 
       <div className="p-4 flex-1">
