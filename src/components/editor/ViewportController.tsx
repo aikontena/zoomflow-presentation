@@ -287,5 +287,5 @@ export function useViewportController() {
     animateViewport({ x: 0, y: 0, zoom: 1, rotation: 0 });
   }, [animateViewport]);
 
-  return { zoomTo, fitToScreen, zoomToSelection, resetZoom, zoomToFrame };
+  return { zoomTo, fitToScreen, zoomToSelection, resetZoom, zoomToFrame, animateViewport };
 }

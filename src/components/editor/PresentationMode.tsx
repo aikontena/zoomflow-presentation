@@ -123,6 +123,35 @@ export default function PresentationMode() {
       const easing = frame?.settings?.easing ?? presentationSettings.smoothness ?? 'smooth';
       const pathType = frame?.settings?.pathType ?? 'linear';
 
+      // "Zoom out first" effect implementation
+      if (presentationSettings.zoomOutBeforeNext) {
+        // 1. Calculate a "bird's eye view" of the whole presentation
+        const minX = Math.min(...objects.map(o => o.x));
+        const minY = Math.min(...objects.map(o => o.y));
+        const maxX = Math.max(...objects.map(o => o.x + (o.width || 0)));
+        const maxY = Math.max(...objects.map(o => o.y + (o.height || 0)));
+        const width = maxX - minX;
+        const height = maxY - minY;
+        const zoom = Math.min(window.innerWidth / (width * 1.5), window.innerHeight / (height * 1.5), 0.1);
+        
+        const overviewTarget = {
+          zoom,
+          x: window.innerWidth / 2 - (minX + width / 2) * zoom,
+          y: window.innerHeight / 2 - (minY + height / 2) * zoom,
+          rotation: 0
+        };
+
+        // 2. Animate to overview first (quickly)
+        animateViewport(overviewTarget, duration * 0.4, 'ease-out');
+
+        // 3. Then animate to the actual frame after a short delay
+        setTimeout(() => {
+          zoomToFrame(frameId, duration * 0.8, easing, pathType);
+        }, duration * 0.3);
+        
+        return;
+      }
+
       // Special visual effects triggers
       if (easing === 'fade') {
         setFadeOpacity(1);
@@ -135,7 +164,7 @@ export default function PresentationMode() {
 
       zoomToFrame(frameId, duration, easing, pathType);
     }
-  }, [currentFrameIndex, isPresenting, presentationPath, zoomToFrame, presentationSettings.transitionDuration, presentationSettings.smoothness, objects]);
+  }, [currentFrameIndex, isPresenting, presentationPath, zoomToFrame, animateViewport, presentationSettings.transitionDuration, presentationSettings.smoothness, presentationSettings.zoomOutBeforeNext, objects]);
 
   if (!isPresenting) {
     return null;
