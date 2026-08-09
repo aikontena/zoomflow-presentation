@@ -222,6 +222,7 @@ export default function Canvas() {
   const redo = useCanvasStore(state => state.redo);
   const duplicateObjects = useCanvasStore(state => state.duplicateObjects);
   const activeOverlay = useCanvasStore(state => state.activeOverlay);
+  const activeOverlay = useCanvasStore(state => state.activeOverlay);
   
   const { zoomTo, resetZoom } = useViewportController();
   

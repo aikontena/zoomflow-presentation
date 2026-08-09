@@ -58,6 +58,7 @@ export default function LeftSidebar() {
     selection,
     setSelection,
     addObject,
+    deleteObjects,
     requestTemplate,
     setViewport,
     viewport
