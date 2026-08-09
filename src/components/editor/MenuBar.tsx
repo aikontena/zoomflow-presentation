@@ -257,7 +257,7 @@ export default function MenuBar() {
   ];
 
   return (
-    <div className="h-8 bg-neutral-50 border-b border-neutral-200 flex items-center px-2 select-none relative z-50" ref={menuRef}>
+    <div className="h-10 bg-neutral-50 border-b border-neutral-200 flex items-center px-2 select-none relative z-50" ref={menuRef}>
       <input 
         type="file" 
         ref={fileInputRef} 
@@ -339,6 +339,8 @@ export default function MenuBar() {
             )}
           </div>
         ))}
+      <div className="flex-1 flex justify-center">
+        <MenuBarTypography />
       </div>
       
       <div className="ml-auto flex items-center gap-4 pr-2">
