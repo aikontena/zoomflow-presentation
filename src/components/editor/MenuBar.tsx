@@ -44,7 +44,7 @@ const MenuBarTypography = () => {
   };
 
   const adjustFontSize = (delta: number) => {
-    const currentSize = firstText.fontSize || 16;
+    const currentSize = firstText?.fontSize || 16;
     updateSelectedText({ fontSize: Math.max(1, currentSize + delta) });
   };
 
