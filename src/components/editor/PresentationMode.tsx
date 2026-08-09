@@ -124,7 +124,7 @@ export default function PresentationMode() {
       const pathType = frame?.settings?.pathType ?? 'linear';
 
       // "Zoom out first" effect implementation
-      if (presentationSettings.zoomOutBeforeNext) {
+      if (presentationSettings.zoomOutBeforeNext && presentationPath.length > 1) {
         // 1. Calculate a "bird's eye view" of the whole presentation
         const minX = Math.min(...objects.map(o => o.x));
         const minY = Math.min(...objects.map(o => o.y));
