@@ -41,7 +41,7 @@ export const SlideDesignProperties = ({ object }: { object: CanvasObject }) => {
   const updateObject = useCanvasStore(state => state.updateObject);
   const objects = useCanvasStore(state => state.objects);
   
-  const design = object.frameDesign || {
+  const design: NonNullable<CanvasObject['frameDesign']> = {
     backgroundType: 'solid',
     backgroundColor: '#ffffff',
     borderWidth: 1,
@@ -49,8 +49,13 @@ export const SlideDesignProperties = ({ object }: { object: CanvasObject }) => {
     borderStyle: 'solid',
     borderRadius: 0,
     aspectRatio: '16:9',
-    layout: 'blank'
+    layout: 'blank',
+    shadow: 'none',
+    opacity: 1,
+    blur: 0,
+    ...(object.frameDesign || {})
   };
+
 
   const updateDesign = (patch: Partial<NonNullable<CanvasObject['frameDesign']>>) => {
     updateObject(object.id, { 
@@ -177,7 +182,7 @@ export const SlideDesignProperties = ({ object }: { object: CanvasObject }) => {
           <select
             value={design.aspectRatio || '16:9'}
             onChange={(e) => {
-              const ratio = e.target.value as any;
+              const ratio = e.target.value as NonNullable<NonNullable<CanvasObject['frameDesign']>['aspectRatio']>;
               let width = object.width;
               let height = object.height;
               

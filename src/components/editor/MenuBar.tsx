@@ -54,10 +54,13 @@ const MenuBarTypography = () => {
   return (
     <div className="flex items-center gap-2">
       {textObjects.length === 0 && selectedObjects.some(o => o.type === 'frame') && (
-        <div className="flex items-center gap-2 h-8 bg-primary/5 text-primary rounded-md px-3 border border-primary/20 animate-pulse">
-          <Palette size={14} />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Slide Design Mode Active</span>
-        </div>
+        <button 
+          onClick={() => useCanvasStore.getState().setRightSidebarVisible(true)}
+          className="flex items-center gap-2 h-8 bg-primary/10 text-primary rounded-md px-3 border border-primary/20 hover:bg-primary/20 transition-all group"
+        >
+          <Palette size={14} className="group-hover:rotate-12 transition-transform" />
+          <span className="text-[10px] font-bold uppercase tracking-wider">Open Slide Design Engine</span>
+        </button>
       )}
       <div className="flex items-center gap-0.5 bg-neutral-100/50 rounded-md px-1 border border-neutral-200/50 h-8">
         <button 
