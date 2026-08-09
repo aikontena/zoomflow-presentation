@@ -52,7 +52,7 @@ const MenuBarTypography = () => {
     <div className="flex items-center gap-1 h-8 bg-neutral-100/50 rounded-md px-1.5 border border-neutral-200/50">
       {/* Font Family */}
       <select
-        value={firstText.fontFamily || 'Inter'}
+        value={firstText?.fontFamily || 'Inter'}
         onChange={(e) => updateSelectedText({ fontFamily: e.target.value })}
         className="h-6 bg-transparent text-[11px] font-medium outline-none text-neutral-900 min-w-[80px]"
       >
@@ -70,7 +70,7 @@ const MenuBarTypography = () => {
         </button>
         <input
           type="number"
-          value={firstText.fontSize || 16}
+          value={firstText?.fontSize || 16}
           onChange={(e) => updateSelectedText({ fontSize: parseInt(e.target.value) || 16 })}
           className="w-8 bg-transparent text-[11px] font-medium text-center outline-none text-neutral-900"
         />
@@ -91,11 +91,12 @@ const MenuBarTypography = () => {
           <button
             key={i}
             onClick={() => {
+              if (!firstText) return;
               const currentVal = (firstText as any)[btn.key];
               updateSelectedText({ [btn.key]: currentVal === btn.activeVal ? btn.defaultVal : btn.activeVal });
             }}
             className={`p-1 rounded transition-colors ${
-              (firstText as any)[btn.key] === btn.activeVal ? 'bg-primary text-white' : 'hover:bg-neutral-200 text-neutral-600'
+              firstText && (firstText as any)[btn.key] === btn.activeVal ? 'bg-primary text-white' : 'hover:bg-neutral-200 text-neutral-600'
             }`}
           >
             <btn.icon size={13} />
@@ -116,7 +117,7 @@ const MenuBarTypography = () => {
             key={i}
             onClick={() => updateSelectedText({ textAlign: btn.val as any })}
             className={`p-1 rounded transition-colors ${
-              (firstText.textAlign || 'left') === btn.val ? 'bg-primary text-white' : 'hover:bg-neutral-200 text-neutral-600'
+              (firstText?.textAlign || 'left') === btn.val ? 'bg-primary text-white' : 'hover:bg-neutral-200 text-neutral-600'
             }`}
           >
             <btn.icon size={13} />
@@ -130,7 +131,7 @@ const MenuBarTypography = () => {
       <div className="relative flex items-center">
         <input
           type="color"
-          value={firstText.fill || '#000000'}
+          value={firstText?.fill || '#000000'}
           onChange={(e) => updateSelectedText({ fill: e.target.value })}
           className="w-4 h-4 rounded-sm border-none cursor-pointer p-0 overflow-hidden"
         />
