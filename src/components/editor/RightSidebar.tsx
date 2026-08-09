@@ -20,6 +20,7 @@ import { IconRenderer } from './IconRenderer';
 import { IconProperties } from './icons/IconProperties';
 import { toast } from 'sonner';
 import { TextProperties, MediaProperties, ShapeProperties } from './properties/ObjectProperties';
+import { SlideDesignProperties } from './properties/SlideDesignProperties';
 
 export default function RightSidebar() {
   const { 
@@ -310,6 +311,7 @@ export default function RightSidebar() {
 
         {selectedObject.type === 'frame' && (
           <>
+            <SlideDesignProperties object={selectedObject} />
             <Section title="Camera Settings">
               <button 
                 onClick={() => {

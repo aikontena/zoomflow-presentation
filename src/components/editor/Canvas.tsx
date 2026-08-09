@@ -33,12 +33,13 @@ export const CanvasObjectItem = React.memo(({
   }, [isEditing]);
   
   const getFilter = () => {
-    if (obj.type !== 'image' && obj.type !== 'video') return undefined;
     const brightness = obj.brightness ?? 1;
     const contrast = obj.contrast ?? 1;
     const saturation = obj.saturation ?? 1;
-    const blur = obj.blur ?? 0;
-    return `brightness(${brightness}) contrast(${contrast}) saturate(${saturation}) blur(${blur}px)`;
+    const blur = (obj.blur ?? 0) + (obj.frameDesign?.blur ?? 0);
+    
+    let filters = `brightness(${brightness}) contrast(${contrast}) saturate(${saturation}) blur(${blur}px)`;
+    return filters;
   };
 
   const getTextStyle = (): React.CSSProperties => {
@@ -84,10 +85,15 @@ export const CanvasObjectItem = React.memo(({
         width: obj.width,
         height: obj.height,
         transform: `translate3d(0, 0, 0) rotate(${obj.rotation || 0}deg)`,
-        backgroundColor: (obj.type !== 'text' && obj.type !== 'frame' && obj.type !== 'icon' && obj.type !== 'video') ? obj.fill : 'transparent',
-        background: obj.type === 'frame' ? obj.fill : undefined,
-        border: obj.type === 'frame' ? '1px solid rgba(0,0,0,0.1)' : (obj.strokeWidth ? `${obj.strokeWidth}px solid ${obj.stroke || 'black'}` : 'none'),
-        borderRadius: obj.type === 'circle' ? '50%' : `${obj.borderRadius || 0}px`,
+        backgroundColor: (obj.type !== 'text' && obj.type !== 'frame' && obj.type !== 'icon' && obj.type !== 'video') ? obj.fill : (obj.type === 'frame' ? (obj.frameDesign?.backgroundColor || obj.fill) : 'transparent'),
+        background: obj.type === 'frame' ? (
+          obj.frameDesign?.backgroundType === 'gradient' ? obj.frameDesign.backgroundGradient :
+          obj.frameDesign?.backgroundType === 'image' ? `url(${obj.frameDesign.backgroundImage}) center/cover no-repeat` :
+          obj.frameDesign?.backgroundType === 'solid' ? obj.frameDesign.backgroundColor :
+          obj.fill
+        ) : undefined,
+        border: obj.type === 'frame' ? `${obj.frameDesign?.borderWidth ?? 1}px ${obj.frameDesign?.borderStyle || 'solid'} ${obj.frameDesign?.borderColor || 'rgba(0,0,0,0.1)'}` : (obj.strokeWidth ? `${obj.strokeWidth}px solid ${obj.stroke || 'black'}` : 'none'),
+        borderRadius: obj.type === 'circle' ? '50%' : `${obj.frameDesign?.borderRadius || obj.borderRadius || 0}px`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -95,10 +101,11 @@ export const CanvasObjectItem = React.memo(({
         fontSize: obj.fontSize || (obj.type === 'frame' ? 12 : 16),
         pointerEvents: obj.locked ? 'none' : 'auto',
         userSelect: isEditing ? 'text' : 'none',
-        filter: obj.shadow ? `drop-shadow(${obj.shadowOffsetX || 0}px ${obj.shadowOffsetY || 4}px ${obj.shadowBlur || 6}px ${obj.shadowColor || 'rgba(0,0,0,0.25)'})` : undefined,
-        boxShadow: isEditing ? '0 0 0 2px #3b82f6' : (isSelected ? '0 0 0 2px #3b82f6' : (obj.type === 'frame' ? '0 4px 6px -1px rgb(0 0 0 / 0.1)' : 'none')),
+        filter: (obj.shadow || obj.frameDesign?.shadow !== 'none') ? `drop-shadow(${obj.shadowOffsetX || 0}px ${obj.shadowOffsetY || (obj.frameDesign?.shadow === 'card' ? 10 : 4)}px ${obj.shadowBlur || (obj.frameDesign?.shadow === 'card' ? 20 : 6)}px ${obj.shadowColor || 'rgba(0,0,0,0.25)'})` : undefined,
+        boxShadow: isEditing ? '0 0 0 2px #3b82f6' : (isSelected ? '0 0 0 2px #3b82f6' : (obj.type === 'frame' ? (obj.frameDesign?.shadow === 'glass' ? 'inset 0 0 20px rgba(255,255,255,0.5)' : '0 4px 6px -1px rgb(0 0 0 / 0.1)') : 'none')),
         zIndex: obj.type === 'frame' ? 0 : 1,
-        opacity: obj.opacity ?? 1,
+        opacity: obj.frameDesign?.opacity ?? obj.opacity ?? 1,
+        backdropFilter: obj.frameDesign?.shadow === 'glass' ? `blur(${obj.frameDesign.blur || 10}px)` : undefined,
         overflow: 'hidden',
       }}>
 

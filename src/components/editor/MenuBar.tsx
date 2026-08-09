@@ -302,7 +302,22 @@ export default function MenuBar() {
             const file = (e.target as HTMLInputElement).files?.[0];
             if (file) {
               const reader = new FileReader();
-              reader.onload = (event) => addObject({ type: 'image', x: 100, y: 100, width: 300, height: 200, rotation: 0, fill: 'transparent', src: event.target?.result as string });
+              reader.onload = (event) => {
+                const src = event.target?.result as string;
+                const { viewport } = useCanvasStore.getState();
+                addObject({
+                  type: 'image',
+                  x: -viewport.x / viewport.zoom + window.innerWidth / (2 * viewport.zoom) - 150,
+                  y: -viewport.y / viewport.zoom + window.innerHeight / (2 * viewport.zoom) - 100,
+                  width: 300,
+                  height: 200,
+                  rotation: 0,
+                  fill: 'transparent',
+                  src: src,
+                  objectFit: 'contain'
+                });
+                toast.success('Image added');
+              };
               reader.readAsDataURL(file);
             }
           };
