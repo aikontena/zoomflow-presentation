@@ -85,6 +85,27 @@ export interface CanvasObject {
   
   // Animation
   animation?: "none" | "fade" | "slide" | "zoom" | "spin";
+  
+  // Frame Design
+  frameDesign?: {
+    backgroundType: 'solid' | 'gradient' | 'mixed' | 'image' | 'pattern' | 'texture';
+    backgroundColor?: string;
+    backgroundGradient?: string;
+    backgroundImage?: string;
+    backgroundPattern?: string;
+    
+    borderWidth?: number;
+    borderColor?: string;
+    borderStyle?: 'solid' | 'dashed' | 'dotted' | 'double';
+    borderRadius?: number;
+    
+    shadow?: 'none' | 'classic' | 'modern' | 'glass' | 'corporate' | 'academic' | 'minimal' | 'creative' | 'rounded' | 'card';
+    opacity?: number;
+    blur?: number;
+    
+    layout?: 'blank' | 'title' | 'content' | 'split' | 'three-col' | 'comparison' | 'img-left' | 'img-right' | 'quote' | 'divider';
+    aspectRatio?: '16:9' | '4:3' | 'A4-L' | 'A4-P' | 'custom';
+  };
 }
 
 export interface PresentationSettings {
