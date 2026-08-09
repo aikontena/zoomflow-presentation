@@ -166,7 +166,7 @@ export default function RightSidebar() {
                     type="color" 
                     value={presentationSettings.backgroundColor || '#f8f9fa'}
                     onChange={(e) => updatePresentationSettings({ backgroundColor: e.target.value })}
-                    className="w-8 h-8 rounded border-none cursor-pointer" 
+                    className="w-8 h-8 rounded border border-neutral-200 cursor-pointer overflow-hidden p-0" 
                   />
                   <input 
                     type="text"

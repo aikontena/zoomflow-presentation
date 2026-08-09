@@ -512,8 +512,8 @@ export default function Canvas() {
     <div className={`relative h-full w-full overflow-hidden outline-none flex flex-col transition-opacity duration-300 ${!isEditorActive ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} 
 
          style={{ 
-           backgroundColor: viewport.zoom < 0.2 ? (useCanvasStore.getState().presentationSettings.backgroundColor || '#f8f9fa') : (useCanvasStore.getState().presentationSettings.backgroundColor || '#f8f9fa'),
-           backgroundImage: useCanvasStore.getState().presentationSettings.backgroundImage ? `url(${useCanvasStore.getState().presentationSettings.backgroundImage})` : 'none',
+           backgroundColor: presentationSettings.backgroundColor || '#f8f9fa',
+           backgroundImage: presentationSettings.backgroundImage ? `url(${presentationSettings.backgroundImage})` : 'none',
            backgroundSize: 'cover',
            backgroundPosition: 'center',
            backgroundAttachment: 'fixed'
