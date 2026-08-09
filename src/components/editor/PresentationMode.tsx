@@ -20,7 +20,7 @@ export default function PresentationMode() {
   const goToFrame = useCanvasStore(state => state.goToFrame);
   const presentationSettings = useCanvasStore(state => state.presentationSettings);
 
-  const { zoomToFrame, fitToScreen, resetZoom, zoomTo } = useViewportController();
+  const { zoomToFrame, fitToScreen, resetZoom, zoomTo, animateViewport } = useViewportController();
   const [showControls, setShowControls] = useState(true);
   const [showPresenterNotes, setShowPresenterNotes] = useState(false);
   const [fadeOpacity, setFadeOpacity] = useState(0);
