@@ -13,7 +13,7 @@ import {
   ChevronDown,
   RefreshCw,
   Box,
-  FileText
+  FileText,
   ChevronRight
 } from 'lucide-react';
 import { IconRenderer } from './IconRenderer';
