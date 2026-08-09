@@ -14,7 +14,9 @@ import {
   AlignJustify,
   Plus,
   Minus,
-  Palette
+  Palette,
+  Undo2,
+  Redo2
 } from 'lucide-react';
 import { SlideImporter } from '@/lib/slide-importer';
 import { toast } from 'sonner';
@@ -31,111 +33,130 @@ const FONT_FAMILIES = [
 const FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 54, 60, 72, 96, 144];
 
 const MenuBarTypography = () => {
-  const { selection, objects, updateObject } = useCanvasStore();
+  const { selection, objects, updateObject, undo, redo } = useCanvasStore();
   const selectedObjects = objects.filter(o => selection.includes(o.id));
   const textObjects = selectedObjects.filter(o => o.type === 'text');
   
-  if (textObjects.length === 0) return null;
-  
-  const firstText = textObjects[0];
-
   const updateSelectedText = (patch: any) => {
     textObjects.forEach(o => updateObject(o.id, patch));
   };
 
   const adjustFontSize = (delta: number) => {
+    const firstText = textObjects[0];
     const currentSize = firstText?.fontSize || 16;
     updateSelectedText({ fontSize: Math.max(1, currentSize + delta) });
   };
 
   return (
-    <div className="flex items-center gap-1 h-8 bg-neutral-100/50 rounded-md px-1.5 border border-neutral-200/50">
-      {/* Font Family */}
-      <select
-        value={firstText?.fontFamily || 'Inter'}
-        onChange={(e) => updateSelectedText({ fontFamily: e.target.value })}
-        className="h-6 bg-transparent text-[11px] font-medium outline-none text-neutral-900 min-w-[80px]"
-      >
-        {FONT_FAMILIES.map(font => (
-          <option key={font} value={font}>{font}</option>
-        ))}
-      </select>
-
-      <div className="w-px h-4 bg-neutral-300 mx-1" />
-
-      {/* Font Size */}
-      <div className="flex items-center">
-        <button onClick={() => adjustFontSize(-1)} className="p-1 hover:bg-neutral-200 rounded">
-          <Minus size={12} className="text-neutral-600" />
+    <div className="flex items-center gap-2">
+      <div className="flex items-center gap-0.5 bg-neutral-100/50 rounded-md px-1 border border-neutral-200/50 h-8">
+        <button 
+          onClick={() => undo()} 
+          className="p-1.5 hover:bg-neutral-200 rounded text-neutral-600 transition-colors"
+          title="Undo (Ctrl+Z)"
+        >
+          <Undo2 size={13} />
         </button>
-        <input
-          type="number"
-          value={firstText?.fontSize || 16}
-          onChange={(e) => updateSelectedText({ fontSize: parseInt(e.target.value) || 16 })}
-          className="w-8 bg-transparent text-[11px] font-medium text-center outline-none text-neutral-900"
-        />
-        <button onClick={() => adjustFontSize(1)} className="p-1 hover:bg-neutral-200 rounded">
-          <Plus size={12} className="text-neutral-600" />
+        <button 
+          onClick={() => redo()} 
+          className="p-1.5 hover:bg-neutral-200 rounded text-neutral-600 transition-colors"
+          title="Redo (Ctrl+Shift+Z)"
+        >
+          <Redo2 size={13} />
         </button>
       </div>
 
-      <div className="w-px h-4 bg-neutral-300 mx-1" />
-
-      {/* Formatting */}
-      <div className="flex items-center gap-0.5">
-        {[
-          { icon: Bold, key: 'fontWeight', activeVal: 'bold', defaultVal: 'normal' },
-          { icon: Italic, key: 'fontStyle', activeVal: 'italic', defaultVal: 'normal' },
-          { icon: Underline, key: 'textDecoration', activeVal: 'underline', defaultVal: 'none' },
-        ].map((btn, i) => (
-          <button
-            key={i}
-            onClick={() => {
-              if (!firstText) return;
-              const currentVal = (firstText as any)[btn.key];
-              updateSelectedText({ [btn.key]: currentVal === btn.activeVal ? btn.defaultVal : btn.activeVal });
-            }}
-            className={`p-1 rounded transition-colors ${
-              firstText && (firstText as any)[btn.key] === btn.activeVal ? 'bg-primary text-white' : 'hover:bg-neutral-200 text-neutral-600'
-            }`}
+      {textObjects.length > 0 && (
+        <div className="flex items-center gap-1 h-8 bg-neutral-100/50 rounded-md px-1.5 border border-neutral-200/50">
+          {/* Font Family */}
+          <select
+            value={textObjects[0]?.fontFamily || 'Inter'}
+            onChange={(e) => updateSelectedText({ fontFamily: e.target.value })}
+            className="h-6 bg-transparent text-[11px] font-medium outline-none text-neutral-900 min-w-[80px]"
           >
-            <btn.icon size={13} />
-          </button>
-        ))}
-      </div>
+            {FONT_FAMILIES.map(font => (
+              <option key={font} value={font}>{font}</option>
+            ))}
+          </select>
 
-      <div className="w-px h-4 bg-neutral-300 mx-1" />
+          <div className="w-px h-4 bg-neutral-300 mx-1" />
 
-      {/* Alignment */}
-      <div className="flex items-center gap-0.5">
-        {[
-          { icon: AlignLeft, val: 'left' },
-          { icon: AlignCenter, val: 'center' },
-          { icon: AlignRight, val: 'right' },
-        ].map((btn, i) => (
-          <button
-            key={i}
-            onClick={() => updateSelectedText({ textAlign: btn.val as any })}
-            className={`p-1 rounded transition-colors ${
-              (firstText?.textAlign || 'left') === btn.val ? 'bg-primary text-white' : 'hover:bg-neutral-200 text-neutral-600'
-            }`}
-          >
-            <btn.icon size={13} />
-          </button>
-        ))}
-      </div>
+          {/* Font Size */}
+          <div className="flex items-center">
+            <button onClick={() => adjustFontSize(-1)} className="p-1 hover:bg-neutral-200 rounded">
+              <Minus size={12} className="text-neutral-600" />
+            </button>
+            <input
+              type="number"
+              value={textObjects[0]?.fontSize || 16}
+              onChange={(e) => updateSelectedText({ fontSize: parseInt(e.target.value) || 16 })}
+              className="w-8 bg-transparent text-[11px] font-medium text-center outline-none text-neutral-900"
+            />
+            <button onClick={() => adjustFontSize(1)} className="p-1 hover:bg-neutral-200 rounded">
+              <Plus size={12} className="text-neutral-600" />
+            </button>
+          </div>
 
-      <div className="w-px h-4 bg-neutral-300 mx-1" />
+          <div className="w-px h-4 bg-neutral-300 mx-1" />
 
-      {/* Color */}
-      <div className="relative flex items-center">
-        <input
-          type="color"
-          value={firstText?.fill || '#000000'}
-          onChange={(e) => updateSelectedText({ fill: e.target.value })}
-          className="w-4 h-4 rounded-sm border-none cursor-pointer p-0 overflow-hidden"
-        />
-      </div>
+          {/* Formatting */}
+          <div className="flex items-center gap-0.5">
+            {[
+              { icon: Bold, key: 'fontWeight', activeVal: 'bold', defaultVal: 'normal' },
+              { icon: Italic, key: 'fontStyle', activeVal: 'italic', defaultVal: 'normal' },
+              { icon: Underline, key: 'textDecoration', activeVal: 'underline', defaultVal: 'none' },
+            ].map((btn, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  const firstText = textObjects[0];
+                  if (!firstText) return;
+                  const currentVal = (firstText as any)[btn.key];
+                  updateSelectedText({ [btn.key]: currentVal === btn.activeVal ? btn.defaultVal : btn.activeVal });
+                }}
+                className={`p-1 rounded transition-colors ${
+                  textObjects[0] && (textObjects[0] as any)[btn.key] === btn.activeVal ? 'bg-primary text-white' : 'hover:bg-neutral-200 text-neutral-600'
+                }`}
+              >
+                <btn.icon size={13} />
+              </button>
+            ))}
+          </div>
+
+          <div className="w-px h-4 bg-neutral-300 mx-1" />
+
+          {/* Alignment */}
+          <div className="flex items-center gap-0.5">
+            {[
+              { icon: AlignLeft, val: 'left' },
+              { icon: AlignCenter, val: 'center' },
+              { icon: AlignRight, val: 'right' },
+            ].map((btn, i) => (
+              <button
+                key={i}
+                onClick={() => updateSelectedText({ textAlign: btn.val as any })}
+                className={`p-1 rounded transition-colors ${
+                  (textObjects[0]?.textAlign || 'left') === btn.val ? 'bg-primary text-white' : 'hover:bg-neutral-200 text-neutral-600'
+                }`}
+              >
+                <btn.icon size={13} />
+              </button>
+            ))}
+          </div>
+
+          <div className="w-px h-4 bg-neutral-300 mx-1" />
+
+          {/* Color */}
+          <div className="relative flex items-center">
+            <input
+              type="color"
+              value={textObjects[0]?.fill || '#000000'}
+              onChange={(e) => updateSelectedText({ fill: e.target.value })}
+              className="w-4 h-4 rounded-sm border-none cursor-pointer p-0 overflow-hidden"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
