@@ -2,7 +2,6 @@ import React from 'react';
 import { useCanvasStore } from '@/lib/canvas-store';
 import { 
   ChevronRight, 
-  Keyboard,
   Upload,
   Bold,
   Italic,
