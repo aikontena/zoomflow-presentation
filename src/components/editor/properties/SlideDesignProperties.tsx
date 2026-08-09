@@ -272,6 +272,6 @@ export const SlideDesignProperties = ({ object }: { object: CanvasObject }) => {
           <LayoutTemplate size={12} /> Apply to All Slides
         </button>
       </div>
-    </>
+    </div>
   );
 };
