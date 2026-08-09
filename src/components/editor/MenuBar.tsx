@@ -16,7 +16,12 @@ import {
   Minus,
   Palette,
   Undo2,
-  Redo2
+  Redo2,
+  Square,
+  Circle as CircleIcon,
+  Type,
+  Layout,
+  MousePointer2
 } from 'lucide-react';
 import { SlideImporter } from '@/lib/slide-importer';
 import { toast } from 'sonner';
@@ -197,7 +202,9 @@ export default function MenuBar() {
     setViewport,
     viewport,
     updateObject,
-    loadDocument
+    loadDocument,
+    activeTool,
+    setActiveTool
   } = useCanvasStore();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -410,6 +417,26 @@ export default function MenuBar() {
         accept=".pdf,.pptx"
         onChange={handleFileUpload}
       />
+      <div className="flex items-center gap-1 border-r border-neutral-200 pr-2 mr-2">
+        {[
+          { id: 'select', icon: MousePointer2, label: 'Select' },
+          { id: 'frame', icon: Layout, label: 'Frame' },
+          { id: 'text', icon: Type, label: 'Text' },
+          { id: 'rect', icon: Square, label: 'Rectangle' },
+          { id: 'circle', icon: CircleIcon, label: 'Circle' },
+        ].map((tool) => (
+          <button
+            key={tool.id}
+            onClick={() => setActiveTool(tool.id as any)}
+            className={`p-1.5 rounded transition-colors ${
+              activeTool === tool.id ? 'bg-primary text-white' : 'hover:bg-neutral-200 text-neutral-600'
+            }`}
+            title={tool.label}
+          >
+            <tool.icon size={14} />
+          </button>
+        ))}
+      </div>
       <div className="flex items-center">
         {menus.map((menu) => (
           <div key={menu.label} className="relative">

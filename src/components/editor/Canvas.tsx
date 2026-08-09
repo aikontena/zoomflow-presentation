@@ -221,6 +221,8 @@ export default function Canvas() {
   const undo = useCanvasStore(state => state.undo);
   const redo = useCanvasStore(state => state.redo);
   const duplicateObjects = useCanvasStore(state => state.duplicateObjects);
+  const activeTool = useCanvasStore(state => state.activeTool);
+  const setActiveTool = useCanvasStore(state => state.setActiveTool);
   const activeOverlay = useCanvasStore(state => state.activeOverlay);
   
   const { zoomTo, resetZoom } = useViewportController();
@@ -228,7 +230,6 @@ export default function Canvas() {
   const [isPanning, setIsPanning] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [activeTool, setActiveTool] = useState<'select' | 'rect' | 'circle' | 'text' | 'frame'>('select');
   const [clipboard, setClipboard] = useState<string[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
 
