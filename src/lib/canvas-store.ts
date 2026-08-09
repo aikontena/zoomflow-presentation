@@ -97,7 +97,7 @@ export interface PresentationSettings {
   darkBackground: boolean;
   type: 'linear' | 'spatial' | 'spiral' | 'grid';
   zoomPadding: number; // 0 to 1, where 0 is tight fit and 1 is lots of space
-  zoomOutBeforeStart?: boolean;
+  zoomOutBeforeNext?: boolean;
   autoFit?: boolean;
   backgroundColor?: string;
   backgroundImage?: string;
@@ -239,6 +239,7 @@ export const useCanvasStore = create<CanvasStore>()(
         darkBackground: false,
         type: 'spatial',
         zoomPadding: 0.1,
+        zoomOutBeforeNext: true,
         zoomSpeed: 1,
         smoothness: 'smooth',
         manualZoom: true,
