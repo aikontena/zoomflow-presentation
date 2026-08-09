@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCanvasStore } from '@/lib/canvas-store';
-import { Timer, Maximize2, Play, Sliders, Layout, MonitorPlay, Dices, ZoomOut } from 'lucide-react';
+import { Timer, Maximize2, Play, Sliders, Layout, MonitorPlay, Dices, ZoomOut, Palette } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -105,6 +105,25 @@ export default function Footer() {
                 </button>
               </TooltipTrigger>
               <TooltipContent side="top">Apply Morph to All</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="relative group/color">
+                  <button 
+                    className="p-2 rounded-lg hover:bg-neutral-100 text-neutral-600 transition-colors border border-neutral-100 flex items-center gap-1"
+                  >
+                    <Palette size={16} />
+                    <input 
+                      type="color" 
+                      value={presentationSettings.backgroundColor || "#ffffff"}
+                      onChange={(e) => updatePresentationSettings({ backgroundColor: e.target.value, backgroundImage: '' })}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
+                  </button>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top">Slide Background Color</TooltipContent>
             </Tooltip>
 
             <Tooltip>
