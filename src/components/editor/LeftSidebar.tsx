@@ -33,6 +33,7 @@ import { useViewportController } from './ViewportController';
 
 const TABS = [
   { id: 'pages', label: 'Pages', icon: FileText },
+  { id: 'design', label: 'Design', icon: Palette },
   { id: 'path', label: 'Path', icon: MonitorPlay },
   { id: 'layers', label: 'Layers', icon: Layers },
   { id: 'assets', label: 'Assets', icon: Image },
