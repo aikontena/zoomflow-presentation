@@ -132,7 +132,14 @@ export default function PresentationMode() {
         const maxY = Math.max(...objects.map(o => o.y + (o.height || 0)));
         const width = maxX - minX;
         const height = maxY - minY;
-        const zoom = Math.min(window.innerWidth / (width * 1.5), window.innerHeight / (height * 1.5), 0.1);
+        
+        // Ensure we don't zoom out too far or too little
+        const paddingFactor = 1.2;
+        const zoom = Math.min(
+          window.innerWidth / (width * paddingFactor), 
+          window.innerHeight / (height * paddingFactor), 
+          0.1 // Cap the overview zoom so it's not microscopic
+        );
         
         const overviewTarget = {
           zoom,
@@ -142,12 +149,14 @@ export default function PresentationMode() {
         };
 
         // 2. Animate to overview first (quickly)
-        animateViewport(overviewTarget, duration * 0.4, 'ease-out');
+        animateViewport(overviewTarget, duration * 0.4, 'ease-in-out');
 
         // 3. Then animate to the actual frame after a short delay
         setTimeout(() => {
-          zoomToFrame(frameId, duration * 0.8, easing, pathType);
-        }, duration * 0.3);
+          if (isPresenting) {
+            zoomToFrame(frameId, duration * 0.9, easing, pathType);
+          }
+        }, duration * 0.45);
         
         return;
       }
