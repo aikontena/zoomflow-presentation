@@ -67,8 +67,12 @@ export const SlideDesignProperties = ({ object }: { object: CanvasObject }) => {
   };
 
   return (
-    <>
-      <PropertySection title="Background">
+    <div className="bg-primary/5 -mx-4 px-4 py-2 border-y border-primary/10 mb-4 shadow-inner">
+      <div className="flex items-center gap-2 mb-2 text-primary">
+        <Palette size={14} strokeWidth={2.5} />
+        <h2 className="text-xs font-black uppercase tracking-tighter">Slide Design Engine</h2>
+      </div>
+      <PropertySection title="Background Layout">
         <InputRow label="Type">
           <select
             value={design.backgroundType}
@@ -268,6 +272,6 @@ export const SlideDesignProperties = ({ object }: { object: CanvasObject }) => {
           <LayoutTemplate size={12} /> Apply to All Slides
         </button>
       </div>
-    </>
+    </div>
   );
 };

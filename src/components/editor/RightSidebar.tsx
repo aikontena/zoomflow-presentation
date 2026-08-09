@@ -310,8 +310,13 @@ export default function RightSidebar() {
         </Section>
 
         {selectedObject.type === 'frame' && (
-          <>
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             <SlideDesignProperties object={selectedObject} />
+          </div>
+        )}
+
+        {selectedObject.type === 'frame' && (
+          <>
             <Section title="Camera Settings">
               <button 
                 onClick={() => {
