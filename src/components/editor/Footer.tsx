@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCanvasStore } from '@/lib/canvas-store';
-import { Timer, Maximize2, Play, Sliders, Layout, MonitorPlay, Dices } from 'lucide-react';
+import { Timer, Maximize2, Play, Sliders, Layout, MonitorPlay, Dices, ZoomOut } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -60,6 +60,29 @@ export default function Footer() {
             </div>
           </div>
           <p className="text-[9px] text-neutral-400 pl-5 leading-none">Increase to zoom OUT more during presentation</p>
+        </div>
+
+        <div className="w-px h-8 bg-neutral-200" />
+
+        {/* Zoom Out Transition Toggle */}
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-neutral-500">
+              <ZoomOut size={14} />
+              <span className="text-[10px] font-bold uppercase tracking-tight">Spatial Zoom Out</span>
+            </div>
+            <div className="flex items-center">
+              <button
+                onClick={() => updatePresentationSettings({ zoomOutBeforeNext: !presentationSettings.zoomOutBeforeNext })}
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${presentationSettings.zoomOutBeforeNext ? 'bg-primary' : 'bg-neutral-200'}`}
+              >
+                <span
+                  className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${presentationSettings.zoomOutBeforeNext ? 'translate-x-5' : 'translate-x-1'}`}
+                />
+              </button>
+            </div>
+          </div>
+          <p className="text-[9px] text-neutral-400 pl-5 leading-none">Zoom to overview between slides</p>
         </div>
 
         <div className="w-px h-8 bg-neutral-200" />
