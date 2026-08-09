@@ -513,10 +513,11 @@ export default function Canvas() {
   };
 
 
-  const isEditorActive = !activeOverlay || activeOverlay === null;
+  const isEditorActive = true; // Always active to show changes in real-time
 
   return (
-    <div className={`relative h-full w-full overflow-hidden outline-none flex flex-col transition-opacity duration-300 ${!isEditorActive ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} 
+    <div className={`relative h-full w-full overflow-hidden outline-none flex flex-col transition-all duration-300 ${activeOverlay ? 'brightness-[0.8] grayscale-[0.2]' : 'brightness-100 grayscale-0'}`} 
+
 
          style={{ 
            backgroundColor: presentationSettings.backgroundColor || '#f8f9fa',
