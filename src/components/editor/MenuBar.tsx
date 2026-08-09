@@ -419,11 +419,11 @@ export default function MenuBar() {
       />
       <div className="flex items-center gap-1 border-r border-neutral-200 pr-2 mr-2">
         {[
-          { id: 'select', icon: MousePointer2, label: 'Select' },
-          { id: 'frame', icon: Layout, label: 'Frame' },
-          { id: 'text', icon: Type, label: 'Text' },
-          { id: 'rect', icon: Square, label: 'Rectangle' },
-          { id: 'circle', icon: CircleIcon, label: 'Circle' },
+          { id: 'select', icon: MousePointer2, label: 'Select (V)', shortcut: 'v' },
+          { id: 'frame', icon: Layout, label: 'Frame (F)', shortcut: 'f' },
+          { id: 'text', icon: Type, label: 'Text (T)', shortcut: 't' },
+          { id: 'rect', icon: Square, label: 'Rectangle (R)', shortcut: 'r' },
+          { id: 'circle', icon: CircleIcon, label: 'Circle (O)', shortcut: 'o' },
         ].map((tool) => (
           <button
             key={tool.id}

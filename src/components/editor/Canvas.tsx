@@ -362,6 +362,15 @@ export default function Canvas() {
     if (editingId && e.key !== 'Escape') return; 
     if (e.key === 'Escape') setEditingId(null);
 
+    // Tool shortcuts
+    if (!editingId && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      if (e.key.toLowerCase() === 'v') setActiveTool('select');
+      if (e.key.toLowerCase() === 'f') setActiveTool('frame');
+      if (e.key.toLowerCase() === 't') setActiveTool('text');
+      if (e.key.toLowerCase() === 'r') setActiveTool('rect');
+      if (e.key.toLowerCase() === 'o') setActiveTool('circle');
+    }
+
     if (e.code === 'Space' && !isPanning) {
       setIsPanning(true);
       return;
