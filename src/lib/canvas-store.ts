@@ -137,6 +137,7 @@ interface CanvasStore {
   viewport: { x: number; y: number; zoom: number; rotation: number };
   activeOverlay: 'templates' | 'export' | 'settings' | 'presentation' | null;
   isRightSidebarVisible: boolean;
+  setRightSidebarVisible: (visible: boolean) => void;
   toggleRightSidebar: () => void;
   snapEnabled: boolean;
   setSnapEnabled: (enabled: boolean) => void;
@@ -220,6 +221,7 @@ export const useCanvasStore = create<CanvasStore>()(
       viewport: { x: 0, y: 0, zoom: 1, rotation: 0 },
       activeOverlay: null,
       isRightSidebarVisible: true,
+      setRightSidebarVisible: (isRightSidebarVisible) => set({ isRightSidebarVisible }),
       toggleRightSidebar: () => set((state) => ({ isRightSidebarVisible: !state.isRightSidebarVisible })),
       snapEnabled: true,
       isPresenting: false,
