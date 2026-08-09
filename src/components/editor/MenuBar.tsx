@@ -1,16 +1,144 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { useCanvasStore } from '@/lib/canvas-store';
 import { 
   ChevronRight, 
-  ExternalLink,
   Keyboard,
-  Upload
+  Upload,
+  Bold,
+  Italic,
+  Underline,
+  Strikethrough,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
+  Plus,
+  Minus,
+  Palette
 } from 'lucide-react';
 import { SlideImporter } from '@/lib/slide-importer';
 import { toast } from 'sonner';
 import { ImportModal } from './ImportModal';
+import { useState, useEffect, useRef } from 'react';
 
+const FONT_FAMILIES = [
+  'Arial', 'Calibri', 'Aptos', 'Times New Roman', 'Georgia', 'Verdana', 'Tahoma',
+  'Trebuchet MS', 'Helvetica', 'Roboto', 'Open Sans', 'Lato', 'Montserrat',
+  'Poppins', 'Inter', 'Nunito', 'Playfair Display', 'Merriweather', 'Oswald',
+  'Raleway', 'Source Sans Pro'
+];
 
+const FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44, 48, 54, 60, 72, 96, 144];
+
+const MenuBarTypography = () => {
+  const { selection, objects, updateObject } = useCanvasStore();
+  const selectedObjects = objects.filter(o => selection.includes(o.id));
+  const textObjects = selectedObjects.filter(o => o.type === 'text');
+  
+  if (textObjects.length === 0) return null;
+  
+  const firstText = textObjects[0];
+
+  const updateSelectedText = (patch: any) => {
+    textObjects.forEach(o => updateObject(o.id, patch));
+  };
+
+  const adjustFontSize = (delta: number) => {
+    const currentSize = firstText?.fontSize || 16;
+    updateSelectedText({ fontSize: Math.max(1, currentSize + delta) });
+  };
+
+  return (
+    <div className="flex items-center gap-1 h-8 bg-neutral-100/50 rounded-md px-1.5 border border-neutral-200/50">
+      {/* Font Family */}
+      <select
+        value={firstText?.fontFamily || 'Inter'}
+        onChange={(e) => updateSelectedText({ fontFamily: e.target.value })}
+        className="h-6 bg-transparent text-[11px] font-medium outline-none text-neutral-900 min-w-[80px]"
+      >
+        {FONT_FAMILIES.map(font => (
+          <option key={font} value={font}>{font}</option>
+        ))}
+      </select>
+
+      <div className="w-px h-4 bg-neutral-300 mx-1" />
+
+      {/* Font Size */}
+      <div className="flex items-center">
+        <button onClick={() => adjustFontSize(-1)} className="p-1 hover:bg-neutral-200 rounded">
+          <Minus size={12} className="text-neutral-600" />
+        </button>
+        <input
+          type="number"
+          value={firstText?.fontSize || 16}
+          onChange={(e) => updateSelectedText({ fontSize: parseInt(e.target.value) || 16 })}
+          className="w-8 bg-transparent text-[11px] font-medium text-center outline-none text-neutral-900"
+        />
+        <button onClick={() => adjustFontSize(1)} className="p-1 hover:bg-neutral-200 rounded">
+          <Plus size={12} className="text-neutral-600" />
+        </button>
+      </div>
+
+      <div className="w-px h-4 bg-neutral-300 mx-1" />
+
+      {/* Formatting */}
+      <div className="flex items-center gap-0.5">
+        {[
+          { icon: Bold, key: 'fontWeight', activeVal: 'bold', defaultVal: 'normal' },
+          { icon: Italic, key: 'fontStyle', activeVal: 'italic', defaultVal: 'normal' },
+          { icon: Underline, key: 'textDecoration', activeVal: 'underline', defaultVal: 'none' },
+        ].map((btn, i) => (
+          <button
+            key={i}
+            onClick={() => {
+              if (!firstText) return;
+              const currentVal = (firstText as any)[btn.key];
+              updateSelectedText({ [btn.key]: currentVal === btn.activeVal ? btn.defaultVal : btn.activeVal });
+            }}
+            className={`p-1 rounded transition-colors ${
+              firstText && (firstText as any)[btn.key] === btn.activeVal ? 'bg-primary text-white' : 'hover:bg-neutral-200 text-neutral-600'
+            }`}
+          >
+            <btn.icon size={13} />
+          </button>
+        ))}
+      </div>
+
+      <div className="w-px h-4 bg-neutral-300 mx-1" />
+
+      {/* Alignment */}
+      <div className="flex items-center gap-0.5">
+        {[
+          { icon: AlignLeft, val: 'left' },
+          { icon: AlignCenter, val: 'center' },
+          { icon: AlignRight, val: 'right' },
+        ].map((btn, i) => (
+          <button
+            key={i}
+            onClick={() => updateSelectedText({ textAlign: btn.val as any })}
+            className={`p-1 rounded transition-colors ${
+              (firstText?.textAlign || 'left') === btn.val ? 'bg-primary text-white' : 'hover:bg-neutral-200 text-neutral-600'
+            }`}
+          >
+            <btn.icon size={13} />
+          </button>
+        ))}
+      </div>
+
+      <div className="w-px h-4 bg-neutral-300 mx-1" />
+
+      {/* Color */}
+      <div className="relative flex items-center">
+        <input
+          type="color"
+          value={firstText?.fill || '#000000'}
+          onChange={(e) => updateSelectedText({ fill: e.target.value })}
+          className="w-4 h-4 rounded-sm border-none cursor-pointer p-0 overflow-hidden"
+        />
+      </div>
+    </div>
+  );
+};
 
 interface MenuItem {
   label: string;
@@ -21,7 +149,6 @@ interface MenuItem {
   icon?: React.ReactNode;
   submenu?: MenuItem[];
 }
-
 
 interface MenuCategory {
   label: string;
@@ -86,8 +213,6 @@ export default function MenuBar() {
     }
   };
 
-
-
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -105,7 +230,6 @@ export default function MenuBar() {
         { label: 'New Presentation', action: () => { if(confirm('Clear current canvas and start new?')) clear(); } },
         { label: 'Import PPTX / PDF', icon: <Upload size={12} />, action: () => fileInputRef.current?.click() },
         { label: 'Open Presentation', comingSoon: true },
-
         { label: 'Save', shortcut: 'Ctrl+S', action: () => save() },
         { label: 'Save As', shortcut: 'Ctrl+Shift+S', action: () => save() },
         { label: 'Duplicate', action: () => duplicateObjects(selection) },
@@ -257,7 +381,7 @@ export default function MenuBar() {
   ];
 
   return (
-    <div className="h-8 bg-neutral-50 border-b border-neutral-200 flex items-center px-2 select-none relative z-50" ref={menuRef}>
+    <div className="h-10 bg-neutral-50 border-b border-neutral-200 flex items-center px-2 select-none relative z-50" ref={menuRef}>
       <input 
         type="file" 
         ref={fileInputRef} 
@@ -266,7 +390,6 @@ export default function MenuBar() {
         onChange={handleFileUpload}
       />
       <div className="flex items-center">
-
         {menus.map((menu) => (
           <div key={menu.label} className="relative">
             <button
@@ -303,7 +426,6 @@ export default function MenuBar() {
                         {item.icon}
                         {item.label}
                         {item.comingSoon && (
-
                           <span className="text-[9px] px-1 rounded bg-neutral-100 text-neutral-400 group-hover:bg-white/20 group-hover:text-white">
                             Coming Soon
                           </span>
@@ -340,6 +462,10 @@ export default function MenuBar() {
           </div>
         ))}
       </div>
+
+      <div className="flex-1 flex justify-center">
+        <MenuBarTypography />
+      </div>
       
       <div className="ml-auto flex items-center gap-4 pr-2">
         <div className="flex items-center gap-1.5 text-[10px] text-neutral-400">
@@ -356,6 +482,5 @@ export default function MenuBar() {
         fileType={pendingFile?.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'pptx'}
       />
     </div>
-
   );
 }
