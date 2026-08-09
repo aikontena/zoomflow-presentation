@@ -16,7 +16,8 @@ import {
   Plus,
   MonitorPlay,
   Bookmark as BookmarkIcon,
-  Layout
+  Layout,
+  Trash2
 } from 'lucide-react';
 import { PresentationPathPanel } from './PresentationPathPanel';
 import { IconLibrary } from './IconLibrary';
@@ -57,6 +58,7 @@ export default function LeftSidebar() {
     selection,
     setSelection,
     addObject,
+    deleteObjects,
     requestTemplate,
     setViewport,
     viewport
@@ -264,6 +266,16 @@ export default function LeftSidebar() {
                             title="Duplicate"
                           >
                             <History size={12} />
+                          </button>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteObjects([frame.id]);
+                            }}
+                            className="p-1.5 bg-white/90 shadow-sm border border-neutral-100 rounded text-red-500 hover:bg-red-50"
+                            title="Delete"
+                          >
+                            <Trash2 size={12} />
                           </button>
                         </div>
                       </div>

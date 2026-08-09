@@ -221,6 +221,7 @@ export default function Canvas() {
   const undo = useCanvasStore(state => state.undo);
   const redo = useCanvasStore(state => state.redo);
   const duplicateObjects = useCanvasStore(state => state.duplicateObjects);
+  const activeOverlay = useCanvasStore(state => state.activeOverlay);
   
   const { zoomTo, resetZoom } = useViewportController();
   
@@ -494,8 +495,11 @@ export default function Canvas() {
   };
 
 
+  const isEditorActive = !activeOverlay || activeOverlay === null;
+
   return (
-    <div className={`relative h-full w-full overflow-hidden outline-none flex flex-col`} 
+    <div className={`relative h-full w-full overflow-hidden outline-none flex flex-col transition-opacity duration-300 ${!isEditorActive ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} 
+
          style={{ 
            backgroundColor: viewport.zoom < 0.2 ? (useCanvasStore.getState().presentationSettings.backgroundColor || '#f8f9fa') : (useCanvasStore.getState().presentationSettings.backgroundColor || '#f8f9fa'),
            backgroundImage: useCanvasStore.getState().presentationSettings.backgroundImage ? `url(${useCanvasStore.getState().presentationSettings.backgroundImage})` : 'none',
