@@ -14,7 +14,9 @@ import {
   AlignJustify,
   Plus,
   Minus,
-  Palette
+  Palette,
+  Undo2,
+  Redo2
 } from 'lucide-react';
 import { SlideImporter } from '@/lib/slide-importer';
 import { toast } from 'sonner';
