@@ -41,7 +41,7 @@ export const SlideDesignProperties = ({ object }: { object: CanvasObject }) => {
   const updateObject = useCanvasStore(state => state.updateObject);
   const objects = useCanvasStore(state => state.objects);
   
-  const design = object.frameDesign || {
+  const design = {
     backgroundType: 'solid',
     backgroundColor: '#ffffff',
     borderWidth: 1,
@@ -49,8 +49,13 @@ export const SlideDesignProperties = ({ object }: { object: CanvasObject }) => {
     borderStyle: 'solid',
     borderRadius: 0,
     aspectRatio: '16:9',
-    layout: 'blank'
+    layout: 'blank',
+    shadow: 'none',
+    opacity: 1,
+    blur: 0,
+    ...(object.frameDesign || {})
   };
+
 
   const updateDesign = (patch: Partial<NonNullable<CanvasObject['frameDesign']>>) => {
     updateObject(object.id, { 
