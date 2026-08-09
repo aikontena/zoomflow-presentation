@@ -117,7 +117,7 @@ export default function Footer() {
                     <input 
                       type="color" 
                       value={presentationSettings.backgroundColor || "#ffffff"}
-                      onChange={(e) => updatePresentationSettings({ backgroundColor: e.target.value, backgroundImage: '' })}
+                      onChange={(e) => updatePresentationSettings({ backgroundColor: e.target.value })}
                       className="absolute inset-0 opacity-0 cursor-pointer"
                     />
                   </button>

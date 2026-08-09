@@ -224,6 +224,7 @@ export default function Canvas() {
   const activeTool = useCanvasStore(state => state.activeTool);
   const setActiveTool = useCanvasStore(state => state.setActiveTool);
   const activeOverlay = useCanvasStore(state => state.activeOverlay);
+  const presentationSettings = useCanvasStore(state => state.presentationSettings);
   
   const { zoomTo, resetZoom } = useViewportController();
   
