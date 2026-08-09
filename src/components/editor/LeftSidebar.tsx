@@ -107,20 +107,6 @@ export default function LeftSidebar() {
         ))}
         <div className="mt-auto flex flex-col items-center gap-4 mb-4">
           <button 
-            onClick={() => undo()}
-            className="p-3 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-xl transition-colors"
-            title="Undo (Ctrl+Z)"
-          >
-            <Undo2 size={20} />
-          </button>
-          <button 
-            onClick={() => redo()}
-            className="p-3 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-xl transition-colors"
-            title="Redo (Ctrl+Shift+Z)"
-          >
-            <Redo2 size={20} />
-          </button>
-          <button 
             onClick={() => setActiveOverlay('settings')}
             className="p-3 text-neutral-500 hover:text-neutral-900 transition-colors"
           >
