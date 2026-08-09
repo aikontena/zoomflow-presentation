@@ -286,45 +286,63 @@ export default function PresentationMode() {
             willChange: 'transform',
           }}
         >
-          {objects.map(obj => (
-            <div
-              key={obj.id}
-              className="absolute"
-              style={{
-                left: obj.x,
-                top: obj.y,
-                width: obj.width,
-                height: obj.height,
-                transform: `rotate(${obj.rotation || 0}deg)`,
-                backgroundColor: (obj.type !== 'text' && obj.type !== 'frame' && obj.type !== 'icon') ? obj.fill : 'transparent',
-                background: obj.type === 'frame' ? obj.fill : undefined,
-                border: obj.type === 'frame' ? '1px solid rgba(0,0,0,0.1)' : 'none',
-                borderRadius: obj.type === 'circle' ? '50%' : '0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: obj.fill || 'black',
-                fontSize: obj.fontSize || (obj.type === 'frame' ? 12 : 16),
-                pointerEvents: 'none',
-                userSelect: 'none',
-                filter: obj.shadow ? 'drop-shadow(0 4px 6px rgba(0,0,0,0.25))' : undefined,
-                zIndex: obj.type === 'frame' ? -1 : 1,
-                opacity: obj.opacity ?? 1,
-              }}
-            >
-              {obj.type === 'text' && obj.text}
-              {obj.type === 'icon' && obj.iconName && (
-                <div className="w-full h-full p-[10%]">
-                  <IconRenderer
-                    name={obj.iconName}
-                    size="100%"
-                    color={obj.fill}
-                    strokeWidth={obj.strokeWidth || 2}
+          {objects.map(obj => {
+            const isFrame = obj.type === 'frame';
+            const design = obj.frameDesign;
+            
+            return (
+              <div
+                key={obj.id}
+                className="absolute"
+                style={{
+                  left: obj.x,
+                  top: obj.y,
+                  width: obj.width,
+                  height: obj.height,
+                  transform: `rotate(${obj.rotation || 0}deg)`,
+                  backgroundColor: (obj.type !== 'text' && !isFrame && obj.type !== 'icon' && obj.type !== 'video') ? obj.fill : (isFrame ? (design?.backgroundColor || obj.fill) : 'transparent'),
+                  background: isFrame ? (
+                    design?.backgroundType === 'gradient' ? design.backgroundGradient :
+                    design?.backgroundType === 'image' ? `url(${design.backgroundImage}) center/cover no-repeat` :
+                    design?.backgroundType === 'solid' ? design.backgroundColor :
+                    obj.fill
+                  ) : undefined,
+                  border: isFrame ? `${design?.borderWidth ?? 1}px ${design?.borderStyle || 'solid'} ${design?.borderColor || 'rgba(0,0,0,0.1)'}` : (obj.strokeWidth ? `${obj.strokeWidth}px solid ${obj.stroke || 'black'}` : 'none'),
+                  borderRadius: obj.type === 'circle' ? '50%' : `${design?.borderRadius || obj.borderRadius || 0}px`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: obj.fill || 'black',
+                  fontSize: obj.fontSize || (isFrame ? 12 : 16),
+                  pointerEvents: 'none',
+                  userSelect: 'none',
+                  filter: (obj.shadow || design?.shadow !== 'none') ? `drop-shadow(${obj.shadowOffsetX || 0}px ${obj.shadowOffsetY || (design?.shadow === 'card' ? 10 : 4)}px ${obj.shadowBlur || (design?.shadow === 'card' ? 20 : 6)}px ${obj.shadowColor || 'rgba(0,0,0,0.25)'})` : undefined,
+                  boxShadow: isFrame ? (design?.shadow === 'glass' ? 'inset 0 0 20px rgba(255,255,255,0.5)' : '0 4px 6px -1px rgb(0 0 0 / 0.1)') : 'none',
+                  backdropFilter: design?.shadow === 'glass' ? `blur(${design.blur || 10}px)` : undefined,
+                  zIndex: isFrame ? -1 : 1,
+                  opacity: design?.opacity ?? obj.opacity ?? 1,
+                }}
+              >
+                {obj.type === 'text' && obj.text}
+                {obj.type === 'icon' && obj.iconName && (
+                  <div className="w-full h-full p-[10%]">
+                    <IconRenderer
+                      name={obj.iconName}
+                      size="100%"
+                      color={obj.fill}
+                      strokeWidth={obj.strokeWidth || 2}
+                    />
+                  </div>
+                )}
+                {obj.type === 'image' && obj.src && (
+                  <img 
+                    src={obj.src} 
+                    style={{ width: '100%', height: '100%', objectFit: obj.objectFit || 'contain' }} 
                   />
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            );
+          })}
         </div>
 
         <LaserPointer />
