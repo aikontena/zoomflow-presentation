@@ -17,7 +17,8 @@ import {
   MonitorPlay,
   Bookmark as BookmarkIcon,
   Layout,
-  Trash2
+  Trash2,
+  Palette
 } from 'lucide-react';
 import { PresentationPathPanel } from './PresentationPathPanel';
 import { IconLibrary } from './IconLibrary';
@@ -29,6 +30,7 @@ import { useCanvasStore } from '@/lib/canvas-store';
 import { TEMPLATES } from '@/lib/templates';
 import { toast } from 'sonner';
 import { useViewportController } from './ViewportController';
+import { SlideDesignProperties } from './properties/SlideDesignProperties';
 
 
 const TABS = [
@@ -129,6 +131,18 @@ export default function LeftSidebar() {
             </button>
           </div>
           <div className="flex-1 p-4 text-sm text-neutral-500 overflow-y-auto">
+            {activeTab === 'design' && (
+              <div className="space-y-4">
+                {selection.length > 0 && objects.find(o => selection.includes(o.id))?.type === 'frame' ? (
+                  <SlideDesignProperties object={objects.find(o => selection.includes(o.id))!} />
+                ) : (
+                  <div className="text-center py-12 px-6 border-2 border-dashed border-neutral-100 rounded-xl bg-neutral-50/50">
+                    <Palette className="mx-auto mb-3 text-neutral-300" size={32} strokeWidth={1.5} />
+                    <p className="text-xs text-neutral-400 font-medium">Select a frame to access slide design controls.</p>
+                  </div>
+                )}
+              </div>
+            )}
             {activeTab === 'path' && <PresentationPathPanel />}
             {activeTab === 'bookmarks' && (
               <div className="space-y-4">
