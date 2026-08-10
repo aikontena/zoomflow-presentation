@@ -64,7 +64,7 @@ export default function RightSidebar() {
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="py-4 border-b border-neutral-100 last:border-0">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">{title}</h3>
+        <h3 className="text-[11px] font-extrabold text-neutral-400 uppercase tracking-wider">{title}</h3>
         <ChevronDown size={12} className="text-neutral-300" />
       </div>
       <div className="space-y-3">
@@ -86,7 +86,7 @@ export default function RightSidebar() {
     return (
       <div className="w-64 h-full bg-white border-l border-neutral-200 flex flex-col overflow-y-auto">
         <div className="p-4 border-b border-neutral-100 flex items-center justify-between">
-          <h2 className="font-semibold text-neutral-900">Project Settings</h2>
+          <h2 className="font-extrabold text-neutral-900">Project Settings</h2>
           <button 
             onClick={() => setRightSidebarVisible(false)}
             className="p-1.5 hover:bg-neutral-100 rounded-lg text-neutral-400 hover:text-neutral-600 transition-colors"
@@ -249,7 +249,7 @@ export default function RightSidebar() {
   return (
     <div className="w-64 h-full bg-white border-l border-neutral-200 flex flex-col overflow-y-auto">
       <div className="p-4 border-b border-neutral-100 flex items-center justify-between">
-        <h2 className="font-semibold text-neutral-900 capitalize">{selectedObject.type} Properties</h2>
+        <h2 className="font-extrabold text-neutral-900 capitalize">{selectedObject.type} Properties</h2>
         <button 
           onClick={() => setRightSidebarVisible(false)}
           className="p-1.5 hover:bg-neutral-100 rounded-lg text-neutral-400 hover:text-neutral-600 transition-colors"

@@ -28,9 +28,9 @@ import { ImportModal } from './ImportModal';
 import { useState, useEffect, useRef } from 'react';
 
 const FONT_FAMILIES = [
+  'Inter', 'Space Grotesk', 'DM Sans', 'Poppins', 'Montserrat', 'Playfair Display',
   'Arial', 'Calibri', 'Aptos', 'Times New Roman', 'Georgia', 'Verdana', 'Tahoma',
-  'Trebuchet MS', 'Helvetica', 'Roboto', 'Open Sans', 'Lato', 'Montserrat',
-  'Poppins', 'Inter', 'Nunito', 'Playfair Display', 'Merriweather', 'Oswald',
+  'Roboto', 'Open Sans', 'Lato', 'Nunito', 'Merriweather', 'Oswald',
   'Raleway', 'Source Sans Pro'
 ];
 
@@ -59,7 +59,7 @@ const MenuBarTypography = () => {
           className="flex items-center gap-2 h-8 bg-primary/10 text-primary rounded-md px-3 border border-primary/20 hover:bg-primary/20 transition-all group"
         >
           <Palette size={14} className="group-hover:rotate-12 transition-transform" />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Open Slide Design Engine</span>
+          <span className="text-[10px] font-extrabold uppercase tracking-wider">Open Slide Design Engine</span>
         </button>
       )}
       <div className="flex items-center gap-0.5 bg-neutral-100/50 rounded-md px-1 border border-neutral-200/50 h-8">
