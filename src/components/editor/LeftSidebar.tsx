@@ -238,46 +238,69 @@ export default function LeftSidebar() {
                 </div>
                 <div className="grid grid-cols-1 gap-4">
                   {objects.filter(o => o.type === 'frame').map((frame, index) => (
-                    <div key={frame.id} className="group relative flex flex-col gap-2">
+                    <div key={frame.id} className="group relative flex items-start gap-4">
+                      {/* Slide Indicator & Sequence Number */}
+                      <div className="flex flex-col items-center pt-2">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-black transition-all border-2 ${
+                          selection.includes(frame.id) 
+                            ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-110' 
+                            : 'bg-white text-neutral-400 border-neutral-100 group-hover:border-neutral-200'
+                        }`}>
+                          {index + 1}
+                        </div>
+                        {index < objects.filter(o => o.type === 'frame').length - 1 && (
+                          <div className="w-0.5 h-16 bg-neutral-100 my-2 rounded-full" />
+                        )}
+                      </div>
+
+                      {/* Notebook-style Card */}
                       <div 
                         onClick={() => {
                           setSelection([frame.id]);
                           zoomToFrame(frame.id);
                         }}
-                        className={`aspect-video rounded-lg border-2 overflow-hidden relative transition-all cursor-pointer shadow-sm ${
-                          selection.includes(frame.id) ? 'border-primary ring-2 ring-primary/20' : 'border-neutral-200 hover:border-neutral-300'
+                        className={`flex-1 rounded-2xl border-2 transition-all cursor-pointer shadow-sm overflow-hidden bg-white group/card ${
+                          selection.includes(frame.id) ? 'border-primary ring-4 ring-primary/10 -translate-y-1' : 'border-neutral-100 hover:border-neutral-200 hover:-translate-y-0.5'
                         }`}
                       >
-                        <FramePreview frame={frame} allObjects={objects} />
-                        <div className="absolute bottom-0 inset-x-0 bg-white/95 backdrop-blur-sm px-2.5 py-1.5 text-[10px] font-bold border-t border-neutral-100 flex justify-between items-center">
-                          <span className="truncate max-w-[150px] uppercase tracking-tight text-neutral-700">{frame.text || `Frame ${index + 1}`}</span>
-                          <span className="text-neutral-400 font-mono text-[9px]">#{index + 1}</span>
+                        <div className="aspect-video relative">
+                          <FramePreview frame={frame} allObjects={objects} />
+                          {/* Top-right Actions */}
+                          <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity">
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addObject({ ...frame, id: undefined, x: frame.x + 50, y: frame.y + 50 } as any);
+                              }}
+                              className="p-1.5 bg-white/90 backdrop-blur shadow-sm border border-neutral-100 rounded-lg text-neutral-500 hover:text-primary transition-colors"
+                            >
+                              <History size={12} />
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteObjects([frame.id]);
+                              }}
+                              className="p-1.5 bg-white/90 backdrop-blur shadow-sm border border-neutral-100 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
                         </div>
                         
-                        {/* Frame Actions Overlay */}
-                        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const newX = frame.x + 50;
-                              const newY = frame.y + 50;
-                              addObject({ ...frame, id: undefined, x: newX, y: newY } as any);
-                            }}
-                            className="p-1.5 bg-white/90 shadow-sm border border-neutral-100 rounded text-neutral-500 hover:text-primary hover:bg-white"
-                            title="Duplicate"
-                          >
-                            <History size={12} />
-                          </button>
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteObjects([frame.id]);
-                            }}
-                            className="p-1.5 bg-white/90 shadow-sm border border-neutral-100 rounded text-red-500 hover:bg-red-50"
-                            title="Delete"
-                          >
-                            <Trash2 size={12} />
-                          </button>
+                        {/* Information Row */}
+                        <div className="px-3 py-2.5 flex items-center justify-between border-t border-neutral-50">
+                          <div className="flex flex-col gap-0.5 min-w-0">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-neutral-900 truncate">
+                              {frame.text || `Untitled Slide`}
+                            </span>
+                            <span className="text-[9px] font-bold text-neutral-400 uppercase">
+                              {frame.settings?.duration || 1200}ms • {frame.settings?.easing || 'smooth'}
+                            </span>
+                          </div>
+                          <div className={`p-1 rounded-md transition-colors ${selection.includes(frame.id) ? 'text-primary' : 'text-neutral-300'}`}>
+                            <Layout size={14} />
+                          </div>
                         </div>
                       </div>
                     </div>
