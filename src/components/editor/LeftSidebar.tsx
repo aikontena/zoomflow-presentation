@@ -93,27 +93,27 @@ export default function LeftSidebar() {
   return (
     <div className="flex h-full bg-white border-r border-neutral-200">
       {/* Icon Bar */}
-      <div className="w-16 flex flex-col items-center py-4 gap-4 border-r border-neutral-100 bg-neutral-50/50">
+      <div className="w-20 flex flex-col items-center py-6 gap-5 border-r border-neutral-100 bg-neutral-50/30">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(activeTab === tab.id ? null : tab.id)}
-            className={`p-3 rounded-xl transition-all ${
+            className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all glass-3d hover:glass-3d-active group ${
               activeTab === tab.id 
-                ? 'bg-white text-primary shadow-sm border border-neutral-200' 
-                : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
+                ? 'glass-3d-active' 
+                : 'text-neutral-500'
             }`}
             title={tab.label}
           >
-            <tab.icon size={20} />
+            <tab.icon size={22} className="group-hover:scale-110 transition-transform duration-300" />
           </button>
         ))}
         <div className="mt-auto flex flex-col items-center gap-4 mb-4">
           <button 
             onClick={() => setActiveOverlay('settings')}
-            className="p-3 text-neutral-500 hover:text-neutral-900 transition-colors"
+            className="w-12 h-12 flex items-center justify-center rounded-2xl text-neutral-500 glass-3d hover:glass-3d-active group"
           >
-            <Settings size={20} />
+            <Settings size={22} className="group-hover:rotate-90 transition-transform duration-500" />
           </button>
         </div>
       </div>
