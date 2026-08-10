@@ -216,8 +216,11 @@ export default function LeftSidebar() {
             )}
             {activeTab === 'pages' && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-neutral-400">Total Frames: {objects.filter(o => o.type === 'frame').length}</p>
+                <div className="flex items-center justify-between bg-neutral-50/50 p-2 rounded-xl border border-neutral-100 mb-2">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase text-neutral-400">Inventory</span>
+                    <p className="text-[11px] font-bold text-neutral-900">{objects.filter(o => o.type === 'frame').length} Slides</p>
+                  </div>
                   <button 
                     onClick={() => {
                       addObject({
@@ -228,12 +231,12 @@ export default function LeftSidebar() {
                         height: 450,
                         rotation: 0,
                         fill: '#ffffff',
-                        text: `Frame ${objects.filter(o => o.type === 'frame').length + 1}`
+                        text: `Slide ${objects.filter(o => o.type === 'frame').length + 1}`
                       });
                     }}
-                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold bg-primary text-white rounded hover:bg-primary/90 transition-colors"
+                    className="flex items-center gap-2 px-3 py-1.5 text-[10px] font-black bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 transition-all shadow-sm active:scale-95"
                   >
-                    <Plus size={12} /> NEW FRAME
+                    <Plus size={12} /> ADD SLIDE
                   </button>
                 </div>
                 <div className="grid grid-cols-1 gap-4">
