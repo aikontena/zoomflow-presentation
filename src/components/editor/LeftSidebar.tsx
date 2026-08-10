@@ -122,7 +122,7 @@ export default function LeftSidebar() {
       {activeTab && (
         <div className="w-[320px] flex flex-col animate-in slide-in-from-left duration-200 bg-white shadow-xl z-10 border-r border-neutral-100">
           <div className="p-4 border-b border-neutral-100 flex items-center justify-between">
-            <h2 className="font-semibold text-neutral-900 capitalize">{activeTab}</h2>
+            <h2 className="font-extrabold text-neutral-900 capitalize">{activeTab}</h2>
             <button 
               onClick={() => setActiveTab(null)}
               className="p-1 hover:bg-neutral-100 rounded-md text-neutral-400"
@@ -207,7 +207,7 @@ export default function LeftSidebar() {
                     const label = prompt('Bookmark Label:');
                     if (label) useCanvasStore.getState().addBookmark(label);
                   }}
-                  className="w-full py-2 bg-neutral-900 text-white rounded-lg font-medium shadow-sm hover:bg-neutral-800 transition-all flex items-center justify-center gap-2 mt-4"
+                  className="w-full py-2 bg-neutral-900 text-white rounded-lg font-extrabold shadow-sm hover:bg-neutral-800 transition-all flex items-center justify-center gap-2 mt-4"
                 >
                   <Plus size={16} />
                   Add Bookmark

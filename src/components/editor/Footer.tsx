@@ -17,7 +17,7 @@ export default function Footer() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 text-neutral-500">
               <Timer size={14} />
-              <span className="text-[10px] font-bold uppercase tracking-tight">Transition Speed</span>
+              <span className="text-[10px] font-extrabold uppercase tracking-tight">Transition Speed</span>
             </div>
             <div className="flex items-center gap-3 w-40">
               <Slider
@@ -43,7 +43,7 @@ export default function Footer() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 text-neutral-500">
               <Maximize2 size={14} />
-              <span className="text-[10px] font-bold uppercase tracking-tight">Presentation Zoom</span>
+              <span className="text-[10px] font-extrabold uppercase tracking-tight">Presentation Zoom</span>
             </div>
             <div className="flex items-center gap-3 w-40">
               <Slider
@@ -69,7 +69,7 @@ export default function Footer() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 text-neutral-500">
               <ZoomOut size={14} />
-              <span className="text-[10px] font-bold uppercase tracking-tight">Spatial Zoom Out</span>
+              <span className="text-[10px] font-extrabold uppercase tracking-tight">Spatial Zoom Out</span>
             </div>
             <div className="flex items-center">
               <button
@@ -153,7 +153,7 @@ export default function Footer() {
             }
             startPresentation();
           }}
-          className="flex items-center gap-2 bg-primary text-white px-6 py-2 rounded-full hover:bg-primary/90 transition-all text-sm font-bold shadow-lg shadow-primary/20 active:scale-95 group"
+          className="flex items-center gap-2 bg-primary text-white px-6 py-2 rounded-full hover:bg-primary/90 transition-all text-sm font-extrabold shadow-lg shadow-primary/20 active:scale-95 group"
         >
           <Play size={16} fill="currentColor" className="group-hover:scale-110 transition-transform" />
           PRESENTATION MODE
